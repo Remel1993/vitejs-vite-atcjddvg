@@ -1,10 +1,9 @@
-```react
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { 
   Trophy, Settings, Calendar, History, Swords, ChevronLeft, Save, 
   Users, BarChart3, Play, RotateCcw, Check, Dice1, Dice2, Dice3, 
@@ -17,6 +16,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 // 1. CONSTANTES DEL SISTEMA Y PRESETS
 // ==========================================
 const APP_ID = 'dice-football-hub-elite-v5';
+const STORAGE_KEY = 'dice-football-hub-v1';
 
 const PRESETS = {
   ES: [
@@ -210,10 +210,11 @@ const PRESETS = {
 // ==========================================
 
 let globalAudioCtx = null;
+
 const playClick = () => {
   try {
     if (!globalAudioCtx) {
-      const AudioContext = window.AudioContext || window['webkitAudioContext'];
+      const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
       if (AudioContext) globalAudioCtx = new AudioContext();
     }
     if (!globalAudioCtx) return;
@@ -233,7 +234,7 @@ const playClick = () => {
   } catch (e) {}
 };
 
-const pickLeague = (preset, guaranteed, extra) => {
+const pickLeague = (preset: any[], guaranteed: number, extra: number) => {
   const top = preset.slice(0, guaranteed);
   const rest = [...preset.slice(guaranteed, guaranteed + 6)].sort(() => Math.random() - 0.5).slice(0, extra);
   return [...top, ...rest];
@@ -253,7 +254,7 @@ const drawKnockoutGroups = (pool, isWC, randomize) => {
   let groups = Array.from({length: 8}, () => []);
   const sortedPool = [...pool].sort((a, b) => (b.att + b.opp + b.def) - (a.att + a.opp + a.def));
   let pots = [sortedPool.slice(0, 8), sortedPool.slice(8, 16), sortedPool.slice(16, 24), sortedPool.slice(24, 32)];
-  
+
   if (randomize) {
      pots = pots.map(pot => [...pot].sort(() => Math.random() - 0.5));
   }
@@ -271,6 +272,7 @@ const drawKnockoutGroups = (pool, isWC, randomize) => {
            let conflict = false;
            if (team.region === 'EU' && regionCount >= 2) conflict = true;
            if (team.region !== 'EU' && regionCount >= 1) conflict = true;
+
            if (!conflict) {
               team.used = true;
               groups[groupIdx].push(team);
@@ -285,6 +287,7 @@ const drawKnockoutGroups = (pool, isWC, randomize) => {
      let workingPots = pots.map(pot => pot.map(t => ({...t, used: false})));
      pots = workingPots;
      let success = solve(0, 0);
+
      if (!success) {
         groups = Array.from({length: 8}, (_, i) => [pots[0][i], pots[1][i], pots[2][i], pots[3][i]]);
      }
@@ -317,6 +320,7 @@ const drawKnockoutGroups = (pool, isWC, randomize) => {
   }
 
   const formattedGroups = groups.map((g, i) => ({ name: 'Grupo ' + String.fromCharCode(65 + i), teamIds: g.map(t => t.id) }));
+
   return { teams: pool, groups: formattedGroups, matchday: 0, history: [], phase: 'groups', showWinner: false, disqualified: false, userTeamId: pool[0].id, bracket: null };
 };
 
@@ -340,9 +344,10 @@ const generateKnockoutBrackets = (comp) => {
     const teams = comp.teams.filter(t => g.teamIds && g.teamIds.includes(t.id)).sort((a, b) => b.pts - a.pts || (b.gf - b.ga) - (a.gf - a.ga));
     return { first: teams[0], second: teams[1] };
   });
+
   const numGroups = groupResults.length;
   const bracket = { Octavos: [], Cuartos: [], Semis: [], Final: [{ id: 'F1', hId: null, aId: null, sh: null, sa: null, penH: null, penA: null, sh2: null, sa2: null }] };
-  
+
   if (numGroups === 8) {
     for (let i = 0; i < 8; i += 2) {
       if (groupResults[i] && groupResults[i+1]) {
@@ -372,10 +377,12 @@ const generateLeagueSchedule = (teams, twoLegged = true) => {
   const teamIds = teams.map(t => t.id);
   const rounds = [];
   const totalRounds = twoLegged ? (n - 1) * 2 : (n - 1);
+
   for (let j = 0; j < totalRounds; j++) {
     const round = [];
     const isReturn = j >= (n - 1);
     const r = isReturn ? j - (n - 1) : j;
+
     for (let i = 0; i < n / 2; i++) {
       const home = i === 0 ? teamIds[n - 1] : teamIds[(r + i) % (n - 1)];
       const away = teamIds[(n - 1 - i + r) % (n - 1)];
@@ -390,7 +397,7 @@ const generateLeagueSchedule = (teams, twoLegged = true) => {
 // ==========================================
 // 3. COMPONENTES ATÓMICOS
 // ==========================================
-const COUNTRY_CODES = {
+const COUNTRY_CODES: Record<string, string> = {
   'afghanistan': 'af', 'afganistán': 'af', 'albania': 'al', 'algeria': 'dz', 'argelia': 'dz',
   'andorra': 'ad', 'angola': 'ao', 'argentina': 'ar', 'armenia': 'am', 'australia': 'au',
   'austria': 'at', 'azerbaijan': 'az', 'azerbaiyán': 'az', 'bahrain': 'bh', 'baréin': 'bh',
@@ -444,10 +451,10 @@ const COUNTRY_CODES = {
   'emiratos arabes unidos': 'ae', 'united arab emirates': 'ae', 'united states': 'us',
   'usa': 'us', 'estados unidos': 'us', 'uruguay': 'uy', 'uzbekistan': 'uz', 'venezuela': 've',
   'vietnam': 'vn', 'wales': 'gb-wls', 'gales': 'gb-wls', 'yemen': 'ye', 'zambia': 'zm',
-  'zimbabwe': 'zw'
+  'zimbabwe': 'zw',
 };
 
-const getCountryCode = (name) => {
+const getCountryCode = (name: string): string | null => {
   if (!name) return null;
   const key = name.toLowerCase().trim();
   return COUNTRY_CODES[key] || null;
@@ -468,7 +475,7 @@ const Shield = ({ color1, color2, initial, size = 'md', isFlag = false }) => {
             src={`https://flagcdn.com/${code}.svg`}
             alt={initial}
             className='w-full h-full object-cover'
-            onError={(e) => { e.target.style.display = 'none'; }}
+            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
           />
         </div>
       );
@@ -574,7 +581,7 @@ const PenaltyDots = ({ history }) => {
 };
 
 // ==========================================
-// 4. VISTAS SECUNDARIAS (MÓDULOS DE UI)
+// 4. VISTAS SECUNDARIAS
 // ==========================================
 
 const ArchiveView = ({ setView, archive, selectedArchiveEntry, setSelectedArchiveEntry }) => (
@@ -613,7 +620,7 @@ const ArchiveView = ({ setView, archive, selectedArchiveEntry, setSelectedArchiv
             <Trophy size={56} className='text-yellow-400 mx-auto mb-4 drop-shadow-[0_0_15px_rgba(250,204,21,0.6)]' />
             <h3 className='text-2xl font-black italic uppercase mb-1 text-white'>{selectedArchiveEntry.name}</h3>
             <p className='text-[10px] font-bold text-slate-300 uppercase tracking-widest mb-6'>{selectedArchiveEntry.date}</p>
-          
+            
             <div className='bg-black/30 rounded-3xl p-6 mb-6 border border-white/10 backdrop-blur-sm'>
               <h4 className='text-[10px] font-black uppercase text-yellow-500/80 mb-4 tracking-widest'>Campeón del Torneo</h4>
               <div className='flex flex-col items-center justify-center gap-3'>
@@ -800,7 +807,7 @@ const HubView = ({ setView, setActiveCompId, setCompView, comps }) => {
 
 const ConfigPanel = ({ initialComp, compId, hasStarted, onSave, onCancel }) => {
   const [draft, setDraft] = useState(() => JSON.parse(JSON.stringify(initialComp)));
-  const [drawModal, setDrawModal] = useState(null); 
+  const [drawModal, setDrawModal] = useState(null);
 
   const updateTeamAttr = (id, field, val) => {
     setDraft(prev => ({ ...prev, teams: prev.teams.map(t => t.id === id ? { ...t, [field]: val } : t) }));
@@ -817,7 +824,6 @@ const ConfigPanel = ({ initialComp, compId, hasStarted, onSave, onCancel }) => {
     const pool = isWC ? [...PRESETS.WC] : buildCLPool();
     const initializedPool = pool.map((t, i) => ({ ...t, id: i + 1, p: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, pts: 0 }));
     
-    // 1. Crear y ordenar bombos por fuerza para mostrarlos
     initializedPool.sort((a, b) => (b.att + b.opp + b.def) - (a.att + a.opp + a.def));
     const pots = [
       initializedPool.slice(0, 8),
@@ -826,10 +832,8 @@ const ConfigPanel = ({ initialComp, compId, hasStarted, onSave, onCancel }) => {
       initializedPool.slice(24, 32)
     ];
 
-    // 2. Realizar el Sorteo de acuerdo a las Reglas
     const drawData = drawKnockoutGroups(initializedPool, isWC, type === 'shuffle');
 
-    // 3. Mostrar Modal Visual interactivo
     setDrawModal({
       step: 'pots',
       pots,
@@ -960,54 +964,81 @@ const ConfigPanel = ({ initialComp, compId, hasStarted, onSave, onCancel }) => {
 // 5. APLICACIÓN PRINCIPAL Y LÓGICA DE COMPETICIÓN
 // ==========================================
 
-const baseTeam = (preset) => PRESETS[preset].map((t, i) => ({ ...t, id: i + 1, p: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, pts: 0 }));
-const defaultComps = {
-  'L1': { type: 'league', name: 'Liga Española', teams: baseTeam('ES'), matchday: 0, history: [], userTeamId: 1, showWinner: false, disqualified: false },
-  'L2': { type: 'league', name: 'Liga Italiana', teams: baseTeam('IT'), matchday: 0, history: [], userTeamId: 1, showWinner: false, disqualified: false },
-  'L3': { type: 'league', name: 'Liga Inglesa', teams: baseTeam('EN'), matchday: 0, history: [], userTeamId: 1, showWinner: false, disqualified: false },
-  'L4': { type: 'league', name: 'Liga Alemana', teams: baseTeam('DE'), matchday: 0, history: [], userTeamId: 1, showWinner: false, disqualified: false },
-  'L5': { type: 'league', name: 'Liga Holandesa', teams: baseTeam('NL'), matchday: 0, history: [], userTeamId: 1, showWinner: false, disqualified: false },
-  'L6': { type: 'league', name: 'Liga Francesa', teams: baseTeam('FR'), matchday: 0, history: [], userTeamId: 1, showWinner: false, disqualified: false },
-  'L7': { type: 'league', name: 'Miscelánea', teams: baseTeam('MI'), matchday: 0, history: [], userTeamId: 1, showWinner: false, disqualified: false },
-  'C1': { type: 'cup', name: 'Champions League', teams: [], matchday: 0, history: [], userTeamId: 1, showWinner: false, phase: 'groups', bracket: null, disqualified: false },
-  'C2': { type: 'cup', name: 'Copa del Mundo', teams: [], matchday: 0, history: [], userTeamId: 1, showWinner: false, phase: 'groups', bracket: null, disqualified: false }
-};
-
 export default function App() {
   const [view, setView] = useState('hub');
   const [activeCompId, setActiveCompId] = useState(null);
   const [compView, setCompView] = useState('main');
-
-  // SSR-Safe Persistence state
+  const [showExitModal, setShowExitModal] = useState(false);
   const [archive, setArchive] = useState([]);
-  const [comps, setComps] = useState(defaultComps);
-  const [isClient, setIsClient] = useState(false);
   const [selectedArchiveEntry, setSelectedArchiveEntry] = useState(null);
 
-  useEffect(() => {
-    setIsClient(true);
+  // --- PERSISTENCIA ---
+  const guardarProgreso = useCallback((nuevoEstado) => {
     try {
-      const savedArchive = window.localStorage.getItem('hub-elite-archive');
-      if (savedArchive) setArchive(JSON.parse(savedArchive));
-
-      const savedComps = window.localStorage.getItem('hub-elite-comps');
-      if (savedComps) setComps(JSON.parse(savedComps));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(nuevoEstado));
     } catch (e) {
-      console.warn("Error cargando datos locales:", e);
+      console.error('No se pudo guardar el progreso', e);
     }
   }, []);
 
-  useEffect(() => {
-    if (isClient) {
-      window.localStorage.setItem('hub-elite-archive', JSON.stringify(archive));
+  const cargarProgreso = useCallback(() => {
+    try {
+      const guardado = localStorage.getItem(STORAGE_KEY);
+      if (guardado) {
+        const datos = JSON.parse(guardado);
+        setComps(datos.comps);
+        setArchive(datos.archive);
+        return true;
+      }
+    } catch (e) {
+      console.error('No se pudo cargar el progreso', e);
     }
-  }, [archive, isClient]);
+    return false;
+  }, []);
+
+  const [comps, setComps] = useState(() => {
+    const baseTeam = (preset) => PRESETS[preset].map((t, i) => ({ ...t, id: i + 1, p: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, pts: 0 }));
+    return {
+      'L1': { type: 'league', name: 'Liga Española', teams: baseTeam('ES'), matchday: 0, history: [], userTeamId: 1, showWinner: false, disqualified: false },
+      'L2': { type: 'league', name: 'Liga Italiana', teams: baseTeam('IT'), matchday: 0, history: [], userTeamId: 1, showWinner: false, disqualified: false },
+      'L3': { type: 'league', name: 'Liga Inglesa', teams: baseTeam('EN'), matchday: 0, history: [], userTeamId: 1, showWinner: false, disqualified: false },
+      'L4': { type: 'league', name: 'Liga Alemana', teams: baseTeam('DE'), matchday: 0, history: [], userTeamId: 1, showWinner: false, disqualified: false },
+      'L5': { type: 'league', name: 'Liga Holandesa', teams: baseTeam('NL'), matchday: 0, history: [], userTeamId: 1, showWinner: false, disqualified: false },
+      'L6': { type: 'league', name: 'Liga Francesa', teams: baseTeam('FR'), matchday: 0, history: [], userTeamId: 1, showWinner: false, disqualified: false },
+      'L7': { type: 'league', name: 'Miscelánea', teams: baseTeam('MI'), matchday: 0, history: [], userTeamId: 1, showWinner: false, disqualified: false },
+      'C1': { type: 'cup', name: 'Champions League', teams: [], matchday: 0, history: [], userTeamId: 1, showWinner: false, phase: 'groups', bracket: null, disqualified: false },
+      'C2': { type: 'cup', name: 'Copa del Mundo', teams: [], matchday: 0, history: [], userTeamId: 1, showWinner: false, phase: 'groups', bracket: null, disqualified: false }
+    };
+  });
 
   useEffect(() => {
-    if (isClient) {
-      window.localStorage.setItem('hub-elite-comps', JSON.stringify(comps));
-    }
-  }, [comps, isClient]);
+    guardarProgreso({ comps, archive });
+  }, [comps, archive, guardarProgreso]);
+
+  useEffect(() => {
+    cargarProgreso();
+    window.history.pushState(null, '', window.location.href);
+
+    const handlePopState = () => {
+      window.history.pushState(null, '', window.location.href);
+      if (showExitModal) {
+        setShowExitModal(false);
+        return;
+      }
+      if (view === 'competition' && compView !== 'main') {
+        setCompView('main');
+      } else if (view !== 'hub') {
+        setView('hub');
+        setActiveCompId(null);
+        setCompView('main');
+      } else {
+        setShowExitModal(true);
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [view, compView, showExitModal, cargarProgreso]);
 
   useEffect(() => {
     const handler = (e) => { if (e.target.closest('button')) playClick(); };
@@ -1045,7 +1076,7 @@ export default function App() {
     const entry = { id: Date.now(), compId, name: comp.name, date: new Date().toLocaleDateString(), winner, teams: comp.teams, history: comp.history, bracket: comp.bracket, groups: comp.groups, type: comp.type };
     setArchive(prev => {
       const newArchive = [entry, ...prev];
-      return newArchive.slice(0, 5); 
+      return newArchive.slice(0, 5);
     });
   };
 
@@ -1059,6 +1090,7 @@ export default function App() {
     const home = activeComp.teams.find(t => t.id === homeId);
     const away = activeComp.teams.find(t => t.id === awayId);
     if (!home || !away) return;
+
     const isVuelta = activeCompId === 'C1' && activeComp.matchday % 2 !== 0 && activeComp.phase !== 'Final' && activeComp.phase !== 'groups';
     let aggregate = null;
     if (isVuelta && activeComp.bracket) {
@@ -1081,7 +1113,7 @@ export default function App() {
     setRolling(true);
     if (rollIntervalRef.current) clearInterval(rollIntervalRef.current);
     rollIntervalRef.current = setInterval(() => setMatchState(prev => prev ? { ...prev, lastDie: Math.floor(Math.random() * 6) + 1 } : prev), 100);
-    
+
     setTimeout(() => {
       if (rollIntervalRef.current) { clearInterval(rollIntervalRef.current); rollIntervalRef.current = null; }
       const die = Math.floor(Math.random() * 6) + 1;
@@ -1164,15 +1196,15 @@ export default function App() {
     let nextTurn = state.turn === 'H' ? 'A' : 'H';
     if (nextTurn === 'H' && nextOppH <= 0) nextTurn = 'A';
     if (nextTurn === 'A' && nextOppA <= 0) nextTurn = 'H';
-    
+
     if (nextOppH <= 0 && nextOppA <= 0) {
       const isChampions = activeCompId === 'C1';
       const isIda = isChampions && activeComp.matchday % 2 === 0 && activeComp.phase !== 'Final' && activeComp.phase !== 'groups';
       const isVuelta = isChampions && activeComp.matchday % 2 !== 0 && activeComp.phase !== 'Final' && activeComp.phase !== 'groups';
-      
+
       let needsPenalties = state.isKnockout && state.scoreH === state.scoreA && !isIda && !isVuelta;
       if (isVuelta && state.aggregate) if (state.aggregate.sh + state.scoreH === state.aggregate.sa + state.scoreA) needsPenalties = true;
-      
+
       if (needsPenalties) return { ...state, oppH: 0, oppA: 0, phase: 'penalties', penalties: { scoreH: 0, scoreA: 0, turn: 'H', shotsH: 0, shotsA: 0, phase: 'att', finished: false, historyH: [], historyA: [] }, logs: ['⚖️ ¡Empate global! Nos vamos a la tanda de penaltis.', ...state.logs] };
       return { ...state, oppH: 0, oppA: 0, finished: true, logs: ['🏁 Final del partido.', ...state.logs] };
     }
@@ -1210,7 +1242,7 @@ export default function App() {
 
     } else if (activeComp.type === 'cup' || activeComp.type === 'knockout') {
       const results = [{ hId: matchState.home.id, aId: matchState.away.id, sh: matchState.scoreH, sa: matchState.scoreA, penH: matchState.penalties?.scoreH, penA: matchState.penalties?.scoreA }];
-      
+
       if (activeComp.phase === 'groups') {
         const isWorldCup = activeCompId === 'C2';
         const maxMatchdays = isWorldCup ? 3 : 6;
@@ -1338,6 +1370,7 @@ export default function App() {
     setCompView('main');
   };
 
+  // Componente CompetitionView (es muy largo, se incluye completo)
   const CompetitionView = () => {
     if (!activeComp) return null;
     const hasStarted = activeComp.matchday > 0 || activeComp.history?.length > 0;
@@ -1497,527 +1530,4 @@ export default function App() {
               </motion.div>
             </motion.div>
           )}
-        </AnimatePresence>
-
-        <header className='flex items-center gap-3 mb-6'>
-          <button onClick={() => setView('hub')} className='p-2 bg-slate-900/30 backdrop-blur-md rounded-xl text-slate-200 border border-white/10 active:scale-95 transition-all'><ChevronLeft /></button>
-          <div className='flex-grow'>
-            <h2 className='text-xl font-black italic uppercase truncate drop-shadow-md'>{activeComp?.name}</h2>
-            {activeComp.type !== 'league' && <span className='text-[8px] font-black text-blue-300 uppercase tracking-widest drop-shadow-md'>Fase: {activeComp.phase}</span>}
-          </div>
-        </header>
-
-        <div className='grid grid-cols-4 gap-2 mb-6 bg-slate-900/30 p-3 rounded-[2rem] border border-white/10 backdrop-blur-md shadow-lg'>
-           <MenuButton icon={<BarChart3 size={18} className='text-emerald-400'/>} label="Stats" onClick={() => setCompView('stats')} />
-           <MenuButton icon={<Calendar size={18} className='text-blue-400'/>} label="Fechas" onClick={() => setCompView('calendar')} />
-           <MenuButton icon={<History size={18} className='text-yellow-400'/>} label="Result." onClick={() => setCompView('results')} />
-           {activeComp.type !== 'league' ? (
-             <MenuButton icon={<Swords size={18} className='text-purple-400'/>} label="Llaves" onClick={() => setCompView('bracket')} />
-           ) : (
-             <MenuButton icon={<Users size={18} className='text-indigo-400'/>} label="Equipo" onClick={() => setCompView('teamSelect')} />
-           )}
-           
-           <MenuButton icon={<Settings size={16} className='text-slate-300'/>} label="Ajustes" onClick={() => setCompView('config')} isWide />
-           <MenuButton icon={<RotateCcw size={16}/>} label="Reset" onClick={() => resetCompetition(activeCompId)} isDanger isWide />
-           {activeComp.type !== 'league' && <MenuButton icon={<Users size={16} className='text-indigo-400'/>} label="Mi Equipo" onClick={() => setCompView('teamSelect')} isWide />}
-        </div>
-
-        {activeComp.type !== 'league' && activeComp.phase === 'groups' && Array.isArray(activeComp.groups) && (
-          <div className='grid grid-cols-1 gap-6 mb-8'>
-            {activeComp.groups.map((group, gi) => (
-              <section key={gi} className='bg-slate-900/30 backdrop-blur-md rounded-[2rem] p-4 border border-white/10 shadow-lg'>
-                <h3 className='text-[10px] font-black uppercase text-blue-400 mb-3 flex items-center gap-2 drop-shadow-md'><ShieldIcon size={12} /> {group?.name}</h3>
-                <div className='space-y-1.5'>
-                  {activeComp.teams.filter(t => group.teamIds.includes(t.id)).sort((a, b) => b.pts - a.pts || (b.gf - b.ga) - (a.gf - a.ga)).map((t, i) => (
-                    <div key={t.id} className={'flex items-center gap-3 p-2 rounded-xl ' + (t.id === activeComp.userTeamId ? 'bg-blue-600/40 border border-blue-400/50 shadow-inner' : 'bg-black/30')}>
-                      <span className='text-[10px] font-black text-slate-300 italic w-4'>{i+1}</span>
-                      <Shield color1={t.color1} color2={t.color2} initial={t.name} size='sm' isFlag={t.isFlag} />
-                      <span className='text-[11px] font-bold uppercase truncate flex-grow italic text-white drop-shadow-sm'>{t.name}</span>
-                      <span className='text-[10px] font-black bg-slate-800/60 px-2 py-0.5 rounded-md text-emerald-400 border border-white/10'>{t.pts} PTS</span>
-                    </div>
-                  ))}
-                </div>
-              </section>
-            ))}
-          </div>
-        )}
-
-        {activeComp.type === 'league' && (
-          <section className='bg-slate-900/30 backdrop-blur-md rounded-[2rem] p-4 border border-white/10 mb-6 shadow-lg'>
-            <h3 className='text-[10px] font-black uppercase text-slate-200 mb-3 flex items-center gap-2 drop-shadow-md'><BarChart3 size={12} /> Top Clasificación</h3>
-            <div className='space-y-1.5'>
-              {sortedTeams.slice(0, 6).map((t, i) => (
-                <div key={t.id} className={'flex items-center gap-3 p-2 rounded-xl ' + (t.id === activeComp.userTeamId ? 'bg-blue-600/40 border border-blue-400/50 shadow-inner' : 'bg-black/30')}>
-                  <span className='text-[10px] font-black text-slate-300 italic w-4'>{i+1}</span>
-                  <Shield color1={t?.color1} color2={t?.color2} initial={t?.name} size='sm' isFlag={t?.isFlag} />
-                  <span className='text-[11px] font-bold uppercase truncate flex-grow italic text-white drop-shadow-sm'>{t?.name}</span>
-                  <span className='text-[10px] font-black bg-slate-800/60 px-2 py-0.5 rounded-md text-emerald-400 border border-white/10'>{t.pts} PTS</span>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {!activeComp.showWinner && currentMatch && (
-          <section className='bg-gradient-to-br from-blue-700/80 to-indigo-900/80 backdrop-blur-md rounded-[2.5rem] p-6 shadow-2xl relative overflow-hidden border border-white/20'>
-            <div className='flex justify-between items-center mb-6'>
-              <div className='text-center w-24'>
-                <Shield color1={homeTeam?.color1} color2={homeTeam?.color2} initial={homeTeam?.name} size='lg' isFlag={homeTeam?.isFlag} />
-                <p className='mt-2 text-[10px] font-black uppercase italic truncate text-white drop-shadow-sm'>{homeTeam?.name}</p>
-                {homeTeam?.id === userTeam?.id && <span className='text-[7px] font-black bg-white/30 px-1.5 py-0.5 rounded uppercase backdrop-blur-sm'>Tu Equipo</span>}
-              </div>
-              <div className='flex flex-col items-center'>
-                <span className='text-xs font-black text-white/70 italic mb-1 drop-shadow-sm'>VS</span>
-                <div className='w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center animate-pulse border border-white/30 shadow-inner'><Play size={20} className='ml-1 text-white' /></div>
-              </div>
-              <div className='text-center w-24'>
-                <Shield color1={awayTeam?.color1} color2={awayTeam?.color2} initial={awayTeam?.name} size='lg' isFlag={awayTeam?.isFlag} />
-                <p className='mt-2 text-[10px] font-black uppercase italic truncate text-white drop-shadow-sm'>{awayTeam?.name}</p>
-                {awayTeam?.id === userTeam?.id && <span className='text-[7px] font-black bg-white/30 px-1.5 py-0.5 rounded uppercase backdrop-blur-sm'>Tu Equipo</span>}
-              </div>
-            </div>
-            <button onClick={() => startMatch(homeId, awayId)} className='w-full bg-white/95 text-blue-900 py-4 rounded-2xl text-xs font-black uppercase italic tracking-widest shadow-xl active:scale-95 transition-all flex flex-col items-center justify-center'>
-              <span>{activeComp.phase === 'Final' ? 'Gran Final' : ('Jugar ' + (activeComp.type === 'league' || activeComp.phase === 'groups' ? 'Jornada ' + (activeComp.matchday + 1) : activeComp.phase + (activeCompId === 'C1' ? (activeComp.matchday % 2 === 0 ? ' (Ida)' : ' (Vuelta)') : '')))}</span>
-              <span className='text-[7px] opacity-60 mt-0.5 tracking-normal'>{homeTeam?.opp} vs {awayTeam?.opp} TIROS DISPONIBLES</span>
-            </button>
-          </section>
-        )}
-      </div>
-    );
-
-    if (compView === 'stats') return (
-      <div className='flex-grow px-4 pb-20'>
-        <div className='flex items-center gap-3 mb-6'>
-          <button onClick={() => setCompView('main')} className='p-2 bg-slate-900/30 backdrop-blur-md rounded-xl active:scale-95 transition-all border border-white/10'><ChevronLeft /></button>
-          <h2 className='text-xl font-black italic uppercase drop-shadow-md'>Estadísticas</h2>
-        </div>
-
-        {activeComp.type === 'league' ? (
-          <div className='bg-slate-900/30 backdrop-blur-md rounded-[2rem] border border-white/10 overflow-x-auto custom-scrollbar relative shadow-xl'>
-            <table className='w-full text-left border-collapse min-w-[550px]'>
-              <thead className='bg-[#0f172a] sticky top-0 z-50 shadow-md'>
-                <tr className='text-[8px] font-black uppercase italic text-slate-400'>
-                  <th className='p-3 sticky z-50 bg-[#0f172a]' style={{ left: 0, minWidth: '40px' }}>Pos</th>
-                  <th className='p-3 sticky z-50 bg-[#0f172a]' style={{ left: '40px', minWidth: '130px' }}>Equipo</th>
-                  <th className='p-3 sticky z-50 bg-[#0f172a] text-center border-r border-white/10' style={{ left: '170px', minWidth: '40px' }}>PJ</th>
-                  <th className='p-3 text-center'>G</th><th className='p-3 text-center'>E</th><th className='p-3 text-center'>P</th><th className='p-3 text-center'>GF</th><th className='p-3 text-center'>GC</th><th className='p-3 text-center'>DG</th><th className='p-3 text-center text-emerald-400'>Pts</th>
-                </tr>
-              </thead>
-              <tbody className='divide-y divide-white/5'>
-                {Array.isArray(sortedTeams) && sortedTeams.map((t, i) => (
-                  <tr key={t.id} className={t.id === activeComp.userTeamId ? 'bg-blue-600/30' : ''}>
-                    <td className='p-3 text-[10px] font-black italic text-slate-300 sticky z-40 bg-[#0f172a]' style={{ left: 0 }}>{i+1}</td>
-                    <td className='p-3 flex items-center gap-2 sticky z-40 bg-[#0f172a]' style={{ left: '40px', minWidth: '130px' }}><Shield color1={t?.color1} color2={t?.color2} initial={t?.name} size='xs' isFlag={t?.isFlag} /><span className='text-[10px] font-bold uppercase truncate italic max-w-[80px]'>{t?.name}</span></td>
-                    <td className='p-3 text-center text-[10px] font-bold sticky z-40 bg-[#0f172a] border-r border-white/10' style={{ left: '170px' }}>{t.p}</td>
-                    <td className='p-3 text-center text-[10px] font-bold'>{t.w}</td><td className='p-3 text-center text-[10px] font-bold'>{t.d}</td><td className='p-3 text-center text-[10px] font-bold'>{t.l}</td><td className='p-3 text-center text-[10px] font-bold'>{t.gf}</td><td className='p-3 text-center text-[10px] font-bold'>{t.ga}</td><td className='p-3 text-center text-[10px] font-bold'>{t.gf - t.ga}</td><td className='p-3 text-center text-[10px] font-black text-emerald-400'>{t.pts}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          <div className='space-y-8'>
-            {(activeComp.groups || []).map((group, gi) => (
-              <div key={gi} className='bg-slate-900/30 backdrop-blur-md rounded-[2rem] border border-white/10 overflow-x-auto custom-scrollbar relative shadow-xl'>
-                <div className='bg-[#0f172a] p-3 border-b border-white/10 sticky left-0 z-50'><h3 className='text-[10px] font-black uppercase text-blue-400 flex items-center gap-2'><ShieldIcon size={12} /> {group.name}</h3></div>
-                <table className='w-full text-left border-collapse min-w-[550px]'>
-                  <thead className='bg-[#0f172a] sticky top-0 z-50'>
-                    <tr className='text-[8px] font-black uppercase italic text-slate-400'>
-                      <th className='p-3 sticky z-50 bg-[#0f172a]' style={{ left: 0, minWidth: '40px' }}>Pos</th>
-                      <th className='p-3 sticky z-50 bg-[#0f172a]' style={{ left: '40px', minWidth: '130px' }}>Equipo</th>
-                      <th className='p-3 sticky z-50 bg-[#0f172a] text-center border-r border-white/10' style={{ left: '170px', minWidth: '40px' }}>PJ</th>
-                      <th className='p-3 text-center'>G</th><th className='p-3 text-center'>E</th><th className='p-3 text-center'>P</th><th className='p-3 text-center'>GF</th><th className='p-3 text-center'>GC</th><th className='p-3 text-center'>DG</th><th className='p-3 text-center text-emerald-400'>Pts</th>
-                    </tr>
-                  </thead>
-                  <tbody className='divide-y divide-white/5'>
-                    {Array.isArray(activeComp.teams) && activeComp.teams.filter(t => Array.isArray(group.teamIds) && group.teamIds.includes(t.id)).sort((a, b) => b.pts - a.pts || (b.gf - b.ga) - (a.gf - a.ga)).map((t, i) => (
-                      <tr key={t.id} className={t.id === activeComp.userTeamId ? 'bg-blue-600/30' : ''}>
-                        <td className='p-3 text-[10px] font-black italic text-slate-300 sticky z-40 bg-[#0f172a]' style={{ left: 0 }}>{i+1}</td>
-                        <td className='p-3 flex items-center gap-2 sticky z-40 bg-[#0f172a]' style={{ left: '40px', minWidth: '130px' }}><Shield color1={t?.color1} color2={t?.color2} initial={t?.name} size='xs' isFlag={t?.isFlag} /><span className='text-[10px] font-bold uppercase truncate italic max-w-[80px]'>{t?.name}</span></td>
-                        <td className='p-3 text-center text-[10px] font-bold sticky z-40 bg-[#0f172a] border-r border-white/10' style={{ left: '170px' }}>{t.p}</td>
-                        <td className='p-3 text-center text-[10px] font-bold'>{t.w}</td><td className='p-3 text-center text-[10px] font-bold'>{t.d}</td><td className='p-3 text-center text-[10px] font-bold'>{t.l}</td><td className='p-3 text-center text-[10px] font-bold'>{t.gf}</td><td className='p-3 text-center text-[10px] font-bold'>{t.ga}</td><td className='p-3 text-center text-[10px] font-bold'>{t.gf - t.ga}</td><td className='p-3 text-center text-[10px] font-black text-emerald-400'>{t.pts}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    );
-
-    if (compView === 'results') return (
-      <div className='flex-grow px-4 pb-20'>
-        <div className='flex items-center gap-3 mb-6'>
-          <button onClick={() => setCompView('main')} className='p-2 bg-slate-900/30 backdrop-blur-md rounded-xl active:scale-95 transition-all border border-white/10'><ChevronLeft /></button>
-          <h2 className='text-xl font-black italic uppercase drop-shadow-md'>Resultados</h2>
-        </div>
-        <div className='space-y-4'>
-          {(!Array.isArray(activeComp.history) || activeComp.history.length === 0) && <div className='text-center py-20 text-slate-300 bg-slate-900/30 backdrop-blur-md rounded-[2rem] border border-white/5 italic font-bold uppercase text-[10px] shadow-lg'>No hay partidos jugados aún.</div>}
-          {Array.isArray(activeComp.history) && activeComp.history.map((h, i) => (
-            <div key={i} className='bg-slate-900/30 backdrop-blur-md rounded-3xl p-4 border border-white/10 shadow-lg'>
-              <h3 className='text-[9px] font-black uppercase text-blue-300 mb-3 drop-shadow-md'>{h.day}</h3>
-              <div className='space-y-2'>
-                {Array.isArray(h.results) && h.results.map((r, ri) => {
-                  const home = Array.isArray(activeComp.teams) ? activeComp.teams.find(t => t.id === r.hId) : null;
-                  const away = Array.isArray(activeComp.teams) ? activeComp.teams.find(t => t.id === r.aId) : null;
-                  return (
-                    <div key={ri} className='flex items-center justify-between bg-black/30 p-3 rounded-2xl border border-white/5'>
-                      <div className='flex items-center gap-2 w-24'><Shield color1={home?.color1} color2={home?.color2} initial={home?.name} size='xs' isFlag={home?.isFlag} /><span className='text-[9px] font-bold uppercase truncate italic'>{home?.name}</span></div>
-                      <div className='bg-slate-800/60 backdrop-blur-sm px-3 py-1 rounded-lg text-xs font-black italic tabular-nums flex flex-col items-center border border-white/10'>
-                        <span>{r.sh} - {r.sa}</span>
-                        {r.penH !== undefined && r.penA !== undefined && <span className='text-[7px] text-blue-300 mt-0.5'>(pen {r.penH}-{r.penA})</span>}
-                      </div>
-                      <div className='flex items-center gap-2 w-24 justify-end'><span className='text-[9px] font-bold uppercase truncate italic'>{away?.name}</span><Shield color1={away?.color1} color2={away?.color2} initial={away?.name} size='xs' isFlag={away?.isFlag} /></div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-
-    if (compView === 'calendar') return (
-      <div className='flex-grow px-4 pb-20'>
-        <div className='flex items-center gap-3 mb-6'>
-          <button onClick={() => setCompView('main')} className='p-2 bg-slate-900/30 backdrop-blur-md rounded-xl active:scale-95 transition-all border border-white/10'><ChevronLeft /></button>
-          <h2 className='text-xl font-black italic uppercase drop-shadow-md'>Calendario</h2>
-        </div>
-        <div className='space-y-4'>
-          {activeComp.type === 'league' ? (
-            (() => {
-              const rounds = generateLeagueSchedule(activeComp.teams).map((round, ri) => ({ round, ri }));
-              return [...rounds.filter(r => r.ri === activeComp.matchday), ...rounds.filter(r => r.ri > activeComp.matchday), ...rounds.filter(r => r.ri < activeComp.matchday).reverse()];
-            })().map(({ round, ri }) => (
-              <div key={ri} className={'bg-slate-900/30 backdrop-blur-md rounded-3xl p-4 border border-white/10 shadow-lg ' + (ri === activeComp.matchday ? 'ring-2 ring-blue-500/50' : 'opacity-80')}>
-                <div className='flex justify-between items-center mb-3'>
-                  <h3 className='text-[9px] font-black uppercase text-slate-300'>Jornada {ri + 1} {ri === activeComp.matchday && '(Actual)'}</h3>
-                  <span className={'text-[7px] font-black uppercase px-2 py-0.5 rounded-full ' + (ri < activeComp.matchday ? 'bg-emerald-500/30 text-emerald-300' : ri === activeComp.matchday ? 'bg-blue-500/40 text-blue-200' : 'bg-slate-800/80 text-slate-300')}>{ri < activeComp.matchday ? 'Finalizado' : ri === activeComp.matchday ? 'En Curso' : 'Próximo'}</span>
-                </div>
-                <div className='space-y-2'>
-                  {round.map((m, mi) => {
-                    const home = activeComp.teams.find(t => t.id === m.homeId); const away = activeComp.teams.find(t => t.id === m.awayId);
-                    const result = activeComp.history.find(h => h.day === 'Jornada ' + (ri + 1))?.results.find(r => (r.hId === m.homeId && r.aId === m.awayId) || (r.hId === m.awayId && r.aId === m.homeId));
-                    return (
-                      <div key={mi} className='flex items-center justify-between bg-black/30 p-2 rounded-xl border border-white/5'>
-                        <div className='flex items-center gap-2 w-24'><Shield color1={home?.color1} color2={home?.color2} initial={home?.name} size='xs' isFlag={home?.isFlag} /><span className='text-[9px] font-bold uppercase truncate italic'>{home?.name}</span></div>
-                        <div className='flex flex-col items-center'>{result ? <span className='text-[10px] font-black tabular-nums bg-slate-800/60 px-2 py-0.5 rounded'>{result.sh} - {result.sa}</span> : <span className='text-[8px] font-black text-slate-400 italic'>VS</span>}</div>
-                        <div className='flex items-center gap-2 w-24 justify-end'><span className='text-[9px] font-bold uppercase truncate italic'>{away?.name}</span><Shield color1={away?.color1} color2={away?.color2} initial={away?.name} size='xs' isFlag={away?.isFlag} /></div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            ))
-          ) : (
-            <div className='space-y-8'>
-              {(activeComp.groups || []).length > 0 && (
-                <div className='space-y-6'>
-                  <h2 className='text-xs font-black uppercase text-slate-200 border-b border-white/20 pb-2 drop-shadow-md'>Fase de Grupos</h2>
-                  {(activeComp.groups || []).map((group, gi) => {
-                    const groupTeams = activeComp.teams.filter(t => group.teamIds.includes(t.id));
-                    const isWorldCup = activeCompId === 'C2';
-                    const groupSchedule = generateLeagueSchedule(groupTeams, !isWorldCup);
-                    const maxMatchdays = isWorldCup ? 3 : 6;
-                    return (
-                      <div key={gi} className='bg-slate-900/30 backdrop-blur-md rounded-3xl p-4 border border-white/10 shadow-lg'>
-                        <h3 className='text-[10px] font-black uppercase text-blue-400 mb-4 flex items-center gap-2 drop-shadow-md'><ShieldIcon size={12} /> {group.name}</h3>
-                        <div className='space-y-4'>
-                          {(() => {
-                            const rounds = groupSchedule.map((round, ri) => ({ round, ri }));
-                            const curIdx = activeComp.matchday % maxMatchdays;
-                            if (activeComp.phase !== 'groups') return [...rounds].reverse();
-                            return [...rounds.filter(r => r.ri === curIdx), ...rounds.filter(r => r.ri > curIdx), ...rounds.filter(r => r.ri < curIdx).reverse()];
-                          })().map(({ round, ri }) => {
-                            const isCur = activeComp.phase === 'groups' && ri === (activeComp.matchday % maxMatchdays);
-                            const isPast = activeComp.phase !== 'groups' || (activeComp.phase === 'groups' && ri < (activeComp.matchday % maxMatchdays));
-
-                            return (
-                              <div key={ri} className={'p-3 rounded-2xl bg-black/30 border border-white/5 ' + (isCur ? 'border-blue-400/40 shadow-inner' : 'opacity-80')}>
-                                <div className='flex justify-between items-center mb-2'>
-                                  <span className='text-[8px] font-black uppercase text-slate-300 italic'>Jornada {ri + 1}</span>
-                                  <span className={'text-[7px] font-black uppercase px-2 py-0.5 rounded-full ' + (isPast ? 'bg-emerald-500/30 text-emerald-300' : isCur ? 'bg-blue-500/40 text-blue-200' : 'bg-slate-800/80 text-slate-300')}>{isPast ? 'Finalizado' : isCur ? 'En Curso' : 'Próximo'}</span>
-                                </div>
-                                {round.map((m, mi) => {
-                                  const home = activeComp.teams.find(t => t.id === m.homeId); const away = activeComp.teams.find(t => t.id === m.awayId);
-                                  const result = activeComp.history.find(h => h.day === 'Jornada ' + (ri + 1))?.results.find(r => (r.hId === m.homeId && r.aId === m.awayId) || (r.hId === m.awayId && r.aId === m.homeId));
-
-                                  return (
-                                    <div key={mi} className='flex items-center justify-between py-1 border-b border-white/10 last:border-0'>
-                                      <div className='flex items-center gap-2 w-20'><Shield color1={home?.color1} color2={home?.color2} initial={home?.name} size='xs' isFlag={home?.isFlag} /><span className='text-[9px] font-bold uppercase italic truncate'>{home?.name}</span></div>
-                                      <div className='flex flex-col items-center'>
-                                        {result ? (
-                                          <div className='flex flex-col items-center'>
-                                            <span className='text-[10px] font-black tabular-nums bg-slate-800/60 px-1.5 rounded'>{result.sh} - {result.sa}</span>
-                                            {result.penH !== undefined && <span className='text-[7px] text-blue-300 font-bold'>(pen {result.penH}-{result.penA})</span>}
-                                          </div>
-                                        ) : <span className='text-[8px] font-black text-slate-400 italic'>VS</span>}
-                                      </div>
-                                      <div className='flex items-center gap-2 w-20 justify-end'><span className='text-[9px] font-bold uppercase italic truncate text-right'>{away?.name}</span><Shield color1={away?.color1} color2={away?.color2} initial={away?.name} size='xs' isFlag={away?.isFlag} /></div>
-                                    </div>
-                                  );
-                                })}
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-
-              {activeComp.bracket && (
-                <div className='space-y-6'>
-                  <h2 className='text-xs font-black uppercase text-slate-200 border-b border-white/20 pb-2 drop-shadow-md'>Eliminatorias</h2>
-                  {(() => {
-                    const po = ['Octavos', 'Cuartos', 'Semis', 'Final'];
-                    const curIdx = po.indexOf(activeComp.phase);
-                    if (curIdx === -1) return po; 
-                    return [...po.slice(curIdx, curIdx + 1), ...po.slice(curIdx + 1), ...po.slice(0, curIdx).reverse()];
-                  })().map(phase => {
-                    const matches = activeComp.bracket[phase];
-                    if (!matches || (Array.isArray(matches) && matches.length === 0)) return null;
-                    const matchArray = Array.isArray(matches) ? matches : [matches];
-                    const phases = ['groups', 'Octavos', 'Cuartos', 'Semis', 'Final'];
-                    const currentPhaseIdx = phases.indexOf(activeComp.phase);
-                    const phaseIdx = phases.indexOf(phase);
-                    let status = phaseIdx < currentPhaseIdx ? 'Finalizado' : phaseIdx === currentPhaseIdx ? 'En Curso' : 'Próximo';
-
-                    return (
-                      <div key={phase} className={'bg-slate-900/30 backdrop-blur-md rounded-3xl p-4 border border-white/10 shadow-lg ' + (status === 'En Curso' ? 'ring-2 ring-blue-500/50' : 'opacity-80')}>
-                        <div className='flex justify-between items-center mb-3'>
-                          <h3 className='text-[9px] font-black uppercase text-slate-300'>{phase}</h3>
-                          <span className={'text-[7px] font-black uppercase px-2 py-0.5 rounded-full ' + (status === 'Finalizado' ? 'bg-emerald-500/30 text-emerald-300' : status === 'En Curso' ? 'bg-blue-500/40 text-blue-200' : 'bg-slate-800/80 text-slate-300')}>{status}</span>
-                        </div>
-                        <div className='space-y-2'>
-                          {matchArray.map((m, mi) => {
-                            if (!m) return null;
-                            const home = activeComp.teams.find(t => t.id === m.hId); const away = activeComp.teams.find(t => t.id === m.aId);
-                            const isChampions = activeCompId === 'C1';
-                            const isPlayedIda = m.sh !== null; const isPlayedVuelta = m.sh2 !== null;
-
-                            return (
-                              <div key={mi} className='flex flex-col bg-black/30 p-3 rounded-2xl gap-2 border border-white/5'>
-                                <div className='flex items-center justify-between'>
-                                  <div className='flex items-center gap-2 w-28'><Shield color1={home?.color1} color2={home?.color2} initial={home?.name} size='xs' isFlag={home?.isFlag} /><span className='text-[9px] font-bold uppercase truncate italic'>{home?.name || 'TBD'}</span></div>
-                                  <div className='flex flex-col items-center flex-1'>
-                                    {isPlayedIda ? <div className='flex items-center gap-2 bg-slate-800/60 px-1.5 rounded'><span className='text-[10px] font-black tabular-nums'>{m.sh} - {m.sa}</span><span className='text-[7px] font-bold text-slate-400 uppercase italic'>Ida</span></div> : <span className='text-[8px] font-black text-slate-500 italic'>VS (Ida)</span>}
-                                  </div>
-                                  <div className='flex items-center gap-2 w-28 justify-end'><span className='text-[9px] font-bold uppercase truncate italic text-right'>{away?.name || 'TBD'}</span><Shield color1={away?.color1} color2={away?.color2} initial={away?.name} size='xs' isFlag={away?.isFlag} /></div>
-                                </div>
-
-                                {isChampions && phase !== 'Final' && (
-                                  <div className='flex items-center justify-between border-t border-white/10 pt-2'>
-                                    <div className='flex items-center gap-2 w-28'><Shield color1={away?.color1} color2={away?.color2} initial={away?.name} size='xs' isFlag={away?.isFlag} /><span className='text-[9px] font-bold uppercase truncate italic'>{away?.name || 'TBD'}</span></div>
-                                    <div className='flex flex-col items-center flex-1'>
-                                      {isPlayedVuelta ? (
-                                        <div className='flex flex-col items-center'>
-                                          <div className='flex items-center gap-2 bg-slate-800/60 px-1.5 rounded'><span className='text-[10px] font-black tabular-nums'>{m.sh2} - {m.sa2}</span><span className='text-[7px] font-bold text-slate-400 uppercase italic'>Vuelta</span></div>
-                                          <div className='flex items-center gap-1 mt-1'>
-                                            <span className='text-[8px] font-black text-blue-300 uppercase italic bg-blue-900/40 px-1.5 rounded'>Global: {m.sh + m.sh2} - {m.sa + m.sa2}</span>
-                                            {m.penH !== undefined && m.penH !== null && <span className='text-[7px] text-blue-200 font-bold'>(pen {m.penH}-{m.penA})</span>}
-                                          </div>
-                                        </div>
-                                      ) : <span className='text-[7px] font-bold text-slate-500 uppercase italic'>Vuelta Pendiente</span>}
-                                    </div>
-                                    <div className='flex items-center gap-2 w-28 justify-end'><span className='text-[9px] font-bold uppercase truncate italic text-right'>{home?.name || 'TBD'}</span><Shield color1={home?.color1} color2={home?.color2} initial={home?.name} size='xs' isFlag={home?.isFlag} /></div>
-                                  </div>
-                                )}
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      </div>
-    );
-
-    if (compView === 'bracket') return (
-      <div className='flex-grow px-4 pb-20'>
-        <div className='flex items-center gap-3 mb-6'>
-          <button onClick={() => setCompView('main')} className='p-2 bg-slate-900/30 backdrop-blur-md rounded-xl active:scale-95 transition-all border border-white/10'><ChevronLeft /></button>
-          <h2 className='text-xl font-black italic uppercase drop-shadow-md'>Eliminatorias</h2>
-        </div>
-        {!activeComp.bracket ? (
-          <div className='text-center py-20 text-slate-300 font-black bg-slate-900/30 backdrop-blur-md rounded-[2rem] border border-white/10 uppercase italic text-[10px] shadow-lg'>Las eliminatorias se generarán al finalizar la fase de grupos.</div>
-        ) : (
-          <div className='flex gap-8 overflow-x-auto custom-scrollbar pb-8'>
-            {['Octavos', 'Cuartos', 'Semis', 'Final'].filter(p => activeComp.bracket[p]).map(phase => (
-              <div key={phase} className='min-w-[280px] flex-shrink-0'>
-                <h3 className='text-[10px] font-black uppercase text-blue-300 mb-4 px-3 border-l-2 border-blue-500 bg-slate-900/40 backdrop-blur-md rounded-r-xl py-1 drop-shadow-md'>{phase}</h3>
-                <div className='grid grid-cols-1 gap-3'>
-                  {(Array.isArray(activeComp.bracket[phase]) ? activeComp.bracket[phase] : [activeComp.bracket[phase]]).filter(m => m !== null).map((m, mi) => {
-                    const h = activeComp.teams.find(t => t.id === m.hId); const a = activeComp.teams.find(t => t.id === m.aId);
-                    const isChampions = activeCompId === 'C1';
-                    let winner = null;
-                    if ((isChampions && phase !== 'Final' ? m.sh2 !== null : m.sh !== null)) {
-                      if (isChampions && phase !== 'Final') {
-                        const totH = (m.sh || 0) + (m.sh2 || 0); const totA = (m.sa || 0) + (m.sa2 || 0);
-                        if (totH > totA) winner = h; else if (totA > totH) winner = a; else if (m.penH !== null && m.penH !== undefined) winner = m.penH > m.penA ? h : a;
-                      } else {
-                        if (m.sh > m.sa) winner = h; else if (m.sa > m.sh) winner = a; else if (m.penH !== null && m.penH !== undefined) winner = m.penH > m.penA ? h : a;
-                      }
-                    }
-
-                    return (
-                      <div key={mi} className='bg-slate-900/30 backdrop-blur-md rounded-2xl p-3 border border-white/10 flex flex-col gap-2 shadow-lg'>
-                        <div className='flex justify-between items-center'>
-                          <div className='flex items-center gap-2 flex-1'><Shield color1={h?.color1} color2={h?.color2} initial={h?.name} size='xs' isFlag={h?.isFlag} /><span className={'text-[10px] font-bold uppercase italic truncate ' + (h ? 'text-white' : 'text-slate-400')}>{h?.name || 'TBD'}</span></div>
-                          <div className='flex items-center gap-2 tabular-nums font-black italic text-xs bg-black/30 px-2 py-0.5 rounded'>
-                            {m.sh !== null && <span>{m.sh}</span>}{isChampions && m.sh2 !== null && <span className='text-slate-400 text-[10px]'>({m.sh2})</span>}{m.penH !== null && m.penH !== undefined && <span className='text-red-400 text-[9px] font-black'>[{m.penH}]</span>}
-                          </div>
-                        </div>
-                        <div className='flex justify-between items-center'>
-                          <div className='flex items-center gap-2 flex-1'><Shield color1={a?.color1} color2={a?.color2} initial={a?.name} size='xs' isFlag={a?.isFlag} /><span className={'text-[10px] font-bold uppercase italic truncate ' + (a ? 'text-white' : 'text-slate-400')}>{a?.name || 'TBD'}</span></div>
-                          <div className='flex items-center gap-2 tabular-nums font-black italic text-xs bg-black/30 px-2 py-0.5 rounded'>
-                            {m.sa !== null && <span>{m.sa}</span>}{isChampions && m.sa2 !== null && <span className='text-slate-400 text-[10px]'>({m.sa2})</span>}{m.penA !== null && m.penA !== undefined && <span className='text-red-400 text-[9px] font-black'>[{m.penA}]</span>}
-                          </div>
-                        </div>
-                        {winner && (
-                          <div className='mt-2 pt-2 border-t border-white/10 flex items-center justify-center gap-2 bg-emerald-900/30 backdrop-blur-sm rounded-b-xl'>
-                            <span className='text-[7px] font-black uppercase text-emerald-300 italic'>Pasa:</span>
-                            <Shield color1={winner.color1} color2={winner.color2} initial={winner.name} size='xs' isFlag={winner.isFlag} />
-                            <span className='text-[8px] font-black uppercase italic text-white truncate max-w-[100px]'>{winner.name}</span>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    );
-
-    if (compView === 'playing') {
-      if (!matchState) return null;
-      return (
-        <div className='flex-grow flex flex-col px-4'>
-        <div className='flex justify-between items-center mb-6'>
-          <button onClick={() => setCompView('main')} className='p-2 bg-slate-900/30 backdrop-blur-md border border-white/10 rounded-xl text-slate-200 active:scale-95 transition-all'><ChevronLeft /></button>
-          <div className='px-4 py-1 bg-red-600/80 backdrop-blur-md rounded-full text-[9px] font-black uppercase italic animate-pulse shadow-md'>En Vivo</div>
-          <div className='w-10'></div>
-        </div>
-
-        <div className='bg-slate-900/40 backdrop-blur-md rounded-[2.5rem] p-6 mb-4 border-b-4 border-slate-800 relative shadow-xl'>
-          {matchState.aggregate && (
-            <div className='absolute -top-3 left-1/2 -translate-x-1/2 bg-blue-600/90 backdrop-blur-sm px-3 py-1 rounded-full border border-blue-400 shadow-lg z-10'>
-              <span className='text-[8px] font-black uppercase italic text-white tracking-widest'>Global: {matchState.aggregate.sh + matchState.scoreH} - {matchState.aggregate.sa + matchState.scoreA}</span>
-            </div>
-          )}
-          <div className='flex items-center'>
-            <div className='flex-1 flex flex-col items-center text-center'>
-              {matchState.phase === 'penalties' && <PenaltyDots history={matchState.penalties?.historyH} />}
-              <Shield color1={matchState.home?.color1} color2={matchState.home?.color2} initial={matchState.home?.name} size='lg' isFlag={matchState.home?.isFlag} />
-              <p className='text-[10px] font-black uppercase italic mt-2 truncate text-white drop-shadow-md w-full'>{matchState.home?.name}</p>
-              <p className='text-[8px] font-bold text-slate-300 mt-1 bg-black/40 backdrop-blur-sm inline-block px-2 rounded'>{matchState.home.att + '/' + matchState.home.opp + '/' + matchState.home.def}</p>
-            </div>
-            
-            <div className='px-4 flex flex-col items-center shrink-0 w-32'>
-              <div className='text-5xl font-black italic tracking-tighter flex gap-3 tabular-nums drop-shadow-[0_0_15px_rgba(0,0,0,0.8)] text-white'><span>{matchState.scoreH}</span><span className='text-slate-400'>-</span><span>{matchState.scoreA}</span></div>
-              {!matchState.finished && matchState.phase !== 'penalties' && <div className='text-[8px] font-black text-white/70 uppercase italic mt-1 bg-black/40 px-2 py-0.5 rounded backdrop-blur-sm'>{matchState.oppH} vs {matchState.oppA} TIROS RESTANTES</div>}
-              {matchState.phase === 'penalties' && (
-                <div className='mt-2 flex flex-col items-center w-full'>
-                  <span className='text-[8px] font-black text-red-400 uppercase italic'>Penaltis</span>
-                  <div className='text-xl font-black italic text-blue-300 tabular-nums drop-shadow-md'>(pen {matchState.penalties.scoreH} - {matchState.penalties.scoreA})</div>
-                  {matchState.penalties.shotsH < 5 || matchState.penalties.shotsA < 5 ? (
-                    <div className='flex justify-between w-full text-[7px] font-bold text-slate-300 uppercase mt-1'><span>Res H: {5 - matchState.penalties.shotsH}</span><span>Res A: {5 - matchState.penalties.shotsA}</span></div>
-                  ) : <div className='text-[7px] font-bold text-yellow-400 uppercase mt-1 animate-pulse'>¡Muerte Súbita!</div>}
-                  <div className='text-[7px] font-bold text-slate-200 uppercase mt-1 bg-black/50 backdrop-blur-sm px-2 py-0.5 rounded text-center'>{matchState.penalties.phase === 'att' ? '⚽ Preparando Disparo' : '🧤 ¡El portero se prepara!'}</div>
-                </div>
-              )}
-            </div>
-            
-            <div className='flex-1 flex flex-col items-center text-center'>
-              {matchState.phase === 'penalties' && <PenaltyDots history={matchState.penalties?.historyA} />}
-              <Shield color1={matchState.away?.color1} color2={matchState.away?.color2} initial={matchState.away?.name} size='lg' isFlag={matchState.away?.isFlag} />
-              <p className='text-[10px] font-black uppercase italic mt-2 truncate text-white drop-shadow-md w-full'>{matchState.away?.name}</p>
-              <p className='text-[8px] font-bold text-slate-300 mt-1 bg-black/40 backdrop-blur-sm inline-block px-2 rounded'>{matchState.away.att + '/' + matchState.away.opp + '/' + matchState.away.def}</p>
-            </div>
-          </div>
-        </div>
-
-        <div className='flex-grow bg-[#2e7d32]/60 backdrop-blur-md rounded-[3rem] border-8 border-slate-900/40 relative overflow-hidden flex flex-col items-center justify-center shadow-[inset_0_0_30px_rgba(0,0,0,0.8)]'>
-          <div className='absolute top-1/2 left-0 w-full h-[2px] bg-white/20 -translate-y-1/2'></div>
-          <div className='absolute top-1/2 left-1/2 w-40 h-40 border-[2px] border-white/20 rounded-full -translate-x-1/2 -translate-y-1/2'></div>
-          <div className='absolute top-1/2 left-1/2 w-3 h-3 bg-white/20 rounded-full -translate-x-1/2 -translate-y-1/2'></div>
-
-          {!matchState.finished ? (
-            <div className='z-10 flex flex-col items-center gap-8'>
-              <div className={'transition-all duration-300 transform ' + (rolling ? 'scale-125 rotate-45' : 'scale-100')}>
-                <DieIcon value={matchState.lastDie} className='w-24 h-24 text-white drop-shadow-[0_0_25px_rgba(255,255,255,0.8)]' />
-              </div>
-              <button onClick={handleRoll} disabled={rolling} className='bg-white/90 backdrop-blur-sm text-emerald-900 px-10 py-5 rounded-3xl font-black uppercase italic tracking-widest shadow-[0_10px_20px_rgba(0,0,0,0.5)] active:scale-90 transition-transform disabled:opacity-50'>{rolling ? 'Lanzando...' : 'Lanzar Dado'}</button>
-            </div>
-          ) : (
-            <div className='z-10 text-center p-6 bg-black/40 backdrop-blur-md rounded-3xl border border-white/20 max-w-[80%] shadow-2xl'>
-              <Trophy size={48} className='text-yellow-400 mx-auto mb-4 drop-shadow-[0_0_10px_rgba(250,204,21,0.5)]' />
-              <h3 className='text-lg font-black uppercase italic mb-4 text-white drop-shadow-md'>¡Fin del Partido!</h3>
-              <button onClick={processMatchday} className='w-full bg-white/90 backdrop-blur-sm text-slate-950 py-4 rounded-2xl font-black uppercase italic tracking-widest active:scale-95 transition-all shadow-md'>Finalizar</button>
-            </div>
-          )}
-        </div>
-
-        <div className='mt-4 bg-slate-900/40 backdrop-blur-md rounded-3xl p-5 h-40 overflow-y-auto border border-white/10 space-y-2 shadow-lg custom-scrollbar'>
-          {matchState.logs.map((log, i) => (
-            <div key={i} className={'text-[10px] font-bold italic flex gap-3 ' + (i === 0 ? 'text-white drop-shadow-md' : 'text-slate-300')}><span className='opacity-60 shrink-0'>⚽</span><p>{log}</p></div>
-          ))}
-        </div>
-      </div>
-    );
-    }
-
-    if (compView === 'teamSelect') return (
-      <div className='flex-grow px-4 pb-20'>
-        <div className='flex items-center gap-3 mb-6'>
-          <button onClick={() => setCompView('main')} className='p-2 bg-slate-900/30 backdrop-blur-md rounded-xl active:scale-95 transition-all border border-white/10'><ChevronLeft /></button>
-          <h2 className='text-xl font-black italic uppercase drop-shadow-md'>Seleccionar Equipo</h2>
-        </div>
-        <div className='grid gap-3 overflow-y-auto max-h-[75vh] pr-2 custom-scrollbar'>
-          {Array.isArray(activeComp.teams) && activeComp.teams.map(t => (
-            <button key={t.id} onClick={() => { updateActiveComp({ userTeamId: t.id }); setCompView('main'); }} className={'flex items-center gap-4 p-4 rounded-3xl border transition-all active:scale-95 backdrop-blur-md ' + (t.id === activeComp.userTeamId ? 'bg-blue-600/60 border-blue-400 shadow-[0_0_20px_rgba(37,99,235,0.5)]' : 'bg-slate-900/40 border-white/10 hover:border-white/30')}>
-              <Shield color1={t?.color1} color2={t?.color2} initial={t?.name} size='md' isFlag={t?.isFlag} />
-              <div className='text-left'>
-                <p className='text-xs font-black uppercase italic text-white drop-shadow-md'>{t?.name}</p>
-                <p className='text-[8px] font-bold text-slate-200 uppercase bg-black/40 px-1.5 py-0.5 rounded inline-block mt-1'>{t?.att + '/' + t?.opp + '/' + t?.def}</p>
-              </div>
-              {t.id === activeComp.userTeamId && <div className='ml-auto bg-white/30 p-1.5 rounded-full shadow-inner'><Check size={14} className="text-white"/></div>}
-            </button>
-          ))}
-        </div>
-      </div>
-    );
-
-    return null;
-  };
-
-  return (
-    <div className='relative min-h-screen selection:bg-blue-500/30 font-sans text-slate-100 overflow-hidden'>
-      <div className='fixed inset-0 bg-[url("https://images.unsplash.com/photo-1522778119026-d647f0596c20?q=80&w=2000&auto=format&fit=crop")] bg-cover bg-center bg-no-repeat z-0'></div>
-      <div className='fixed inset-0 bg-slate-950/60 z-0 backdrop-blur-[2px]'></div>
-
-      <div className='relative z-10 max-w-md mx-auto min-h-screen flex flex-col'>
-        <AnimatePresence mode='wait'>
-          {view === 'hub' && <motion.div key='hub' className='flex-grow flex flex-col' initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}><HubView setView={setView} setActiveCompId={setActiveCompId} setCompView={setCompView} comps={comps} /></motion.div>}
-          {view === 'rules' && <motion.div key='rules' className='flex-grow flex flex-col' initial={{ x: 300, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: -300, opacity: 0 }}><RulesView setView={setView} /></motion.div>}
-          {view === 'archive' && <motion.div key='archive' className='flex-grow flex flex-col' initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}><ArchiveView selectedArchiveEntry={selectedArchiveEntry} setSelectedArchiveEntry={setSelectedArchiveEntry} setView={setView} archive={archive} /></motion.div>}
-          {view === 'competition' && <motion.div key='comp' className='flex-grow flex flex-col' initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 1.1, opacity: 0 }}><CompetitionView /></motion.div>}
-        </AnimatePresence>
-      </div>
-    </div>
-  );
-}
-
-```
+        </AnimatePresence
