@@ -1,3 +1,4 @@
+```react
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
@@ -987,34 +988,30 @@ export default function App() {
   const [view, setView] = useState('hub');
   const [activeCompId, setActiveCompId] = useState(null);
   const [compView, setCompView] = useState('main');
-  const [showExitModal, setShowExitModal] = useState(false);
 
   // MANEJO DE NAVEGACIÓN Y BOTÓN FÍSICO (ANDROID/PWA)
   useEffect(() => {
     window.history.pushState(null, '', window.location.href);
 
     const handlePopState = () => {
-      window.history.pushState(null, '', window.location.href); 
-      
-      if (showExitModal) {
-        setShowExitModal(false);
-        return;
-      }
-
       if (view === 'competition' && compView !== 'main') {
+        window.history.pushState(null, '', window.location.href);
         setCompView('main');
       } else if (view !== 'hub') {
+        window.history.pushState(null, '', window.location.href);
         setView('hub');
         setActiveCompId(null);
         setCompView('main');
       } else {
-        setShowExitModal(true);
+        // Si estamos en la vista principal ('hub'), dejamos que la acción natural ocurra
+        // (es decir, salir de la app), por lo que permitimos el comportamiento nativo del navegador
+        window.history.back();
       }
     };
 
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
-  }, [view, compView, showExitModal]);
+  }, [view, compView]);
 
   // IMPLEMENTACIÓN PROFESIONAL DE LOCALSTORAGE (EVITA PÉRDIDA DE DATOS)
   const [archive, setArchive] = useState(() => {
@@ -2084,22 +2081,8 @@ export default function App() {
           {view === 'competition' && <motion.div key='comp' className='flex-grow flex flex-col' initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 1.1, opacity: 0 }}><CompetitionView /></motion.div>}
         </AnimatePresence>
       </div>
-
-      {/* MODAL GLOBAL DE CONFIRMACIÓN DE SALIDA (ASOCIADO AL BOTÓN FÍSICO) */}
-      <AnimatePresence>
-        {showExitModal && (
-           <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className='fixed inset-0 z-[200] bg-black/80 backdrop-blur-md flex items-center justify-center p-4'>
-              <motion.div initial={{scale:0.9, y:20}} animate={{scale:1, y:0}} className='bg-slate-900 rounded-[2rem] border border-white/10 p-6 shadow-2xl max-w-sm w-full text-center'>
-                  <h2 className='text-xl font-black uppercase italic text-white mb-2'>¿Salir del Juego?</h2>
-                  <p className='text-[11px] text-slate-300 font-bold mb-6'>Todo tu progreso local se encuentra guardado de forma segura.</p>
-                  <div className='flex gap-3'>
-                      <button onClick={() => setShowExitModal(false)} className='flex-1 bg-slate-800 text-white font-bold py-3 rounded-xl border border-white/10 active:scale-95 transition-all text-xs uppercase'>Cancelar</button>
-                      <button onClick={() => window.close()} className='flex-1 bg-red-600 text-white font-black uppercase py-3 rounded-xl active:scale-95 transition-all shadow-lg shadow-red-500/20 text-xs'>Salir</button>
-                  </div>
-              </motion.div>
-           </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }
+
+```
