@@ -1002,11 +1002,8 @@ export default function App() {
         setView('hub');
         setActiveCompId(null);
         setCompView('main');
-      } else {
-        // Si estamos en la vista principal ('hub'), dejamos que la acción natural ocurra
-        // (es decir, salir de la app), por lo que permitimos el comportamiento nativo del navegador
-        window.history.back();
       }
+      // Si estamos en 'hub', no hacemos pushState para permitir la salida nativa.
     };
 
     window.addEventListener('popstate', handlePopState);
@@ -2084,5 +2081,6 @@ export default function App() {
     </div>
   );
 }
+
 
 ```
