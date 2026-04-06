@@ -1,3 +1,4 @@
+```react
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
@@ -1006,8 +1007,19 @@ export default function App() {
     return () => window.removeEventListener('popstate', handlePopState);
   }, [view, compView, showExitModal]);
 
-  const [archive, setArchive] = useState([]);
+  const [archive, setArchive] = useState(() => {
+    try {
+      const saved = localStorage.getItem(APP_ID + '_archive');
+      if (saved) return JSON.parse(saved);
+    } catch (e) { console.error("Error cargando historial", e); }
+    return [];
+  });
   const [selectedArchiveEntry, setSelectedArchiveEntry] = useState(null);
+
+  // Auto-guardar Historial
+  useEffect(() => {
+    localStorage.setItem(APP_ID + '_archive', JSON.stringify(archive));
+  }, [archive]);
 
   useEffect(() => {
     const handler = (e) => { if (e.target.closest('button')) playClick(); };
@@ -1016,6 +1028,11 @@ export default function App() {
   }, []);
 
   const [comps, setComps] = useState(() => {
+    try {
+      const saved = localStorage.getItem(APP_ID + '_comps');
+      if (saved) return JSON.parse(saved);
+    } catch (e) { console.error("Error cargando torneos", e); }
+
     const baseTeam = (preset) => PRESETS[preset].map((t, i) => ({ ...t, id: i + 1, p: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, pts: 0 }));
     return {
       'L1': { type: 'league', name: 'Liga Española', teams: baseTeam('ES'), matchday: 0, history: [], userTeamId: 1, showWinner: false, disqualified: false },
@@ -1029,6 +1046,11 @@ export default function App() {
       'C2': { type: 'cup', name: 'Copa del Mundo', teams: [], matchday: 0, history: [], userTeamId: 1, showWinner: false, phase: 'groups', bracket: null, disqualified: false }
     };
   });
+
+  // Auto-guardar Progreso de todos los Torneos
+  useEffect(() => {
+    localStorage.setItem(APP_ID + '_comps', JSON.stringify(comps));
+  }, [comps]);
 
   const activeComp = comps[activeCompId];
   const updateActiveComp = (newData) => setComps(prev => ({ ...prev, [activeCompId]: { ...prev[activeCompId], ...newData } }));
@@ -2019,6 +2041,23 @@ export default function App() {
     return null;
   };
 
+  const handleExitApp = () => {
+    // 1. Intento nativo para Android / Cordova / Capacitor
+    if (typeof navigator !== 'undefined' && navigator.app && navigator.app.exitApp) {
+      navigator.app.exitApp();
+    } else if (typeof navigator !== 'undefined' && navigator.device && navigator.device.exitApp) {
+      navigator.device.exitApp();
+    } else {
+      // 2. Intento para navegadores
+      window.close();
+      // 3. Fallback: Si el navegador bloquea el cierre por seguridad (PWA / Web)
+      setTimeout(() => {
+        alert("Tu progreso está completamente guardado \uD83D\uDCBE. Puedes minimizar o cerrar esta aplicación desde tu teléfono con seguridad.");
+        setShowExitModal(false);
+      }, 300);
+    }
+  };
+
   return (
     <div className='relative min-h-screen selection:bg-blue-500/30 font-sans text-slate-100 overflow-hidden'>
       {/* BACKGROUND ESTADIO NOCTURNO PARA APRECIAR TRANSPARENCIAS */}
@@ -2043,7 +2082,7 @@ export default function App() {
                   <p className='text-[11px] text-slate-300 font-bold mb-6'>Todo tu progreso local se mantendrá guardado hasta la próxima vez.</p>
                   <div className='flex gap-3'>
                       <button onClick={() => setShowExitModal(false)} className='flex-1 bg-slate-800 text-white font-bold py-3 rounded-xl border border-white/10 active:scale-95 transition-all text-xs uppercase'>Cancelar</button>
-                      <button onClick={() => window.close()} className='flex-1 bg-red-600 text-white font-black uppercase py-3 rounded-xl active:scale-95 transition-all shadow-lg shadow-red-500/20 text-xs'>Salir</button>
+                      <button onClick={handleExitApp} className='flex-1 bg-red-600 text-white font-black uppercase py-3 rounded-xl active:scale-95 transition-all shadow-lg shadow-red-500/20 text-xs'>Salir</button>
                   </div>
               </motion.div>
            </motion.div>
@@ -2052,3 +2091,6 @@ export default function App() {
     </div>
   );
 }
+
+
+```
