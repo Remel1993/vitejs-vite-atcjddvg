@@ -1,4 +1,3 @@
-```react
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
@@ -991,19 +990,20 @@ export default function App() {
 
   // MANEJO DE NAVEGACIÓN Y BOTÓN FÍSICO (ANDROID/PWA)
   useEffect(() => {
-    window.history.pushState(null, '', window.location.href);
+    // Solo atrapamos el historial si no estamos en la vista principal
+    if (view !== 'hub' || compView !== 'main') {
+      window.history.pushState(null, '', window.location.href);
+    }
 
     const handlePopState = () => {
       if (view === 'competition' && compView !== 'main') {
-        window.history.pushState(null, '', window.location.href);
         setCompView('main');
       } else if (view !== 'hub') {
-        window.history.pushState(null, '', window.location.href);
         setView('hub');
         setActiveCompId(null);
         setCompView('main');
       }
-      // Si estamos en 'hub', no hacemos pushState para permitir la salida nativa.
+      // Si estamos en la vista 'hub' y 'main', permitimos que el navegador salga de la app de forma natural
     };
 
     window.addEventListener('popstate', handlePopState);
@@ -2082,5 +2082,3 @@ export default function App() {
   );
 }
 
-
-```
