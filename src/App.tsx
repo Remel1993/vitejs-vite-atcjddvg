@@ -1504,7 +1504,7 @@ function DiceFootballApp() {
           let newBracket = null;
           if (isEndOfGroups) newBracket = generateKnockoutBrackets({ ...activeComp, teams: updatedTeams });
            updateActiveComp({ teams: updatedTeams, history: [{ day: 'Jornada ' + nextMatchday, results }, ...activeComp.history], matchday: nextMatchday, phase: isEndOfGroups ? (newBracket.Octavos ? 'Octavos' : 'Cuartos') : 'groups', bracket: newBracket });
-           
+
            // Check if user's team was eliminated in group stage
            if (isEndOfGroups) {
              const userTeamId = activeComp.userTeamId;
@@ -1806,7 +1806,7 @@ function DiceFootballApp() {
                       const bracket = activeComp.bracket;
                       const nextPhase = activeComp.phase;
                       let remainingTeams: any[] = [];
-                      
+
                       if (bracket && bracket[nextPhase]) {
                         // Knockout: get teams from next round bracket
                         const nextMatches = Array.isArray(bracket[nextPhase]) ? bracket[nextPhase] : [bracket[nextPhase]];
@@ -1916,7 +1916,7 @@ function DiceFootballApp() {
             return (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className='fixed inset-0 z-[60] bg-slate-950/98 backdrop-blur-xl flex flex-col'>
               {/* Confetti removed */}
-              
+
               {/* Header */}
                <div className='shrink-0 pt-3 pb-2 px-4'>
                 <div className='flex items-center justify-center gap-3'>
@@ -1977,7 +1977,7 @@ function DiceFootballApp() {
                   <div>
                     {isLeague ? (
                       <>
-                        <h3 className='text-xs font-black uppercase text-slate-200 mb-3 text-center'>Clasificación {championModalDiv === 2 ? '2ª' : '1ª'} Div.</h3>
+                        <h3 className='text-xs font-black uppercase text-slate-200 mb-3 text-center'>Clasificación</h3>
                         <div className='bg-slate-900/30 rounded-2xl border border-white/10 overflow-hidden'>
                           <table className='w-full text-left border-collapse'>
                             <thead className='bg-[#0f172a] sticky top-0 z-10'>
@@ -2084,7 +2084,7 @@ function DiceFootballApp() {
                 {/* TAB: RESULTS */}
                 {championModalTab === 'results' && (
                   <div>
-                    <h3 className='text-xs font-black uppercase text-slate-200 mb-3 text-center'>Resultados {championModalDiv === 2 ? '2ª' : '1ª'} Div.</h3>
+                    <h3 className='text-xs font-black uppercase text-slate-200 mb-3 text-center'>Resultados</h3>
                     <div className='space-y-3'>
                       {displayHistory.length === 0 && <p className='text-center text-[10px] text-slate-400 italic py-8'>No hay resultados.</p>}
                       {displayHistory.slice(0, 5).map((h, i) => (
@@ -2324,20 +2324,24 @@ function DiceFootballApp() {
 
         {!currentShowWinner && (currentMatch || (isLeague && currentMatchday >= generateLeagueSchedule(currentTeams).length)) && (
           <section className='bg-gradient-to-br from-blue-700/80 to-indigo-900/80 backdrop-blur-md rounded-[2.5rem] p-6 shadow-2xl relative overflow-hidden border border-white/20'>
-            <div className='flex justify-between items-center mb-6'>
-              <div className='text-center w-24'>
+            <div className='flex justify-between items-start mb-6'>
+              <div className='flex flex-col items-center w-24'>
                 <Shield color1={homeTeam?.color1} color2={homeTeam?.color2} initial={homeTeam?.name} size='lg' isFlag={homeTeam?.isFlag} />
-                <p className='mt-2 text-[10px] font-black uppercase italic truncate text-white drop-shadow-sm'>{homeTeam?.name}</p>
-                {homeTeam?.id === userTeam?.id && <span className='text-[7px] font-black bg-white/30 px-1.5 py-0.5 rounded uppercase backdrop-blur-sm'>Tu Equipo</span>}
+                <p className='mt-2 text-[10px] font-black uppercase italic text-center truncate w-full text-white drop-shadow-sm'>{homeTeam?.name}</p>
+                <div className='h-4 mt-1 flex items-start justify-center w-full'>
+                  {homeTeam?.id === userTeam?.id && <span className='text-[7px] font-black bg-white/30 px-1.5 py-0.5 rounded uppercase backdrop-blur-sm text-white'>Tu Equipo</span>}
+                </div>
               </div>
-              <div className='flex flex-col items-center'>
+              <div className='flex flex-col items-center mt-4'>
                 <span className='text-xs font-black text-white/70 italic mb-1 drop-shadow-sm'>VS</span>
                 <div className='w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center animate-pulse border border-white/30 shadow-inner'><Play size={20} className='ml-1 text-white' /></div>
               </div>
-              <div className='text-center w-24'>
+              <div className='flex flex-col items-center w-24'>
                 <Shield color1={awayTeam?.color1} color2={awayTeam?.color2} initial={awayTeam?.name} size='lg' isFlag={awayTeam?.isFlag} />
-                <p className='mt-2 text-[10px] font-black uppercase italic truncate text-white drop-shadow-sm'>{awayTeam?.name}</p>
-                {awayTeam?.id === userTeam?.id && <span className='text-[7px] font-black bg-white/30 px-1.5 py-0.5 rounded uppercase backdrop-blur-sm'>Tu Equipo</span>}
+                <p className='mt-2 text-[10px] font-black uppercase italic text-center truncate w-full text-white drop-shadow-sm'>{awayTeam?.name}</p>
+                <div className='h-4 mt-1 flex items-start justify-center w-full'>
+                  {awayTeam?.id === userTeam?.id && <span className='text-[7px] font-black bg-white/30 px-1.5 py-0.5 rounded uppercase backdrop-blur-sm text-white'>Tu Equipo</span>}
+                </div>
               </div>
             </div>
 
@@ -2355,7 +2359,7 @@ function DiceFootballApp() {
                 <button onClick={() => startMatch(homeId, awayId, isDiv2)} className='w-full bg-white/95 text-blue-900 py-4 rounded-2xl text-xs font-black uppercase italic tracking-widest shadow-xl active:scale-95 transition-all flex flex-col items-center justify-center'>
                   <span>{activeComp.phase === 'Final' ? 'Gran Final' : ('Jugar ' + (isLeague || activeComp.phase === 'groups' ? 'Jornada ' + (currentMatchday + 1) : activeComp.phase + (activeCompId === 'C1' ? (activeComp.matchday % 2 === 0 ? ' (Ida)' : ' (Vuelta)') : '')))}</span>
                   <span className='text-[7px] opacity-60 mt-0.5 tracking-normal'>{homeTeam?.opp} vs {awayTeam?.opp} TIROS DISPONIBLES</span>
-                  
+
                 </button>
               );
             })()}
@@ -2467,7 +2471,7 @@ function DiceFootballApp() {
       </div>
     );
 
-    if (compView === 'calendar') return (
+        if (compView === 'calendar') return (
       <div className='flex-grow px-4 pb-20'>
         <div className='flex items-center gap-3 mb-6'>
           <button onClick={() => setCompView('main')} className='p-2 bg-slate-900/30 backdrop-blur-md rounded-xl active:scale-95 transition-all border border-white/10'><ChevronLeft /></button>
@@ -2815,3 +2819,4 @@ function DiceFootballApp() {
 }
 
 export default DiceFootballApp;
+
