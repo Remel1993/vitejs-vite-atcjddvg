@@ -1138,6 +1138,8 @@ function DiceFootballApp() {
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [championModalTab, setChampionModalTab] = useState<'champion' | 'stats' | 'results' | 'promotions'>('champion');
   const [championModalDiv, setChampionModalDiv] = useState(1);
+  const [eliminatedModal, setEliminatedModal] = useState<{ compId: string; phase: string } | null>(null);
+  const [resetConfirmModal, setResetConfirmModal] = useState(false);
 
   useEffect(() => {
     if (view !== 'hub' || compView !== 'main') window.history.pushState(null, '', window.location.href);
@@ -1469,7 +1471,20 @@ function DiceFootballApp() {
           const isEndOfGroups = nextMatchday >= maxMatchdays;
           let newBracket = null;
           if (isEndOfGroups) newBracket = generateKnockoutBrackets({ ...activeComp, teams: updatedTeams });
-          updateActiveComp({ teams: updatedTeams, history: [{ day: 'Jornada ' + nextMatchday, results }, ...activeComp.history], matchday: nextMatchday, phase: isEndOfGroups ? (newBracket.Octavos ? 'Octavos' : 'Cuartos') : 'groups', bracket: newBracket });
+           updateActiveComp({ teams: updatedTeams, history: [{ day: 'Jornada ' + nextMatchday, results }, ...activeComp.history], matchday: nextMatchday, phase: isEndOfGroups ? (newBracket.Octavos ? 'Octavos' : 'Cuartos') : 'groups', bracket: newBracket });
+           
+           // Check if user's team was eliminated in group stage
+           if (isEndOfGroups) {
+             const userTeamId = activeComp.userTeamId;
+             const userGroup = activeComp.groups.find(g => g.teamIds.includes(userTeamId));
+             if (userGroup) {
+               const groupTeams = updatedTeams.filter(t => userGroup.teamIds.includes(t.id)).sort((a, b) => b.pts - a.pts || (b.gf - b.ga) - (a.gf - a.ga));
+               const userPos = groupTeams.findIndex(t => t.id === userTeamId);
+               if (userPos >= 2) {
+                 setTimeout(() => setEliminatedModal({ compId: activeCompId, phase: 'Fase de Grupos' }), 500);
+               }
+             }
+           }
        } else {
           // Eliminatorias
           const isChampions = activeCompId === 'C1';
@@ -1519,9 +1534,23 @@ function DiceFootballApp() {
              else if (phase === 'Semis') { nextPhase = 'Final'; newBracket.Final = [{ id: 'F1', hId: winners[0], aId: winners[1], sh: null, sa: null, penH: null, penA: null, sh2: null, sa2: null }]; } 
              else { nextPhase = 'Terminado'; showWinner = true; }
           }
-          const updatedComp = { history: [{ day: phase + (isChampions ? (isVuelta ? ' (Vuelta)' : ' (Ida)') : ''), results: allResults }, ...activeComp.history], matchday: activeComp.matchday + 1, phase: nextPhase, bracket: newBracket, showWinner };
-          updateActiveComp(updatedComp);
-          if (showWinner) archiveCompetition(activeCompId, 1);
+           const updatedComp = { history: [{ day: phase + (isChampions ? (isVuelta ? ' (Vuelta)' : ' (Ida)') : ''), results: allResults }, ...activeComp.history], matchday: activeComp.matchday + 1, phase: nextPhase, bracket: newBracket, showWinner };
+           updateActiveComp(updatedComp);
+           if (showWinner) archiveCompetition(activeCompId, 1);
+
+           // Check if user's team was eliminated in knockout
+           if (!isChampions || isVuelta || phase === 'Final') {
+             const userTeamId = activeComp.userTeamId;
+             const winners = matchesToProcess.map(m => {
+               const tH = isChampions && phase!=='Final' ? m.sh+m.sh2 : m.sh; const tA = isChampions && phase!=='Final' ? m.sa+m.sa2 : m.sa;
+               if(tH>tA) return m.hId; if(tA>tH) return m.aId; return m.penH>m.penA ? m.hId : m.aId;
+             });
+             const wasInThisRound = matchesToProcess.some(m => m.hId === userTeamId || m.aId === userTeamId);
+             const userAdvanced = winners.includes(userTeamId);
+             if (wasInThisRound && !userAdvanced && !showWinner) {
+               setTimeout(() => setEliminatedModal({ compId: activeCompId, phase }), 500);
+             }
+           }
        }
     }
     setCompView('main');
@@ -1726,6 +1755,107 @@ function DiceFootballApp() {
           )}
         </AnimatePresence>
 
+        {/* ELIMINATED MODAL - Switch team in cups (groups + knockout) */}
+        <AnimatePresence>
+          {eliminatedModal && activeComp && activeComp.type !== 'league' && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className='fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md'>
+              <motion.div initial={{ scale: 0.8, y: 30 }} animate={{ scale: 1, y: 0 }} className='bg-slate-900/95 backdrop-blur-xl w-full max-w-sm rounded-[2.5rem] border border-red-500/30 shadow-2xl relative overflow-hidden max-h-[85vh] flex flex-col'>
+                <div className='absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-red-500 to-transparent' />
+                <div className='p-6 text-center shrink-0'>
+                  <AlertTriangle size={48} className='text-red-400 mx-auto mb-3 drop-shadow-[0_0_15px_rgba(239,68,68,0.4)]' />
+                  <h2 className='text-xl font-black italic uppercase text-red-400 mb-2'>¡Eliminado!</h2>
+                  <p className='text-[11px] font-bold text-slate-300'>Tu equipo fue eliminado en <span className='text-red-300 uppercase'>{eliminatedModal.phase}</span>.</p>
+                  <p className='text-[10px] font-bold text-slate-400 mt-1'>Elige un nuevo equipo para continuar el torneo.</p>
+                </div>
+                <div className='overflow-y-auto flex-grow px-4 pb-4 custom-scrollbar'>
+                  <div className='grid gap-2'>
+                    {(() => {
+                      // Get remaining teams based on current phase
+                      const bracket = activeComp.bracket;
+                      const nextPhase = activeComp.phase;
+                      let remainingTeams: any[] = [];
+                      
+                      if (bracket && bracket[nextPhase]) {
+                        // Knockout: get teams from next round bracket
+                        const nextMatches = Array.isArray(bracket[nextPhase]) ? bracket[nextPhase] : [bracket[nextPhase]];
+                        const remainingIds = new Set<number>();
+                        nextMatches.forEach((m: any) => { if (m?.hId) remainingIds.add(m.hId); if (m?.aId) remainingIds.add(m.aId); });
+                        remainingTeams = activeComp.teams.filter((t: any) => remainingIds.has(t.id));
+                      } else if (bracket) {
+                        // After group stage: get all teams still in bracket (any phase)
+                        const allIds = new Set<number>();
+                        ['Octavos', 'Cuartos', 'Semis', 'Final'].forEach(p => {
+                          const matches = bracket[p];
+                          if (matches) {
+                            const arr = Array.isArray(matches) ? matches : [matches];
+                            arr.forEach((m: any) => { if (m?.hId) allIds.add(m.hId); if (m?.aId) allIds.add(m.aId); });
+                          }
+                        });
+                        remainingTeams = activeComp.teams.filter((t: any) => allIds.has(t.id));
+                      }
+
+                      return remainingTeams.map((t: any) => (
+                        <button key={t.id} onClick={() => {
+                          updateActiveComp({ userTeamId: t.id });
+                          setEliminatedModal(null);
+                        }} className='flex items-center gap-3 p-3 rounded-2xl border border-white/10 bg-slate-800/40 hover:bg-blue-600/30 hover:border-blue-400/50 active:scale-95 transition-all backdrop-blur-md'>
+                          <Shield color1={t.color1} color2={t.color2} initial={t.name} size='sm' isFlag={t.isFlag} />
+                          <div className='text-left'>
+                            <p className='text-[10px] font-black uppercase italic text-white'>{t.name}</p>
+                            <p className='text-[8px] font-bold text-slate-300'>{t.att}/{t.opp}/{t.def}</p>
+                          </div>
+                        </button>
+                      ));
+                    })()}
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* RESET CONFIRM MODAL */}
+        <AnimatePresence>
+          {resetConfirmModal && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className='fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md'>
+              <motion.div initial={{ scale: 0.8, y: 30 }} animate={{ scale: 1, y: 0 }} className='bg-slate-900/95 backdrop-blur-xl w-full max-w-sm rounded-[2.5rem] border border-red-500/30 shadow-2xl relative overflow-hidden'>
+                <div className='absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-red-500 to-transparent' />
+                <div className='p-8 text-center'>
+                  <div className='w-20 h-20 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-5 shadow-[0_0_30px_rgba(239,68,68,0.3)]'>
+                    <RotateCcw size={36} className='text-red-400' />
+                  </div>
+                  <h2 className='text-xl font-black italic uppercase text-red-400 mb-3'>¿Reiniciar Temporada?</h2>
+                  {isLeague ? (
+                    <div className='space-y-2 mb-6'>
+                      <p className='text-[11px] font-bold text-slate-300'>Se reiniciarán <span className='text-white'>ambas divisiones</span> de {activeComp.name}:</p>
+                      <div className='flex gap-2 justify-center mt-3'>
+                        <div className='bg-blue-900/30 border border-blue-500/20 px-3 py-2 rounded-xl'>
+                          <p className='text-[9px] font-black text-blue-400 uppercase'>1ª División</p>
+                          <p className='text-[8px] text-slate-400 font-bold'>Jornada {activeComp.matchday}</p>
+                        </div>
+                        <div className='bg-emerald-900/30 border border-emerald-500/20 px-3 py-2 rounded-xl'>
+                          <p className='text-[9px] font-black text-emerald-400 uppercase'>2ª División</p>
+                          <p className='text-[8px] text-slate-400 font-bold'>Jornada {activeComp.matchday2 || 0}</p>
+                        </div>
+                      </div>
+                      <p className='text-[9px] font-bold text-red-400/80 mt-2'>⚠️ Todo el progreso, estadísticas y resultados se perderán.</p>
+                    </div>
+                  ) : (
+                    <div className='mb-6'>
+                      <p className='text-[11px] font-bold text-slate-300'>Se reiniciará todo el torneo de <span className='text-white'>{activeComp.name}</span>.</p>
+                      <p className='text-[9px] font-bold text-red-400/80 mt-2'>⚠️ Equipos, grupos y resultados se restaurarán.</p>
+                    </div>
+                  )}
+                  <div className='flex gap-3'>
+                    <button onClick={() => setResetConfirmModal(false)} className='flex-1 bg-slate-800/80 border border-white/10 text-slate-200 py-3.5 rounded-2xl text-[10px] font-black uppercase italic tracking-widest active:scale-95 transition-all'>Cancelar</button>
+                    <button onClick={() => { handleTotalReset(activeCompId); setResetConfirmModal(false); }} className='flex-1 bg-red-600/80 border border-red-400/30 text-white py-3.5 rounded-2xl text-[10px] font-black uppercase italic tracking-widest active:scale-95 transition-all shadow-[0_0_20px_rgba(239,68,68,0.3)]'>Reiniciar</button>
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         <AnimatePresence>
           {(currentShowWinner || readyForPromotion) && compView === 'main' && (() => {
             const sorted1 = activeComp.teams ? [...activeComp.teams].sort((a, b) => b.pts - a.pts || (b.gf - b.ga) - (a.gf - a.ga)) : [];
@@ -1750,185 +1880,275 @@ function DiceFootballApp() {
             ];
 
             return (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className='fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md'>
-              {/* Sin confetti */}
-              <motion.div initial={{ scale: 0.8, y: 50 }} animate={{ scale: 1, y: 0 }} className='bg-slate-900/95 backdrop-blur-xl w-full max-w-sm rounded-[2.5rem] border border-yellow-500/30 shadow-2xl shadow-yellow-500/10 relative overflow-hidden max-h-[90vh] flex flex-col'>
-                <div className='absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-yellow-500 to-transparent' />
-
-                {/* Tabs */}
-                <div className='flex bg-slate-950/80 border-b border-white/10 shrink-0'>
-                  {[
-                    { key: 'champion', label: '🏆 Campeón' },
-                    { key: 'stats', label: '📊 Stats' },
-                    { key: 'results', label: '📋 Result.' },
-                    ...(isLeague ? [{ key: 'promotions', label: '↕️ Asc/Desc' }] : [])
-                  ].map(tab => (
-                    <button key={tab.key} onClick={() => setChampionModalTab(tab.key as any)} className={`flex-1 py-3 text-[9px] font-black uppercase italic tracking-wider transition-all ${championModalTab === tab.key ? 'text-yellow-400 border-b-2 border-yellow-500 bg-yellow-500/10' : 'text-slate-400 hover:text-white'}`}>{tab.label}</button>
-                  ))}
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className='fixed inset-0 z-[60] bg-slate-950/98 backdrop-blur-xl flex flex-col'>
+              <Confetti />
+              
+              {/* Header */}
+              <div className='shrink-0 pt-6 pb-4 px-4'>
+                <div className='text-center'>
+                  <div className='relative inline-block'>
+                    <Trophy size={72} className='text-yellow-400 mx-auto drop-shadow-[0_0_30px_rgba(250,204,21,0.6)]' />
+                    <div className='absolute -top-2 -right-2 w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center animate-bounce shadow-lg'>
+                      <span className='text-[10px]'>🎉</span>
+                    </div>
+                  </div>
+                  <h1 className='text-3xl font-black italic uppercase tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-yellow-400 to-amber-500 mt-3 drop-shadow-md'>¡CAMPEÓN!</h1>
+                  <p className='text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mt-1'>{activeComp.name}</p>
                 </div>
+              </div>
 
-                {/* Div switcher for stats/results */}
-                {isLeague && championModalTab !== 'champion' && (
-                  <div className='flex mx-4 mt-3 bg-slate-800/60 p-0.5 rounded-xl border border-white/10 shrink-0'>
-                    <button onClick={() => setChampionModalDiv(1)} className={`flex-1 py-1.5 text-[9px] font-black uppercase italic rounded-lg transition-all ${championModalDiv === 1 ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400'}`}>1ª División</button>
-                    <button onClick={() => setChampionModalDiv(2)} className={`flex-1 py-1.5 text-[9px] font-black uppercase italic rounded-lg transition-all ${championModalDiv === 2 ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-400'}`}>2ª División</button>
+              {/* Winner showcase */}
+              <div className='shrink-0 px-6 pb-4'>
+                <div className='bg-gradient-to-br from-yellow-500/15 to-amber-600/10 border border-yellow-500/30 rounded-[2rem] p-5 shadow-[0_0_40px_rgba(234,179,8,0.15)]'>
+                  <div className='flex items-center justify-center gap-5'>
+                    <Shield color1={winner?.color1} color2={winner?.color2} initial={winner?.name} size='lg' isFlag={winner?.isFlag} />
+                    <div>
+                      <h2 className='text-xl font-black uppercase italic text-white drop-shadow-md'>{winner?.name}</h2>
+                      <p className='text-[9px] font-bold text-yellow-400/80 uppercase tracking-widest mt-0.5'>
+                        {isDiv2 ? '2ª División' : (isLeague ? '1ª División' : activeComp.name)}
+                      </p>
+                      {winner && (
+                        <div className='flex gap-2 mt-2'>
+                          <span className='text-[8px] font-black bg-yellow-500/20 text-yellow-300 px-2 py-0.5 rounded-full border border-yellow-500/30'>{winner.pts} PTS</span>
+                          <span className='text-[8px] font-bold bg-slate-800/60 text-slate-300 px-2 py-0.5 rounded-full'>{winner.w}G {winner.d}E {winner.l}P</span>
+                          <span className='text-[8px] font-bold bg-slate-800/60 text-slate-300 px-2 py-0.5 rounded-full'>GF:{winner.gf} GC:{winner.ga}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Tabs */}
+              <div className='flex mx-4 bg-slate-900/80 rounded-2xl border border-white/10 p-0.5 shrink-0'>
+                {[
+                  { key: 'stats', label: '📊 Clasificación' },
+                  { key: 'results', label: '📋 Resultados' },
+                  ...(isLeague ? [{ key: 'promotions', label: '↕️ Asc/Desc' }] : [])
+                ].map(tab => (
+                  <button key={tab.key} onClick={() => setChampionModalTab(tab.key as any)} className={`flex-1 py-2 text-[8px] font-black uppercase italic tracking-wider rounded-xl transition-all ${championModalTab === tab.key ? 'text-yellow-400 bg-yellow-500/15 shadow-inner' : 'text-slate-400 hover:text-white'}`}>{tab.label}</button>
+                ))}
+              </div>
+
+              {/* Div switcher for leagues */}
+              {isLeague && championModalTab !== 'champion' && (
+                <div className='flex mx-4 mt-2 bg-slate-800/60 p-0.5 rounded-xl border border-white/10 shrink-0'>
+                  <button onClick={() => setChampionModalDiv(1)} className={`flex-1 py-1.5 text-[9px] font-black uppercase italic rounded-lg transition-all ${championModalDiv === 1 ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400'}`}>1ª División</button>
+                  <button onClick={() => setChampionModalDiv(2)} className={`flex-1 py-1.5 text-[9px] font-black uppercase italic rounded-lg transition-all ${championModalDiv === 2 ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-400'}`}>2ª División</button>
+                </div>
+              )}
+
+              {/* Content area */}
+              <div className='flex-grow overflow-y-auto px-4 py-4 custom-scrollbar'>
+                {/* TAB: STATS */}
+                {championModalTab === 'stats' && (
+                  <div>
+                    {isLeague ? (
+                      <>
+                        <h3 className='text-xs font-black uppercase text-slate-200 mb-3 text-center'>Clasificación {championModalDiv === 2 ? '2ª' : '1ª'} Div.</h3>
+                        <div className='bg-slate-900/30 rounded-2xl border border-white/10 overflow-x-auto custom-scrollbar'>
+                          <table className='w-full text-left border-collapse min-w-[480px]'>
+                            <thead className='bg-[#0f172a] sticky top-0 z-10'>
+                              <tr className='text-[7px] font-black uppercase italic text-slate-400'>
+                                <th className='p-2 sticky bg-[#0f172a]' style={{ left: 0, minWidth: '28px' }}>Pos</th>
+                                <th className='p-2 sticky bg-[#0f172a]' style={{ left: '28px', minWidth: '100px' }}>Equipo</th>
+                                <th className='p-2 text-center border-r border-white/10'>PJ</th>
+                                <th className='p-2 text-center'>G</th><th className='p-2 text-center'>E</th><th className='p-2 text-center'>P</th>
+                                <th className='p-2 text-center'>GF</th><th className='p-2 text-center'>GC</th><th className='p-2 text-center'>DG</th>
+                                <th className='p-2 text-center text-emerald-400'>Pts</th>
+                              </tr>
+                            </thead>
+                            <tbody className='divide-y divide-white/5'>
+                              {displayTeams.map((t, i) => {
+                                const isPromo = championModalDiv === 2 && i < 3;
+                                const isReleg = championModalDiv === 1 && i >= displayTeams.length - 3;
+                                const rowBg = i === 0 ? 'bg-yellow-500/15' : isPromo ? 'bg-emerald-900/20' : isReleg ? 'bg-red-900/20' : '';
+                                return (
+                                  <tr key={t.id} className={rowBg}>
+                                    <td className={'p-2 text-[9px] font-black italic sticky bg-[#0f172a] ' + (i === 0 ? 'text-yellow-400' : isPromo ? 'text-emerald-400' : isReleg ? 'text-red-400' : 'text-slate-300')} style={{ left: 0 }}>{i+1}</td>
+                                    <td className='p-2 sticky bg-[#0f172a]' style={{ left: '28px', minWidth: '100px' }}>
+                                      <div className='flex items-center gap-1.5'>
+                                        <Shield color1={t.color1} color2={t.color2} initial={t.name} size='xs' isFlag={t.isFlag}/>
+                                        <span className='text-[8px] font-bold uppercase truncate italic max-w-[70px]'>{t.name}</span>
+                                      </div>
+                                    </td>
+                                    <td className='p-2 text-center text-[9px] font-bold border-r border-white/10'>{t.p}</td>
+                                    <td className='p-2 text-center text-[9px] font-bold'>{t.w}</td>
+                                    <td className='p-2 text-center text-[9px] font-bold'>{t.d}</td>
+                                    <td className='p-2 text-center text-[9px] font-bold'>{t.l}</td>
+                                    <td className='p-2 text-center text-[9px] font-bold'>{t.gf}</td>
+                                    <td className='p-2 text-center text-[9px] font-bold'>{t.ga}</td>
+                                    <td className='p-2 text-center text-[9px] font-bold'>{t.gf - t.ga}</td>
+                                    <td className='p-2 text-center text-[9px] font-black text-emerald-400'>{t.pts}</td>
+                                  </tr>
+                                );
+                              })}
+                            </tbody>
+                          </table>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <h3 className='text-xs font-black uppercase text-slate-200 mb-3 text-center'>Clasificación por Grupo</h3>
+                        <div className='space-y-4'>
+                          {(activeComp.groups || []).map((group, gi) => {
+                            const groupTeams = (activeComp.teams || []).filter(t => Array.isArray(group.teamIds) && group.teamIds.includes(t.id)).sort((a, b) => b.pts - a.pts || (b.gf - b.ga) - (a.gf - a.ga));
+                            return (
+                              <div key={gi} className='bg-slate-900/30 rounded-2xl border border-white/10 overflow-x-auto custom-scrollbar'>
+                                <div className='bg-[#0f172a] p-2 border-b border-white/10'>
+                                  <h4 className='text-[9px] font-black uppercase text-blue-400 flex items-center gap-1.5'><ShieldIcon size={10} /> {group.name}</h4>
+                                </div>
+                                <table className='w-full text-left border-collapse min-w-[400px]'>
+                                  <thead className='bg-[#0f172a]'>
+                                    <tr className='text-[7px] font-black uppercase italic text-slate-400'>
+                                      <th className='p-1.5' style={{ minWidth: '20px' }}>Pos</th>
+                                      <th className='p-1.5' style={{ minWidth: '80px' }}>Equipo</th>
+                                      <th className='p-1.5 text-center'>PJ</th>
+                                      <th className='p-1.5 text-center'>G</th><th className='p-1.5 text-center'>E</th><th className='p-1.5 text-center'>P</th>
+                                      <th className='p-1.5 text-center'>GF</th><th className='p-1.5 text-center'>GC</th><th className='p-1.5 text-center'>DG</th>
+                                      <th className='p-1.5 text-center text-emerald-400'>Pts</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody className='divide-y divide-white/5'>
+                                    {groupTeams.map((t, i) => (
+                                      <tr key={t.id} className={i < 2 ? 'bg-emerald-900/15' : ''}>
+                                        <td className='p-1.5 text-[8px] font-black italic text-slate-300'>{i+1}</td>
+                                        <td className='p-1.5'>
+                                          <div className='flex items-center gap-1'>
+                                            <Shield color1={t.color1} color2={t.color2} initial={t.name} size='xs' isFlag={t.isFlag}/>
+                                            <span className='text-[7px] font-bold uppercase truncate italic max-w-[60px]'>{t.name}</span>
+                                          </div>
+                                        </td>
+                                        <td className='p-1.5 text-center text-[8px] font-bold'>{t.p}</td>
+                                        <td className='p-1.5 text-center text-[8px] font-bold'>{t.w}</td>
+                                        <td className='p-1.5 text-center text-[8px] font-bold'>{t.d}</td>
+                                        <td className='p-1.5 text-center text-[8px] font-bold'>{t.l}</td>
+                                        <td className='p-1.5 text-center text-[8px] font-bold'>{t.gf}</td>
+                                        <td className='p-1.5 text-center text-[8px] font-bold'>{t.ga}</td>
+                                        <td className='p-1.5 text-center text-[8px] font-bold'>{t.gf - t.ga}</td>
+                                        <td className='p-1.5 text-center text-[8px] font-black text-emerald-400'>{t.pts}</td>
+                                      </tr>
+                                    ))}
+                                  </tbody>
+                                </table>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </>
+                    )}
                   </div>
                 )}
 
-                <div className='overflow-y-auto flex-grow p-6 custom-scrollbar'>
-                  {/* TAB: CHAMPION */}
-                  {championModalTab === 'champion' && (
-                    <div className='text-center'>
-                      <Trophy size={56} className='text-yellow-400 mx-auto mb-4 drop-shadow-[0_0_15px_rgba(250,204,21,0.4)]' />
-                      <h2 className='text-2xl font-black italic uppercase mb-1 tracking-tighter text-yellow-400'>¡CAMPEÓN!</h2>
-                      <div className='my-6 flex flex-col items-center'>
-                        <Shield color1={winner?.color1} color2={winner?.color2} initial={winner?.name} size='lg' isFlag={winner?.isFlag} />
-                        <h3 className='text-lg font-black uppercase italic mt-3 text-white'>{winner?.name}</h3>
-                        <p className='text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1'>Ganador {isDiv2 ? '2ª División' : (isLeague ? '1ª División' : activeComp.name)}</p>
-                        {winner && <p className='text-[9px] font-bold text-emerald-400 mt-2 bg-emerald-900/30 px-3 py-1 rounded-full'>{winner.pts} PTS | {winner.w}G {winner.d}E {winner.l}P | GF:{winner.gf} GC:{winner.ga}</p>}
-                      </div>
-
-                    </div>
-                  )}
-
-                  {/* TAB: STATS */}
-                  {championModalTab === 'stats' && (
-                    <div>
-                      <h3 className='text-xs font-black uppercase text-slate-200 mb-3 text-center'>Clasificación {championModalDiv === 2 ? '2ª' : '1ª'} Div.</h3>
-                      <div className='bg-slate-900/30 rounded-2xl border border-white/10 overflow-x-auto custom-scrollbar'>
-                        <table className='w-full text-left border-collapse min-w-[480px]'>
-                          <thead className='bg-[#0f172a] sticky top-0 z-10'>
-                            <tr className='text-[7px] font-black uppercase italic text-slate-400'>
-                              <th className='p-2 sticky bg-[#0f172a]' style={{ left: 0, minWidth: '28px' }}>Pos</th>
-                              <th className='p-2 sticky bg-[#0f172a]' style={{ left: '28px', minWidth: '100px' }}>Equipo</th>
-                              <th className='p-2 text-center border-r border-white/10'>PJ</th>
-                              <th className='p-2 text-center'>G</th><th className='p-2 text-center'>E</th><th className='p-2 text-center'>P</th>
-                              <th className='p-2 text-center'>GF</th><th className='p-2 text-center'>GC</th><th className='p-2 text-center'>DG</th>
-                              <th className='p-2 text-center text-emerald-400'>Pts</th>
-                            </tr>
-                          </thead>
-                          <tbody className='divide-y divide-white/5'>
-                            {displayTeams.map((t, i) => {
-                              const isPromo = championModalDiv === 2 && i < 3;
-                              const isReleg = championModalDiv === 1 && i >= displayTeams.length - 3;
-                              const rowBg = i === 0 ? 'bg-yellow-500/15' : isPromo ? 'bg-emerald-900/20' : isReleg ? 'bg-red-900/20' : '';
+                {/* TAB: RESULTS */}
+                {championModalTab === 'results' && (
+                  <div>
+                    <h3 className='text-xs font-black uppercase text-slate-200 mb-3 text-center'>Resultados {championModalDiv === 2 ? '2ª' : '1ª'} Div.</h3>
+                    <div className='space-y-3'>
+                      {displayHistory.length === 0 && <p className='text-center text-[10px] text-slate-400 italic py-8'>No hay resultados.</p>}
+                      {displayHistory.slice(0, 5).map((h, i) => (
+                        <div key={i} className='bg-black/20 rounded-xl p-2.5 border border-white/5'>
+                          <h4 className='text-[8px] font-black uppercase text-blue-300 mb-1.5'>Jornada {h.day}</h4>
+                          <div className='space-y-1'>
+                            {Array.isArray(h.results) && h.results.map((r, ri) => {
+                              const home = displayAllTeams.find(t => t.id === r.hId);
+                              const away = displayAllTeams.find(t => t.id === r.aId);
                               return (
-                                <tr key={t.id} className={rowBg}>
-                                  <td className={'p-2 text-[9px] font-black italic sticky bg-[#0f172a] ' + (i === 0 ? 'text-yellow-400' : isPromo ? 'text-emerald-400' : isReleg ? 'text-red-400' : 'text-slate-300')} style={{ left: 0 }}>{i+1}</td>
-                                  <td className='p-2 sticky bg-[#0f172a]' style={{ left: '28px', minWidth: '100px' }}>
-                                    <div className='flex items-center gap-1.5'>
-                                      <Shield color1={t.color1} color2={t.color2} initial={t.name} size='xs' isFlag={t.isFlag}/>
-                                      <span className='text-[8px] font-bold uppercase truncate italic max-w-[70px]'>{t.name}</span>
-                                    </div>
-                                  </td>
-                                  <td className='p-2 text-center text-[9px] font-bold border-r border-white/10'>{t.p}</td>
-                                  <td className='p-2 text-center text-[9px] font-bold'>{t.w}</td>
-                                  <td className='p-2 text-center text-[9px] font-bold'>{t.d}</td>
-                                  <td className='p-2 text-center text-[9px] font-bold'>{t.l}</td>
-                                  <td className='p-2 text-center text-[9px] font-bold'>{t.gf}</td>
-                                  <td className='p-2 text-center text-[9px] font-bold'>{t.ga}</td>
-                                  <td className='p-2 text-center text-[9px] font-bold'>{t.gf - t.ga}</td>
-                                  <td className='p-2 text-center text-[9px] font-black text-emerald-400'>{t.pts}</td>
-                                </tr>
+                                <div key={ri} className='flex items-center justify-between text-[8px] py-0.5'>
+                                  <div className='flex items-center gap-1 w-20 truncate'>
+                                    <Shield color1={home?.color1} color2={home?.color2} initial={home?.name} size='xs' isFlag={home?.isFlag}/>
+                                    <span className='font-bold uppercase truncate'>{home?.name}</span>
+                                  </div>
+                                  <span className='font-black bg-slate-800/60 px-1.5 rounded tabular-nums'>{r.sh}-{r.sa}</span>
+                                  <div className='flex items-center gap-1 w-20 justify-end truncate'>
+                                    <span className='font-bold uppercase truncate'>{away?.name}</span>
+                                    <Shield color1={away?.color1} color2={away?.color2} initial={away?.name} size='xs' isFlag={away?.isFlag}/>
+                                  </div>
+                                </div>
                               );
                             })}
-                          </tbody>
-                        </table>
-                      </div>
+                          </div>
+                        </div>
+                      ))}
+                      {displayHistory.length > 5 && <p className='text-center text-[8px] text-slate-400 italic'>... y {displayHistory.length - 5} jornadas más</p>}
                     </div>
-                  )}
+                  </div>
+                )}
 
-                  {/* TAB: RESULTS */}
-                  {championModalTab === 'results' && (
-                    <div>
-                      <h3 className='text-xs font-black uppercase text-slate-200 mb-3 text-center'>Resultados {championModalDiv === 2 ? '2ª' : '1ª'} Div.</h3>
-                      <div className='space-y-3'>
-                        {displayHistory.length === 0 && <p className='text-center text-[10px] text-slate-400 italic py-8'>No hay resultados.</p>}
-                        {displayHistory.slice(0, 5).map((h, i) => (
-                          <div key={i} className='bg-black/20 rounded-xl p-2.5 border border-white/5'>
-                            <h4 className='text-[8px] font-black uppercase text-blue-300 mb-1.5'>Jornada {h.day}</h4>
-                            <div className='space-y-1'>
-                              {Array.isArray(h.results) && h.results.map((r, ri) => {
-                                const home = displayAllTeams.find(t => t.id === r.hId);
-                                const away = displayAllTeams.find(t => t.id === r.aId);
-                                return (
-                                  <div key={ri} className='flex items-center justify-between text-[8px] py-0.5'>
-                                    <div className='flex items-center gap-1 w-20 truncate'>
-                                      <Shield color1={home?.color1} color2={home?.color2} initial={home?.name} size='xs' isFlag={home?.isFlag}/>
-                                      <span className='font-bold uppercase truncate'>{home?.name}</span>
-                                    </div>
-                                    <span className='font-black bg-slate-800/60 px-1.5 rounded tabular-nums'>{r.sh}-{r.sa}</span>
-                                    <div className='flex items-center gap-1 w-20 justify-end truncate'>
-                                      <span className='font-bold uppercase truncate'>{away?.name}</span>
-                                      <Shield color1={away?.color1} color2={away?.color2} initial={away?.name} size='xs' isFlag={away?.isFlag}/>
-                                    </div>
-                                  </div>
-                                );
-                              })}
-                            </div>
+                {championModalTab === 'promotions' && isLeague && (
+                  <div className='space-y-4 text-left'>
+                    <div className='bg-emerald-900/20 border border-emerald-500/20 p-3 rounded-2xl'>
+                      <h4 className='text-[9px] font-black uppercase text-emerald-400 mb-2 flex items-center gap-1.5'><ArrowUpCircle size={13}/> Ascienden a 1ª</h4>
+                      <div className='space-y-1.5'>
+                        {promoted.map((t, i) => (
+                          <div key={t.id} className='flex items-center gap-2 bg-black/30 p-2 rounded-xl border border-white/5'>
+                            <span className='text-[9px] font-black text-emerald-300 w-3'>{i+1}</span>
+                            <Shield color1={t.color1} color2={t.color2} initial={t.name} size='xs'/>
+                            <span className='text-[9px] font-bold uppercase truncate flex-grow'>{t.name}</span>
+                            <span className='text-[7px] font-bold text-slate-400'>{t.att}/{t.opp}/{t.def}</span>
+                            <span className='text-[7px] text-emerald-400'>→</span>
+                            <span className='text-[7px] font-black text-emerald-300'>{newPromotedStats[i]?.att}/{newPromotedStats[i]?.opp}/{newPromotedStats[i]?.def}</span>
                           </div>
                         ))}
-                        {displayHistory.length > 5 && <p className='text-center text-[8px] text-slate-400 italic'>... y {displayHistory.length - 5} jornadas más</p>}
                       </div>
                     </div>
-                  )}
-
-                  {championModalTab === 'promotions' && isLeague && (
-                    <div className='space-y-4 text-left'>
-                      <div className='bg-emerald-900/20 border border-emerald-500/20 p-3 rounded-2xl'>
-                        <h4 className='text-[9px] font-black uppercase text-emerald-400 mb-2 flex items-center gap-1.5'><ArrowUpCircle size={13}/> Ascienden a 1ª</h4>
-                        <div className='space-y-1.5'>
-                          {promoted.map((t, i) => (
-                            <div key={t.id} className='flex items-center gap-2 bg-black/30 p-2 rounded-xl border border-white/5'>
-                              <span className='text-[9px] font-black text-emerald-300 w-3'>{i+1}</span>
-                              <Shield color1={t.color1} color2={t.color2} initial={t.name} size='xs'/>
-                              <span className='text-[9px] font-bold uppercase truncate flex-grow'>{t.name}</span>
-                              <span className='text-[7px] font-bold text-slate-400'>{t.att}/{t.opp}/{t.def}</span>
-                              <span className='text-[7px] text-emerald-400'>→</span>
-                              <span className='text-[7px] font-black text-emerald-300'>{newPromotedStats[i]?.att}/{newPromotedStats[i]?.opp}/{newPromotedStats[i]?.def}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                      <div className='bg-red-900/20 border border-red-500/20 p-3 rounded-2xl'>
-                        <h4 className='text-[9px] font-black uppercase text-red-400 mb-2 flex items-center gap-1.5'><ArrowDownCircle size={13}/> Descienden a 2ª</h4>
-                        <div className='space-y-1.5'>
-                          {relegated.map((t, i) => (
-                            <div key={t.id} className='flex items-center gap-2 bg-black/30 p-2 rounded-xl border border-white/5'>
-                              <span className='text-[9px] font-black text-red-300 w-3'>↓</span>
-                              <Shield color1={t.color1} color2={t.color2} initial={t.name} size='xs'/>
-                              <span className='text-[9px] font-bold uppercase truncate flex-grow'>{t.name}</span>
-                              <span className='text-[7px] font-bold text-slate-400'>{t.att}/{t.opp}/{t.def}</span>
-                              <span className='text-[7px] text-red-400'>→</span>
-                              <span className='text-[7px] font-black text-red-300'>{newRelegatedStats[i]?.att}/{newRelegatedStats[i]?.opp}/{newRelegatedStats[i]?.def}</span>
-                            </div>
-                          ))}
-                        </div>
+                    <div className='bg-red-900/20 border border-red-500/20 p-3 rounded-2xl'>
+                      <h4 className='text-[9px] font-black uppercase text-red-400 mb-2 flex items-center gap-1.5'><ArrowDownCircle size={13}/> Descienden a 2ª</h4>
+                      <div className='space-y-1.5'>
+                        {relegated.map((t, i) => (
+                          <div key={t.id} className='flex items-center gap-2 bg-black/30 p-2 rounded-xl border border-white/5'>
+                            <span className='text-[9px] font-black text-red-300 w-3'>↓</span>
+                            <Shield color1={t.color1} color2={t.color2} initial={t.name} size='xs'/>
+                            <span className='text-[9px] font-bold uppercase truncate flex-grow'>{t.name}</span>
+                            <span className='text-[7px] font-bold text-slate-400'>{t.att}/{t.opp}/{t.def}</span>
+                            <span className='text-[7px] text-red-400'>→</span>
+                            <span className='text-[7px] font-black text-red-300'>{newRelegatedStats[i]?.att}/{newRelegatedStats[i]?.opp}/{newRelegatedStats[i]?.def}</span>
+                          </div>
+                        ))}
                       </div>
                     </div>
-                  )}
-                </div>
+                  </div>
+                )}
+              </div>
 
-                <div className='p-4 border-t border-white/10 shrink-0'>
-                  {isLeague && readyForPromotion && championModalTab !== 'promotions' ? (
-                    <button onClick={() => {
-                      setChampionModalTab('promotions');
-                    }} className='w-full bg-yellow-500 text-slate-950 py-3.5 rounded-2xl text-[10px] font-black uppercase italic tracking-widest shadow-xl active:scale-95 transition-all'>Ascendidos y Descendidos</button>
-                  ) : isLeague && readyForPromotion && championModalTab === 'promotions' ? (
-                    <button onClick={() => {
-                      setChampionModalTab('champion');
-                      setChampionModalDiv(1);
-                      handlePromotionAndNewSeason();
-                    }} className='w-full bg-yellow-500 text-slate-950 py-3.5 rounded-2xl text-[10px] font-black uppercase italic tracking-widest shadow-xl active:scale-95 transition-all'>Aplicar y Empezar Nueva Temp.</button>
-                  ) : (
+              {/* Footer buttons */}
+              <div className='shrink-0 p-4 border-t border-white/10 bg-slate-950/80 space-y-2'>
+                {isLeague && readyForPromotion && championModalTab !== 'promotions' ? (
+                  <button onClick={() => setChampionModalTab('promotions')} className='w-full bg-gradient-to-r from-emerald-600 to-blue-600 text-white py-4 rounded-2xl text-[11px] font-black uppercase italic tracking-widest shadow-xl active:scale-95 transition-all flex items-center justify-center gap-2'>
+                    <ArrowUpCircle size={16}/> Ver Ascensos y Descensos
+                  </button>
+                ) : isLeague && readyForPromotion && championModalTab === 'promotions' ? (
+                  <button onClick={() => {
+                    setChampionModalTab('champion');
+                    setChampionModalDiv(1);
+                    handlePromotionAndNewSeason();
+                  }} className='w-full bg-gradient-to-r from-yellow-500 to-amber-600 text-slate-950 py-4 rounded-2xl text-[11px] font-black uppercase italic tracking-widest shadow-xl active:scale-95 transition-all flex items-center justify-center gap-2'>
+                    <RotateCcw size={16}/> Nueva Temporada (1ª y 2ª Div)
+                  </button>
+                ) : !isLeague ? (
+                  <div className='flex gap-2'>
                     <button onClick={() => {
                        setChampionModalTab('champion');
                        setChampionModalDiv(1);
-                       if (isDiv2) updateActiveComp({ showWinner2: false }); else updateActiveComp({ showWinner: false });
-                    }} className='w-full bg-yellow-500 text-slate-950 py-3.5 rounded-2xl text-[10px] font-black uppercase italic tracking-widest shadow-xl active:scale-95 transition-all'>Continuar</button>
-                  )}
-                </div>
-              </motion.div>
+                       updateActiveComp({ showWinner: false });
+                    }} className='flex-1 bg-slate-800/80 border border-white/10 text-slate-200 py-3.5 rounded-2xl text-[10px] font-black uppercase italic tracking-widest active:scale-95 transition-all'>Cerrar</button>
+                    <button onClick={() => {
+                       setChampionModalTab('champion');
+                       setChampionModalDiv(1);
+                       handleTotalReset(activeCompId);
+                       updateActiveComp({ showWinner: false });
+                    }} className='flex-[2] bg-gradient-to-r from-yellow-500 to-amber-600 text-slate-950 py-3.5 rounded-2xl text-[10px] font-black uppercase italic tracking-widest shadow-xl active:scale-95 transition-all flex items-center justify-center gap-2'>
+                      <RotateCcw size={14}/> Nueva Temporada
+                    </button>
+                  </div>
+                ) : (
+                  <button onClick={() => {
+                     setChampionModalTab('champion');
+                     setChampionModalDiv(1);
+                     if (isDiv2) updateActiveComp({ showWinner2: false }); else updateActiveComp({ showWinner: false });
+                  }} className='w-full bg-gradient-to-r from-yellow-500 to-amber-600 text-slate-950 py-4 rounded-2xl text-[11px] font-black uppercase italic tracking-widest shadow-xl active:scale-95 transition-all'>Continuar</button>
+                )}
+              </div>
             </motion.div>
             );
           })()}
@@ -1956,18 +2176,15 @@ function DiceFootballApp() {
            <MenuButton icon={<BarChart3 size={18} className='text-emerald-400'/>} label="Stats" onClick={() => setCompView('stats')} />
            <MenuButton icon={<Calendar size={18} className='text-blue-400'/>} label="Fechas" onClick={() => setCompView('calendar')} />
            <MenuButton icon={<History size={18} className='text-yellow-400'/>} label="Result." onClick={() => setCompView('results')} />
-           {activeComp.type !== 'league' ? (
+           {activeComp.type !== 'league' && (
              <MenuButton icon={<Swords size={18} className='text-purple-400'/>} label="Llaves" onClick={() => setCompView('bracket')} />
-           ) : (
+           )}
+           {activeComp.type === 'league' && (
              <MenuButton icon={<Users size={18} className='text-indigo-400'/>} label="Equipo" onClick={() => setCompView('teamSelect')} />
            )}
 
+           <MenuButton icon={<Users size={16} className='text-indigo-400'/>} label="Mi Equipo" onClick={() => setCompView('teamSelect')} isWide />
            <MenuButton icon={<Settings size={16} className='text-slate-300'/>} label="Ajustes" onClick={() => setCompView('config')} isWide />
-           {activeComp.type !== 'league' ? (
-             <MenuButton icon={<RotateCcw size={16}/>} label="Reset" onClick={() => handleTotalReset(activeCompId)} isDanger isWide />
-           ) : (
-             <MenuButton icon={<Users size={16} className='text-indigo-400'/>} label="Mi Equipo" onClick={() => setCompView('teamSelect')} isWide />
-           )}
         </div>
 
         {activeComp.type !== 'league' && activeComp.phase === 'groups' && Array.isArray(activeComp.groups) && (
