@@ -974,7 +974,8 @@ const HubView = ({ setView, setActiveCompId, setCompView, comps }) => {
 const ConfigPanel = ({ initialComp, compId, onSave, onCancel, onTotalReset }) => {
   const [draft, setDraft] = useState(() => JSON.parse(JSON.stringify(initialComp)));
   const [editDiv, setEditDiv] = useState(1);
-  const [drawModal, setDrawModal] = useState(null); 
+  const [drawModal, setDrawModal] = useState(null);
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
 
   const hasStarted = initialComp.type === 'league' 
     ? (initialComp.matchday > 0 || initialComp.matchday2 > 0 || initialComp.history?.length > 0)
@@ -1072,10 +1073,41 @@ const ConfigPanel = ({ initialComp, compId, onSave, onCancel, onTotalReset }) =>
 
       <div className='bg-slate-900/30 backdrop-blur-md rounded-2xl p-4 border border-white/10 shadow-lg mb-6'>
         <h3 className='text-xs font-black text-red-400 uppercase italic mb-3 flex items-center gap-2'><AlertTriangle size={14}/> Zona de Peligro</h3>
-        <button onClick={() => { if(window.confirm('Esto borrará el progreso de esta competición y restaurará los equipos originales. ¿Continuar?')) onTotalReset(compId); }} className='w-full py-3 bg-red-900/30 text-red-300 font-bold uppercase tracking-wider text-[10px] rounded-xl border border-red-500/30 active:scale-95 transition-all'>
-           Restaurar a Valores Originales
-        </button>
+        <button onClick={() => setShowResetConfirm(true)} className='w-full py-4 bg-gradient-to-r from-red-700/60 via-red-600/50 to-red-700/60 text-red-200 font-black uppercase tracking-widest text-[11px] rounded-2xl border-2 border-red-500/40 active:scale-95 transition-all shadow-[0_0_25px_rgba(239,68,68,0.2)] hover:shadow-[0_0_35px_rgba(239,68,68,0.35)] hover:border-red-400/60 flex items-center justify-center gap-2 italic'>
+           <RotateCcw size={15} className='text-red-300'/> Reiniciar Temporada (Ambas Divisiones)
+         </button>
       </div>
+
+      <AnimatePresence>
+        {showResetConfirm && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className='fixed inset-0 z-[80] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md'>
+            <motion.div initial={{ scale: 0.8, y: 30 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.8, y: 30 }} className='bg-gradient-to-b from-slate-900 to-slate-950 w-full max-w-sm rounded-[2rem] border border-red-500/30 shadow-2xl overflow-hidden'>
+              <div className='bg-gradient-to-r from-red-900/60 via-red-800/40 to-red-900/60 px-6 py-5 border-b border-red-500/20'>
+                <div className='flex items-center justify-center gap-3'>
+                  <div className='w-10 h-10 bg-red-500/20 rounded-full flex items-center justify-center border border-red-500/30'>
+                    <AlertTriangle size={20} className='text-red-400' />
+                  </div>
+                  <h3 className='text-lg font-black uppercase italic text-red-300 tracking-tight'>Reiniciar Temporada</h3>
+                </div>
+              </div>
+              <div className='px-6 py-5'>
+                <p className='text-sm font-bold text-slate-200 text-center leading-relaxed'>
+                  Esto borrará <span className='text-red-400'>todo el progreso</span> de esta competición y restaurará los equipos originales.
+                </p>
+                <p className='text-[10px] font-bold text-slate-500 text-center mt-2 uppercase tracking-wider'>Esta acción no se puede deshacer</p>
+              </div>
+              <div className='flex gap-3 px-6 pb-6'>
+                <button onClick={() => setShowResetConfirm(false)} className='flex-1 bg-slate-800/80 border border-white/10 text-slate-200 py-3.5 rounded-2xl text-[11px] font-black uppercase italic tracking-widest active:scale-95 transition-all'>
+                  Cancelar
+                </button>
+                <button onClick={() => { onTotalReset(compId); setShowResetConfirm(false); }} className='flex-1 bg-gradient-to-r from-red-700/80 to-red-600/80 border-2 border-red-400/40 text-white py-3.5 rounded-2xl text-[11px] font-black uppercase italic tracking-widest active:scale-95 transition-all shadow-[0_0_25px_rgba(239,68,68,0.35)] flex items-center justify-center gap-2'>
+                  <RotateCcw size={14} className='text-red-200'/> Reiniciar
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {draft.type === 'league' && (
         <div className='flex mb-4 bg-slate-900/50 p-1 rounded-2xl border border-white/10 backdrop-blur-sm'>
@@ -1136,7 +1168,7 @@ function DiceFootballApp() {
   const [compView, setCompView] = useState('main');
   const [viewDiv, setViewDiv] = useState(1); 
   const [showSaveModal, setShowSaveModal] = useState(false);
-  const [championModalTab, setChampionModalTab] = useState<'champion' | 'stats' | 'results' | 'promotions'>('champion');
+  const [championModalTab, setChampionModalTab] = useState<'champion' | 'stats' | 'results' | 'promotions' | 'bracket'>('champion');
   const [championModalDiv, setChampionModalDiv] = useState(1);
   const [eliminatedModal, setEliminatedModal] = useState<{ compId: string; phase: string } | null>(null);
   const [resetConfirmModal, setResetConfirmModal] = useState(false);
@@ -1848,7 +1880,9 @@ function DiceFootballApp() {
                   )}
                   <div className='flex gap-3'>
                     <button onClick={() => setResetConfirmModal(false)} className='flex-1 bg-slate-800/80 border border-white/10 text-slate-200 py-3.5 rounded-2xl text-[10px] font-black uppercase italic tracking-widest active:scale-95 transition-all'>Cancelar</button>
-                    <button onClick={() => { handleTotalReset(activeCompId); setResetConfirmModal(false); }} className='flex-1 bg-red-600/80 border border-red-400/30 text-white py-3.5 rounded-2xl text-[10px] font-black uppercase italic tracking-widest active:scale-95 transition-all shadow-[0_0_20px_rgba(239,68,68,0.3)]'>Reiniciar</button>
+                    <button onClick={() => { handleTotalReset(activeCompId); setResetConfirmModal(false); }} className='flex-1 bg-gradient-to-r from-red-700/80 to-red-600/80 border-2 border-red-400/40 text-white py-3.5 rounded-2xl text-[10px] font-black uppercase italic tracking-widest active:scale-95 transition-all shadow-[0_0_25px_rgba(239,68,68,0.35)] hover:shadow-[0_0_35px_rgba(239,68,68,0.5)] hover:border-red-300/60 flex items-center justify-center gap-2'>
+                      <RotateCcw size={14} className='text-red-200'/> Reiniciar
+                    </button>
                   </div>
                 </div>
               </motion.div>
@@ -1881,37 +1915,34 @@ function DiceFootballApp() {
 
             return (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className='fixed inset-0 z-[60] bg-slate-950/98 backdrop-blur-xl flex flex-col'>
-              <Confetti />
+              {/* Confetti removed */}
               
               {/* Header */}
-              <div className='shrink-0 pt-6 pb-4 px-4'>
-                <div className='text-center'>
-                  <div className='relative inline-block'>
-                    <Trophy size={72} className='text-yellow-400 mx-auto drop-shadow-[0_0_30px_rgba(250,204,21,0.6)]' />
-                    <div className='absolute -top-2 -right-2 w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center animate-bounce shadow-lg'>
-                      <span className='text-[10px]'>🎉</span>
-                    </div>
+               <div className='shrink-0 pt-3 pb-2 px-4'>
+                <div className='flex items-center justify-center gap-3'>
+                  <Trophy size={36} className='text-yellow-400 drop-shadow-[0_0_20px_rgba(250,204,21,0.5)]' />
+                  <div>
+                    <h1 className='text-xl font-black italic uppercase tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-yellow-400 to-amber-500 drop-shadow-md'>¡CAMPEÓN!</h1>
+                    <p className='text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]'>{activeComp.name}</p>
                   </div>
-                  <h1 className='text-3xl font-black italic uppercase tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-yellow-400 to-amber-500 mt-3 drop-shadow-md'>¡CAMPEÓN!</h1>
-                  <p className='text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mt-1'>{activeComp.name}</p>
                 </div>
               </div>
 
               {/* Winner showcase */}
-              <div className='shrink-0 px-6 pb-4'>
-                <div className='bg-gradient-to-br from-yellow-500/15 to-amber-600/10 border border-yellow-500/30 rounded-[2rem] p-5 shadow-[0_0_40px_rgba(234,179,8,0.15)]'>
-                  <div className='flex items-center justify-center gap-5'>
-                    <Shield color1={winner?.color1} color2={winner?.color2} initial={winner?.name} size='lg' isFlag={winner?.isFlag} />
-                    <div>
-                      <h2 className='text-xl font-black uppercase italic text-white drop-shadow-md'>{winner?.name}</h2>
-                      <p className='text-[9px] font-bold text-yellow-400/80 uppercase tracking-widest mt-0.5'>
+              <div className='shrink-0 px-4 pb-3'>
+                <div className='bg-gradient-to-br from-yellow-500/15 to-amber-600/10 border border-yellow-500/30 rounded-2xl p-3 shadow-[0_0_30px_rgba(234,179,8,0.1)]'>
+                  <div className='flex items-center gap-3'>
+                    <Shield color1={winner?.color1} color2={winner?.color2} initial={winner?.name} size='md' isFlag={winner?.isFlag} />
+                    <div className='flex-1 min-w-0'>
+                      <h2 className='text-base font-black uppercase italic text-white drop-shadow-md truncate'>{winner?.name}</h2>
+                      <p className='text-[8px] font-bold text-yellow-400/80 uppercase tracking-widest'>
                         {isDiv2 ? '2ª División' : (isLeague ? '1ª División' : activeComp.name)}
                       </p>
                       {winner && (
-                        <div className='flex gap-2 mt-2'>
-                          <span className='text-[8px] font-black bg-yellow-500/20 text-yellow-300 px-2 py-0.5 rounded-full border border-yellow-500/30'>{winner.pts} PTS</span>
-                          <span className='text-[8px] font-bold bg-slate-800/60 text-slate-300 px-2 py-0.5 rounded-full'>{winner.w}G {winner.d}E {winner.l}P</span>
-                          <span className='text-[8px] font-bold bg-slate-800/60 text-slate-300 px-2 py-0.5 rounded-full'>GF:{winner.gf} GC:{winner.ga}</span>
+                        <div className='flex gap-1.5 mt-1.5 flex-wrap'>
+                          <span className='text-[9px] font-black bg-yellow-500/25 text-yellow-300 px-2 py-0.5 rounded-full border border-yellow-500/40'>{winner.pts} PTS</span>
+                          <span className='text-[9px] font-bold bg-slate-800/70 text-slate-200 px-2 py-0.5 rounded-full border border-white/10'>{winner.w}G {winner.d}E {winner.l}P</span>
+                          <span className='text-[9px] font-bold bg-slate-800/70 text-slate-200 px-2 py-0.5 rounded-full border border-white/10'>GF:{winner.gf} GC:{winner.ga}</span>
                         </div>
                       )}
                     </div>
@@ -1924,6 +1955,7 @@ function DiceFootballApp() {
                 {[
                   { key: 'stats', label: '📊 Clasificación' },
                   { key: 'results', label: '📋 Resultados' },
+                  ...(!isLeague ? [{ key: 'bracket', label: '⚔️ Llaves' }] : []),
                   ...(isLeague ? [{ key: 'promotions', label: '↕️ Asc/Desc' }] : [])
                 ].map(tab => (
                   <button key={tab.key} onClick={() => setChampionModalTab(tab.key as any)} className={`flex-1 py-2 text-[8px] font-black uppercase italic tracking-wider rounded-xl transition-all ${championModalTab === tab.key ? 'text-yellow-400 bg-yellow-500/15 shadow-inner' : 'text-slate-400 hover:text-white'}`}>{tab.label}</button>
@@ -1946,45 +1978,49 @@ function DiceFootballApp() {
                     {isLeague ? (
                       <>
                         <h3 className='text-xs font-black uppercase text-slate-200 mb-3 text-center'>Clasificación {championModalDiv === 2 ? '2ª' : '1ª'} Div.</h3>
-                        <div className='bg-slate-900/30 rounded-2xl border border-white/10 overflow-x-auto custom-scrollbar'>
-                          <table className='w-full text-left border-collapse min-w-[480px]'>
+                        <div className='bg-slate-900/30 rounded-2xl border border-white/10 overflow-hidden'>
+                          <table className='w-full text-left border-collapse'>
                             <thead className='bg-[#0f172a] sticky top-0 z-10'>
-                              <tr className='text-[7px] font-black uppercase italic text-slate-400'>
-                                <th className='p-2 sticky bg-[#0f172a]' style={{ left: 0, minWidth: '28px' }}>Pos</th>
-                                <th className='p-2 sticky bg-[#0f172a]' style={{ left: '28px', minWidth: '100px' }}>Equipo</th>
-                                <th className='p-2 text-center border-r border-white/10'>PJ</th>
+                              <tr className='text-[8px] font-black uppercase italic text-slate-400'>
+                                <th className='p-2 sticky left-0 z-20 bg-[#0f172a]' style={{ minWidth: '28px' }}>Pos</th>
+                                <th className='p-2 sticky left-[28px] z-20 bg-[#0f172a]' style={{ minWidth: '110px' }}>Equipo</th>
+                                <th className='p-2 text-center sticky left-[138px] z-20 bg-[#0f172a] border-r border-white/10'>PJ</th>
                                 <th className='p-2 text-center'>G</th><th className='p-2 text-center'>E</th><th className='p-2 text-center'>P</th>
                                 <th className='p-2 text-center'>GF</th><th className='p-2 text-center'>GC</th><th className='p-2 text-center'>DG</th>
                                 <th className='p-2 text-center text-emerald-400'>Pts</th>
                               </tr>
                             </thead>
-                            <tbody className='divide-y divide-white/5'>
-                              {displayTeams.map((t, i) => {
-                                const isPromo = championModalDiv === 2 && i < 3;
-                                const isReleg = championModalDiv === 1 && i >= displayTeams.length - 3;
-                                const rowBg = i === 0 ? 'bg-yellow-500/15' : isPromo ? 'bg-emerald-900/20' : isReleg ? 'bg-red-900/20' : '';
-                                return (
-                                  <tr key={t.id} className={rowBg}>
-                                    <td className={'p-2 text-[9px] font-black italic sticky bg-[#0f172a] ' + (i === 0 ? 'text-yellow-400' : isPromo ? 'text-emerald-400' : isReleg ? 'text-red-400' : 'text-slate-300')} style={{ left: 0 }}>{i+1}</td>
-                                    <td className='p-2 sticky bg-[#0f172a]' style={{ left: '28px', minWidth: '100px' }}>
-                                      <div className='flex items-center gap-1.5'>
-                                        <Shield color1={t.color1} color2={t.color2} initial={t.name} size='xs' isFlag={t.isFlag}/>
-                                        <span className='text-[8px] font-bold uppercase truncate italic max-w-[70px]'>{t.name}</span>
-                                      </div>
-                                    </td>
-                                    <td className='p-2 text-center text-[9px] font-bold border-r border-white/10'>{t.p}</td>
-                                    <td className='p-2 text-center text-[9px] font-bold'>{t.w}</td>
-                                    <td className='p-2 text-center text-[9px] font-bold'>{t.d}</td>
-                                    <td className='p-2 text-center text-[9px] font-bold'>{t.l}</td>
-                                    <td className='p-2 text-center text-[9px] font-bold'>{t.gf}</td>
-                                    <td className='p-2 text-center text-[9px] font-bold'>{t.ga}</td>
-                                    <td className='p-2 text-center text-[9px] font-bold'>{t.gf - t.ga}</td>
-                                    <td className='p-2 text-center text-[9px] font-black text-emerald-400'>{t.pts}</td>
-                                  </tr>
-                                );
-                              })}
-                            </tbody>
                           </table>
+                          <div className='overflow-x-auto custom-scrollbar' style={{ maxHeight: '50vh' }}>
+                            <table className='w-full text-left border-collapse min-w-[480px]'>
+                              <tbody className='divide-y divide-white/5'>
+                                {displayTeams.map((t, i) => {
+                                  const isPromo = championModalDiv === 2 && i < 3;
+                                  const isReleg = championModalDiv === 1 && i >= displayTeams.length - 3;
+                                  const rowBg = i === 0 ? 'bg-yellow-500/15' : isPromo ? 'bg-emerald-900/20' : isReleg ? 'bg-red-900/20' : '';
+                                  return (
+                                    <tr key={t.id} className={rowBg}>
+                                      <td className={'p-2 text-[10px] font-black italic sticky left-0 z-10 bg-[#0f172a] ' + (i === 0 ? 'text-yellow-400' : isPromo ? 'text-emerald-400' : isReleg ? 'text-red-400' : 'text-slate-300')} style={{ minWidth: '28px' }}>{i+1}</td>
+                                      <td className='p-2 sticky left-[28px] z-10 bg-[#0f172a]' style={{ minWidth: '110px' }}>
+                                        <div className='flex items-center gap-1.5'>
+                                          <Shield color1={t.color1} color2={t.color2} initial={t.name} size='xs' isFlag={t.isFlag}/>
+                                          <span className='text-[9px] font-bold uppercase truncate italic max-w-[80px]'>{t.name}</span>
+                                        </div>
+                                      </td>
+                                      <td className='p-2 text-center text-[10px] font-bold sticky left-[138px] z-10 bg-[#0f172a] border-r border-white/10'>{t.p}</td>
+                                      <td className='p-2 text-center text-[10px] font-bold'>{t.w}</td>
+                                      <td className='p-2 text-center text-[10px] font-bold'>{t.d}</td>
+                                      <td className='p-2 text-center text-[10px] font-bold'>{t.l}</td>
+                                      <td className='p-2 text-center text-[10px] font-bold'>{t.gf}</td>
+                                      <td className='p-2 text-center text-[10px] font-bold'>{t.ga}</td>
+                                      <td className='p-2 text-center text-[10px] font-bold'>{t.gf - t.ga}</td>
+                                      <td className='p-2 text-center text-[10px] font-black text-emerald-400'>{t.pts}</td>
+                                    </tr>
+                                  );
+                                })}
+                              </tbody>
+                            </table>
+                          </div>
                         </div>
                       </>
                     ) : (
@@ -1994,43 +2030,48 @@ function DiceFootballApp() {
                           {(activeComp.groups || []).map((group, gi) => {
                             const groupTeams = (activeComp.teams || []).filter(t => Array.isArray(group.teamIds) && group.teamIds.includes(t.id)).sort((a, b) => b.pts - a.pts || (b.gf - b.ga) - (a.gf - a.ga));
                             return (
-                              <div key={gi} className='bg-slate-900/30 rounded-2xl border border-white/10 overflow-x-auto custom-scrollbar'>
+                              <div key={gi} className='bg-slate-900/30 rounded-2xl border border-white/10 overflow-hidden'>
                                 <div className='bg-[#0f172a] p-2 border-b border-white/10'>
-                                  <h4 className='text-[9px] font-black uppercase text-blue-400 flex items-center gap-1.5'><ShieldIcon size={10} /> {group.name}</h4>
+                                  <h4 className='text-[10px] font-black uppercase text-blue-400 flex items-center gap-1.5'><ShieldIcon size={10} /> {group.name}</h4>
                                 </div>
-                                <table className='w-full text-left border-collapse min-w-[400px]'>
+                                {/* Fixed header */}
+                                <table className='w-full text-left border-collapse'>
                                   <thead className='bg-[#0f172a]'>
-                                    <tr className='text-[7px] font-black uppercase italic text-slate-400'>
-                                      <th className='p-1.5' style={{ minWidth: '20px' }}>Pos</th>
-                                      <th className='p-1.5' style={{ minWidth: '80px' }}>Equipo</th>
-                                      <th className='p-1.5 text-center'>PJ</th>
+                                    <tr className='text-[8px] font-black uppercase italic text-slate-400'>
+                                      <th className='p-1.5 sticky left-0 z-20 bg-[#0f172a]' style={{ minWidth: '24px' }}>Pos</th>
+                                      <th className='p-1.5 sticky left-[24px] z-20 bg-[#0f172a]' style={{ minWidth: '90px' }}>Equipo</th>
+                                      <th className='p-1.5 text-center sticky left-[114px] z-20 bg-[#0f172a] border-r border-white/10'>PJ</th>
                                       <th className='p-1.5 text-center'>G</th><th className='p-1.5 text-center'>E</th><th className='p-1.5 text-center'>P</th>
                                       <th className='p-1.5 text-center'>GF</th><th className='p-1.5 text-center'>GC</th><th className='p-1.5 text-center'>DG</th>
                                       <th className='p-1.5 text-center text-emerald-400'>Pts</th>
                                     </tr>
                                   </thead>
-                                  <tbody className='divide-y divide-white/5'>
-                                    {groupTeams.map((t, i) => (
-                                      <tr key={t.id} className={i < 2 ? 'bg-emerald-900/15' : ''}>
-                                        <td className='p-1.5 text-[8px] font-black italic text-slate-300'>{i+1}</td>
-                                        <td className='p-1.5'>
-                                          <div className='flex items-center gap-1'>
-                                            <Shield color1={t.color1} color2={t.color2} initial={t.name} size='xs' isFlag={t.isFlag}/>
-                                            <span className='text-[7px] font-bold uppercase truncate italic max-w-[60px]'>{t.name}</span>
-                                          </div>
-                                        </td>
-                                        <td className='p-1.5 text-center text-[8px] font-bold'>{t.p}</td>
-                                        <td className='p-1.5 text-center text-[8px] font-bold'>{t.w}</td>
-                                        <td className='p-1.5 text-center text-[8px] font-bold'>{t.d}</td>
-                                        <td className='p-1.5 text-center text-[8px] font-bold'>{t.l}</td>
-                                        <td className='p-1.5 text-center text-[8px] font-bold'>{t.gf}</td>
-                                        <td className='p-1.5 text-center text-[8px] font-bold'>{t.ga}</td>
-                                        <td className='p-1.5 text-center text-[8px] font-bold'>{t.gf - t.ga}</td>
-                                        <td className='p-1.5 text-center text-[8px] font-black text-emerald-400'>{t.pts}</td>
-                                      </tr>
-                                    ))}
-                                  </tbody>
                                 </table>
+                                <div className='overflow-x-auto custom-scrollbar'>
+                                  <table className='w-full text-left border-collapse min-w-[400px]'>
+                                    <tbody className='divide-y divide-white/5'>
+                                      {groupTeams.map((t, i) => (
+                                        <tr key={t.id} className={i < 2 ? 'bg-emerald-900/15' : ''}>
+                                          <td className='p-1.5 text-[9px] font-black italic text-slate-300 sticky left-0 z-10 bg-[#0f172a]' style={{ minWidth: '24px' }}>{i+1}</td>
+                                          <td className='p-1.5 sticky left-[24px] z-10 bg-[#0f172a]' style={{ minWidth: '90px' }}>
+                                            <div className='flex items-center gap-1'>
+                                              <Shield color1={t.color1} color2={t.color2} initial={t.name} size='xs' isFlag={t.isFlag}/>
+                                              <span className='text-[8px] font-bold uppercase truncate italic max-w-[65px]'>{t.name}</span>
+                                            </div>
+                                          </td>
+                                          <td className='p-1.5 text-center text-[9px] font-bold sticky left-[114px] z-10 bg-[#0f172a] border-r border-white/10'>{t.p}</td>
+                                          <td className='p-1.5 text-center text-[9px] font-bold'>{t.w}</td>
+                                          <td className='p-1.5 text-center text-[9px] font-bold'>{t.d}</td>
+                                          <td className='p-1.5 text-center text-[9px] font-bold'>{t.l}</td>
+                                          <td className='p-1.5 text-center text-[9px] font-bold'>{t.gf}</td>
+                                          <td className='p-1.5 text-center text-[9px] font-bold'>{t.ga}</td>
+                                          <td className='p-1.5 text-center text-[9px] font-bold'>{t.gf - t.ga}</td>
+                                          <td className='p-1.5 text-center text-[9px] font-black text-emerald-400'>{t.pts}</td>
+                                        </tr>
+                                      ))}
+                                    </tbody>
+                                  </table>
+                                </div>
                               </div>
                             );
                           })}
@@ -2071,6 +2112,64 @@ function DiceFootballApp() {
                         </div>
                       ))}
                       {displayHistory.length > 5 && <p className='text-center text-[8px] text-slate-400 italic'>... y {displayHistory.length - 5} jornadas más</p>}
+                    </div>
+                  </div>
+                )}
+
+                {championModalTab === 'bracket' && !isLeague && activeComp.bracket && (
+                  <div>
+                    <h3 className='text-sm font-black uppercase text-slate-200 mb-4 text-center'>Eliminatorias</h3>
+                    <div className='flex gap-6 overflow-x-auto custom-scrollbar pb-4'>
+                      {['Octavos', 'Cuartos', 'Semis', 'Final'].filter(p => activeComp.bracket[p]).map(phase => (
+                        <div key={phase} className='min-w-[240px] flex-shrink-0'>
+                          <h4 className='text-[10px] font-black uppercase text-blue-300 mb-3 px-3 border-l-2 border-blue-500 bg-slate-900/40 rounded-r-xl py-1'>{phase}</h4>
+                          <div className='grid grid-cols-1 gap-2.5'>
+                            {(Array.isArray(activeComp.bracket[phase]) ? activeComp.bracket[phase] : [activeComp.bracket[phase]]).filter(m => m !== null).map((m, mi) => {
+                              const h = activeComp.teams.find(t => t.id === m.hId);
+                              const a = activeComp.teams.find(t => t.id === m.aId);
+                              const isChampions = activeCompId === 'C1';
+                              let bWinner = null;
+                              if ((isChampions && phase !== 'Final' ? m.sh2 !== null : m.sh !== null)) {
+                                if (isChampions && phase !== 'Final') {
+                                  const totH = (m.sh || 0) + (m.sh2 || 0); const totA = (m.sa || 0) + (m.sa2 || 0);
+                                  if (totH > totA) bWinner = h; else if (totA > totH) bWinner = a; else if (m.penH !== null && m.penH !== undefined) bWinner = m.penH > m.penA ? h : a;
+                                } else {
+                                  if (m.sh > m.sa) bWinner = h; else if (m.sa > m.sh) bWinner = a; else if (m.penH !== null && m.penH !== undefined) bWinner = m.penH > m.penA ? h : a;
+                                }
+                              }
+                              return (
+                                <div key={mi} className='bg-slate-900/40 rounded-xl p-2.5 border border-white/10 flex flex-col gap-1.5'>
+                                  <div className='flex justify-between items-center'>
+                                    <div className='flex items-center gap-1.5 flex-1 truncate'>
+                                      <Shield color1={h?.color1} color2={h?.color2} initial={h?.name} size='xs' isFlag={h?.isFlag} />
+                                      <span className={'text-[9px] font-bold uppercase italic truncate ' + (h ? '' : 'text-slate-500')}>{h?.name || 'TBD'}</span>
+                                    </div>
+                                    <div className='flex items-center gap-1 tabular-nums font-black italic text-[10px] bg-black/30 px-1.5 py-0.5 rounded'>
+                                      {m.sh !== null && <span>{m.sh}</span>}{isChampions && m.sh2 !== null && <span className='text-slate-400 text-[8px]'>({m.sh2})</span>}{m.penH !== null && m.penH !== undefined && <span className='text-red-400 text-[8px] font-black'>[{m.penH}]</span>}
+                                    </div>
+                                  </div>
+                                  <div className='flex justify-between items-center'>
+                                    <div className='flex items-center gap-1.5 flex-1 truncate'>
+                                      <Shield color1={a?.color1} color2={a?.color2} initial={a?.name} size='xs' isFlag={a?.isFlag} />
+                                      <span className={'text-[9px] font-bold uppercase italic truncate ' + (a ? '' : 'text-slate-500')}>{a?.name || 'TBD'}</span>
+                                    </div>
+                                    <div className='flex items-center gap-1 tabular-nums font-black italic text-[10px] bg-black/30 px-1.5 py-0.5 rounded'>
+                                      {m.sa !== null && <span>{m.sa}</span>}{isChampions && m.sa2 !== null && <span className='text-slate-400 text-[8px]'>({m.sa2})</span>}{m.penA !== null && m.penA !== undefined && <span className='text-red-400 text-[8px] font-black'>[{m.penA}]</span>}
+                                    </div>
+                                  </div>
+                                  {bWinner && (
+                                    <div className='mt-1 pt-1.5 border-t border-white/10 flex items-center justify-center gap-1.5 bg-emerald-900/30 rounded-b-lg py-1'>
+                                      <span className='text-[7px] font-black uppercase text-emerald-300 italic'>Pasa:</span>
+                                      <Shield color1={bWinner.color1} color2={bWinner.color2} initial={bWinner.name} size='xs' isFlag={bWinner.isFlag} />
+                                      <span className='text-[8px] font-black uppercase italic truncate max-w-[80px]'>{bWinner.name}</span>
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 )}
