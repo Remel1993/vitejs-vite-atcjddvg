@@ -143,9 +143,7 @@ const PRESETS = {
     { name: 'AJ Auxerre', att: 2, opp: 3, def: 2, color1: '#ffffff', color2: '#00529f', league: 'FR' },
     { name: 'Angers SCO', att: 2, opp: 3, def: 2, color1: '#000000', color2: '#ffffff', league: 'FR' },
     { name: 'Saint-Étienne', att: 2, opp: 3, def: 3, color1: '#006532', color2: '#ffffff', league: 'FR' },
-    { name: 'FC Metz', att: 2, opp: 3, def: 2, color1: '#6c1d45', color2: '#ffffff', league: 'FR' },
-    { name: 'FC Lorient', att: 2, opp: 2, def: 3, color1: '#f68712', color2: '#000000', league: 'FR' }
-  ],
+    ],
   MI: [ 
     { name: 'FC Porto', att: 4, opp: 4, def: 4, color1: '#003399', color2: '#ffffff', league: 'MI' },
     { name: 'Benfica', att: 4, opp: 4, def: 4, color1: '#e30613', color2: '#ffffff', league: 'MI' },
@@ -311,8 +309,8 @@ const PRESETS_2 = {
     { name: 'AC Ajaccio', att: 2, opp: 3, def: 4, color1: '#ffffff', color2: '#e30613', league: 'FR' },
     { name: 'USL Dunkerque', att: 2, opp: 3, def: 3, color1: '#87ceeb', color2: '#ffffff', league: 'FR' },
     { name: 'Red Star FC', att: 2, opp: 3, def: 3, color1: '#00a650', color2: '#ffffff', league: 'FR' },
-    { name: 'FC Martigues', att: 2, opp: 2, def: 3, color1: '#e30613', color2: '#ffcc00', league: 'FR' },
-    { name: 'Stade Lavallois', att: 2, opp: 2, def: 4, color1: '#f5a12d', color2: '#000000', league: 'FR' }
+    { name: 'FC Metz', att: 3, opp: 3, def: 2, color1: '#6c1d45', color2: '#ffffff', league: 'FR' },
+    { name: 'FC Lorient', att: 3, opp: 3, def: 3, color1: '#f68712', color2: '#000000', league: 'FR' }
   ],
   NL: [
     { name: 'Excelsior', att: 5, opp: 5, def: 3, color1: '#000000', color2: '#e30613', league: 'NL' },
