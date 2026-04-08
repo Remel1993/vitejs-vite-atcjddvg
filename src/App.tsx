@@ -15,7 +15,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 // ==========================================
 // 1. CONSTANTES DEL SISTEMA Y PRESETS
 // ==========================================
-const APP_ID = 'dice-football-hub-elite-v6';
+const APP_ID = 'dice-football-hub-elite-v6'; // Actualizado v6
 
 const PRESETS = {
   ES: [
@@ -296,8 +296,8 @@ const PRESETS_2 = {
   ],
   FR: [
     { name: 'Clermont Foot', att: 4, opp: 4, def: 4, color1: '#e30613', color2: '#0033a0', league: 'FR' },
-    { name: 'Girondins Bordeaux', att: 5, opp: 5, def: 3, color1: '#001b50', color2: '#ffffff', league: 'FR' },
-    { name: 'FC Sochaux', att: 4, opp: 4, def: 4, color1: '#fff200', color2: '#00008b', league: 'FR' },
+    { name: 'Valenciennes FC', att: 4, opp: 4, def: 3, color1: '#e30613', color2: '#ffffff', league: 'FR' },
+    { name: 'Chamois Niortais', att: 3, opp: 3, def: 4, color1: '#ffcc00', color2: '#006400', league: 'FR' },
     { name: 'Paris FC', att: 4, opp: 5, def: 4, color1: '#0033a0', color2: '#ffffff', league: 'FR' },
     { name: 'Rodez AF', att: 3, opp: 4, def: 3, color1: '#e30613', color2: '#ffcc00', league: 'FR' },
     { name: 'SM Caen', att: 3, opp: 4, def: 3, color1: '#0033a0', color2: '#e30613', league: 'FR' },
@@ -371,6 +371,7 @@ const playClick = () => {
     }
     if (!globalAudioCtx) return;
     if (globalAudioCtx.state === 'suspended') globalAudioCtx.resume();
+
     const osc = globalAudioCtx.createOscillator();
     const gain = globalAudioCtx.createGain();
     osc.connect(gain);
@@ -385,21 +386,25 @@ const playClick = () => {
   } catch (e) {}
 };
 
+// MODIFICADO: Genera ambas divisiones para las ligas
 const getDefaultComps = () => {
-  const baseTeam = (preset: any, isDiv2 = false) => {
-    const list = isDiv2 ? (PRESETS_2 as any)[preset] : (PRESETS as any)[preset];
+  const baseTeam = (preset, isDiv2 = false) => {
+    const list = isDiv2 ? PRESETS_2[preset] : PRESETS[preset];
     if (!list) return [];
-    const offset = isDiv2 ? 100 : 0;
-    return list.map((t: any, i: number) => ({ ...t, id: i + 1 + offset, p: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, pts: 0 }));
+    const offset = isDiv2 ? 100 : 0; // Previene colisiones de ID
+    return list.map((t, i) => ({ ...t, id: i + 1 + offset, p: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, pts: 0 }));
   };
 
-  const getLeagueData = (name: string, code: string) => ({
-    type: 'league', name, 
-    teams: baseTeam(code), matchday: 0, history: [], showWinner: false, 
-    teams2: baseTeam(code, true), matchday2: 0, history2: [], showWinner2: false,
-    userTeamId: 1, disqualified: false,
-    promotionsLogs: null
-  });
+  const getLeagueData = (name, code) => {
+    const t2 = baseTeam(code, true);
+    return {
+      type: 'league', name, 
+      teams: baseTeam(code), matchday: 0, history: [], showWinner: false, 
+      teams2: t2, matchday2: 0, history2: [], showWinner2: false,
+      userTeamId: 1, userTeamId2: t2[0]?.id || 21, disqualified: false,
+      promotionsLogs: null
+    };
+  };
 
   return {
     'L1': getLeagueData('Liga Española', 'ES'),
@@ -414,8 +419,10 @@ const getDefaultComps = () => {
   };
 };
 
-const buildCLPool = (compsState: any) => {
-  const pull = (compKey: string, guaranteed: number, extra: number) => {
+// MODIFICADO: CL se construye desde el estado actual de comps, no desde los presets originales,
+// para que los equipos ascendidos puedan jugarla.
+const buildCLPool = (compsState) => {
+  const pull = (compKey, guaranteed, extra) => {
     if (!compsState[compKey] || !compsState[compKey].teams) return [];
     const t = [...compsState[compKey].teams].sort((a,b) => b.pts - a.pts || (b.gf - b.ga) - (a.gf - a.ga));
     const top = t.slice(0, guaranteed);
@@ -428,13 +435,15 @@ const buildCLPool = (compsState: any) => {
   ];
 };
 
-const drawKnockoutGroups = (pool: any[], isWC: boolean, randomize: boolean) => {
-  let groups: any[] = Array.from({length: 8}, () => []);
+const drawKnockoutGroups = (pool, isWC, randomize) => {
+  let groups = Array.from({length: 8}, () => []);
   const sortedPool = [...pool].sort((a, b) => (b.att + b.opp + b.def) - (a.att + a.opp + a.def));
   let pots = [sortedPool.slice(0, 8), sortedPool.slice(8, 16), sortedPool.slice(16, 24), sortedPool.slice(24, 32)];
+
   if (randomize) pots = pots.map(pot => [...pot].sort(() => Math.random() - 0.5));
+
   if (isWC) {
-     const solve = (potIdx: number, groupIdx: number): boolean => {
+     const solve = (potIdx, groupIdx) => {
         if (potIdx === 4) return true;
         if (groupIdx === 8) return solve(potIdx + 1, 0);
 
@@ -442,10 +451,11 @@ const drawKnockoutGroups = (pool: any[], isWC: boolean, randomize: boolean) => {
            const team = pots[potIdx][i];
            if (team.used) continue;
 
-           const regionCount = groups[groupIdx].filter((t: any) => t.region === team.region).length;
+           const regionCount = groups[groupIdx].filter(t => t.region === team.region).length;
            let conflict = false;
            if (team.region === 'EU' && regionCount >= 2) conflict = true;
            if (team.region !== 'EU' && regionCount >= 1) conflict = true;
+
            if (!conflict) {
               team.used = true;
               groups[groupIdx].push(team);
@@ -461,7 +471,7 @@ const drawKnockoutGroups = (pool: any[], isWC: boolean, randomize: boolean) => {
      let success = solve(0, 0);
      if (!success) groups = Array.from({length: 8}, (_, i) => [pots[0][i], pots[1][i], pots[2][i], pots[3][i]]);
   } else {
-     const solve = (potIdx: number, groupIdx: number): boolean => {
+     const solve = (potIdx, groupIdx) => {
         if (potIdx === 4) return true;
         if (groupIdx === 8) return solve(potIdx + 1, 0);
 
@@ -469,7 +479,7 @@ const drawKnockoutGroups = (pool: any[], isWC: boolean, randomize: boolean) => {
            const team = pots[potIdx][i];
            if (team.used) continue;
 
-           const sameLeagueCount = groups[groupIdx].filter((t: any) => t.league === team.league).length;
+           const sameLeagueCount = groups[groupIdx].filter(t => t.league === team.league).length;
            if (sameLeagueCount === 0) {
               team.used = true;
               groups[groupIdx].push(team);
@@ -486,32 +496,34 @@ const drawKnockoutGroups = (pool: any[], isWC: boolean, randomize: boolean) => {
      if (!success) groups = Array.from({length: 8}, (_, i) => [pots[0][i], pots[1][i], pots[2][i], pots[3][i]]);
   }
 
-  const formattedGroups = groups.map((g, i) => ({ name: 'Grupo ' + String.fromCharCode(65 + i), teamIds: g.map((t: any) => t.id) }));
+  const formattedGroups = groups.map((g, i) => ({ name: 'Grupo ' + String.fromCharCode(65 + i), teamIds: g.map(t => t.id) }));
   return { teams: pool, groups: formattedGroups, matchday: 0, history: [], phase: 'groups', showWinner: false, disqualified: false, userTeamId: pool[0].id, bracket: null };
 };
 
-const getAutoFillData = (compId: string, compsState: any) => {
+const getAutoFillData = (compId, compsState) => {
   const isWC = compId === 'C2';
   let pool = isWC ? [...PRESETS.WC] : buildCLPool(compsState);
   pool = pool.map((t, i) => ({ ...t, id: i + 1, p: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, pts: 0 }));
   return drawKnockoutGroups(pool, isWC, false);
 };
 
-const getShuffleData = (compId: string, compsState: any) => {
+const getShuffleData = (compId, compsState) => {
   const isWC = compId === 'C2';
   let pool = isWC ? [...PRESETS.WC] : buildCLPool(compsState);
   pool = pool.map((t, i) => ({ ...t, id: i + 1, p: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, pts: 0 }));
   return drawKnockoutGroups(pool, isWC, true);
 };
 
-const generateKnockoutBrackets = (comp: any) => {
+const generateKnockoutBrackets = (comp) => {
   if (!comp || !Array.isArray(comp.groups) || !Array.isArray(comp.teams)) return null;
-  const groupResults = comp.groups.map((g: any) => {
-    const teams = comp.teams.filter((t: any) => g.teamIds && g.teamIds.includes(t.id)).sort((a: any, b: any) => b.pts - a.pts || (b.gf - b.ga) - (a.gf - a.ga));
+  const groupResults = comp.groups.map(g => {
+    const teams = comp.teams.filter(t => g.teamIds && g.teamIds.includes(t.id)).sort((a, b) => b.pts - a.pts || (b.gf - b.ga) - (a.gf - a.ga));
     return { first: teams[0], second: teams[1] };
   });
+
   const numGroups = groupResults.length;
-  const bracket: any = { Octavos: [], Cuartos: [], Semis: [], Final: [{ id: 'F1', hId: null, aId: null, sh: null, sa: null, penH: null, penA: null, sh2: null, sa2: null }] };
+  const bracket = { Octavos: [], Cuartos: [], Semis: [], Final: [{ id: 'F1', hId: null, aId: null, sh: null, sa: null, penH: null, penA: null, sh2: null, sa2: null }] };
+
   if (numGroups === 8) {
     for (let i = 0; i < 8; i += 2) {
       if (groupResults[i] && groupResults[i+1]) {
@@ -534,17 +546,19 @@ const generateKnockoutBrackets = (comp: any) => {
   return bracket;
 };
 
-const generateLeagueSchedule = (teams: any[], twoLegged = true) => {
+const generateLeagueSchedule = (teams, twoLegged = true) => {
   if (!Array.isArray(teams)) return [];
   const n = teams.length;
   if (n % 2 !== 0) return [];
   const teamIds = teams.map(t => t.id);
   const rounds = [];
   const totalRounds = twoLegged ? (n - 1) * 2 : (n - 1);
+
   for (let j = 0; j < totalRounds; j++) {
     const round = [];
     const isReturn = j >= (n - 1);
     const r = isReturn ? j - (n - 1) : j;
+
     for (let i = 0; i < n / 2; i++) {
       const home = i === 0 ? teamIds[n - 1] : teamIds[(r + i) % (n - 1)];
       const away = teamIds[(n - 1 - i + r) % (n - 1)];
@@ -556,10 +570,12 @@ const generateLeagueSchedule = (teams: any[], twoLegged = true) => {
   return rounds;
 };
 
+
 // ==========================================
 // 3. COMPONENTES ATÓMICOS
 // ==========================================
-const COUNTRY_CODES: any = {
+// [Se mantienen intactos]
+const COUNTRY_CODES = {
   'afghanistan': 'af', 'afganistán': 'af', 'albania': 'al', 'algeria': 'dz', 'argelia': 'dz',
   'andorra': 'ad', 'angola': 'ao', 'argentina': 'ar', 'armenia': 'am', 'australia': 'au',
   'austria': 'at', 'azerbaijan': 'az', 'azerbaiyán': 'az', 'bahrain': 'bh', 'baréin': 'bh',
@@ -616,12 +632,12 @@ const COUNTRY_CODES: any = {
   'zimbabwe': 'zw',
 };
 
-const getCountryCode = (name: string) => {
+const getCountryCode = (name) => {
   if (!name) return null;
   return COUNTRY_CODES[name.toLowerCase().trim()] || null;
 };
 
-const Shield = ({ color1, color2, initial, size = 'md', isFlag = false }: any) => {
+const Shield = ({ color1, color2, initial, size = 'md', isFlag = false }) => {
   const dims = size === 'lg' ? 'w-20 h-24' : size === 'sm' ? 'w-8 h-10' : size === 'xs' ? 'w-5 h-6' : 'w-12 h-14';
   const imgDims = size === 'lg' ? 'w-20 h-14' : size === 'sm' ? 'w-8 h-6' : size === 'xs' ? 'w-5 h-4' : 'w-12 h-8';
   const fontSize = size === 'lg' ? 'text-2xl' : size === 'sm' ? 'text-[10px]' : size === 'xs' ? 'text-[8px]' : 'text-sm';
@@ -632,7 +648,7 @@ const Shield = ({ color1, color2, initial, size = 'md', isFlag = false }: any) =
     if (code) {
       return (
         <div className={`${imgDims} relative overflow-hidden shadow-md rounded-sm border border-white/10 shrink-0`}>
-          <img src={`https://flagcdn.com/${code}.svg`} alt={initial} className='w-full h-full object-cover' onError={(e: any) => { e.target.style.display = 'none'; }} />
+          <img src={`https://flagcdn.com/${code}.svg`} alt={initial} className='w-full h-full object-cover' onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
         </div>
       );
     }
@@ -662,7 +678,7 @@ const Shield = ({ color1, color2, initial, size = 'md', isFlag = false }: any) =
   );
 };
 
-const DieIcon = ({ value, className }: any) => {
+const DieIcon = ({ value, className }) => {
   const icons = [Dice1, Dice2, Dice3, Dice4, Dice5, Dice6];
   const Icon = icons[value - 1] || Dices;
   return <Icon className={className} strokeWidth={1.5} />;
@@ -684,7 +700,7 @@ const Confetti = () => (
   </div>
 );
 
-const AttrStepper = ({ label, val, min, max, onUpdate }: any) => (
+const AttrStepper = ({ label, val, min, max, onUpdate }) => (
   <div className='flex flex-col items-center bg-black/40 rounded-xl p-1.5 border border-white/10'>
     <span className='text-[7px] font-black uppercase text-slate-300 mb-1'>{label}</span>
     <div className='flex items-center gap-2 w-full justify-center'>
@@ -695,7 +711,7 @@ const AttrStepper = ({ label, val, min, max, onUpdate }: any) => (
   </div>
 );
 
-const MenuButton = ({ icon, label, onClick, disabled = false, isDanger = false, isWide = false }: any) => (
+const MenuButton = ({ icon, label, onClick, disabled = false, isDanger = false, isWide = false }) => (
   <button 
     onClick={onClick} 
     disabled={disabled}
@@ -712,14 +728,14 @@ const MenuButton = ({ icon, label, onClick, disabled = false, isDanger = false, 
   </button>
 );
 
-const PenaltyDots = ({ history }: any) => {
+const PenaltyDots = ({ history }) => {
   const totalLen = history ? history.length : 0;
   const startIdx = totalLen % 5 === 0 && totalLen > 0 ? totalLen - 5 : totalLen - (totalLen % 5);
   const visibleHistory = history && totalLen > 0 ? history.slice(startIdx) : [];
 
   return (
     <div className="flex justify-center gap-[3px] mb-2 min-h-[14px]">
-      {visibleHistory.map((h: any, i: number) => {
+      {visibleHistory.map((h, i) => {
         const globalIdx = startIdx + i;
         const isNewest = globalIdx === totalLen - 1;
         return (
@@ -740,7 +756,7 @@ const PenaltyDots = ({ history }: any) => {
 // 4. VISTAS SECUNDARIAS (MÓDULOS DE UI)
 // ==========================================
 
-const ArchiveView = ({ setView, archive, selectedArchiveEntry, setSelectedArchiveEntry }: any) => (
+const ArchiveView = ({ setView, archive, selectedArchiveEntry, setSelectedArchiveEntry }) => (
   <div className='flex-grow flex flex-col'>
     <header className='flex items-center gap-3 mb-8 px-4'>
       <button onClick={() => selectedArchiveEntry ? setSelectedArchiveEntry(null) : setView('hub')} className='p-3 bg-slate-900/30 backdrop-blur-md rounded-2xl text-slate-300 hover:text-white active:scale-95 transition-all border border-white/10'><ChevronLeft /></button>
@@ -757,7 +773,7 @@ const ArchiveView = ({ setView, archive, selectedArchiveEntry, setSelectedArchiv
               <p className='text-xs font-black uppercase italic text-slate-300'>No hay registros guardados</p>
             </div>
           ) : (
-            archive.map((entry: any, idx: number) => (
+            archive.map((entry, idx) => (
               <button key={entry.id || idx} onClick={() => setSelectedArchiveEntry(entry)} className='w-full p-4 bg-slate-900/30 backdrop-blur-md rounded-3xl border border-white/10 flex items-center gap-4 hover:bg-slate-800/50 active:scale-95 transition-all text-left shadow-lg group'>
                 <div className='w-12 h-12 rounded-2xl bg-yellow-500/20 flex items-center justify-center text-yellow-500 shrink-0 group-hover:scale-110 transition-transform'><Trophy size={24} /></div>
                 <div className='flex-grow overflow-hidden'>
@@ -808,8 +824,8 @@ const ArchiveView = ({ setView, archive, selectedArchiveEntry, setSelectedArchiv
                  <h4 className='text-[10px] font-black uppercase text-slate-300 mb-3 flex justify-center items-center gap-2'><Swords size={14}/> La Gran Final</h4>
                  {(() => {
                    const finalMatch = selectedArchiveEntry.bracket.Final[0];
-                   const home = selectedArchiveEntry.teams?.find((t: any) => t.id === finalMatch.hId);
-                   const away = selectedArchiveEntry.teams?.find((t: any) => t.id === finalMatch.aId);
+                   const home = selectedArchiveEntry.teams?.find(t => t.id === finalMatch.hId);
+                   const away = selectedArchiveEntry.teams?.find(t => t.id === finalMatch.aId);
                    return (
                      <div className="flex items-center justify-between bg-black/30 p-3 rounded-xl border border-white/5">
                         <div className="flex items-center gap-2 w-20">
@@ -838,7 +854,7 @@ const ArchiveView = ({ setView, archive, selectedArchiveEntry, setSelectedArchiv
   </div>
 );
 
-const RulesView = ({ setView }: any) => (
+const RulesView = ({ setView }) => (
   <div className='flex-grow px-4 pb-8 flex flex-col'>
     <header className='flex items-center gap-3 mb-8'>
       <button onClick={() => setView('hub')} className='p-3 bg-slate-900/30 backdrop-blur-md rounded-2xl text-slate-300 hover:text-white active:scale-95 transition-all border border-white/10'><ChevronLeft /></button>
@@ -861,7 +877,7 @@ const RulesView = ({ setView }: any) => (
   </div>
 );
 
-const HubView = ({ setView, setActiveCompId, setCompView, comps }: any) => {
+const HubView = ({ setView, setActiveCompId, setCompView, comps }) => {
   const [showLeagues, setShowLeagues] = useState(false);
   const leagues = [
     { id: 'L1', color: 'blue' }, { id: 'L2', color: 'emerald' }, { id: 'L3', color: 'orange' }, 
@@ -957,31 +973,32 @@ const HubView = ({ setView, setActiveCompId, setCompView, comps }: any) => {
   </div>
 )};
 
-const ConfigPanel = ({ initialComp, compId, onSave, onCancel, onTotalReset }: any) => {
+const ConfigPanel = ({ initialComp, compId, onSave, onCancel, onTotalReset }) => {
   const [draft, setDraft] = useState(() => JSON.parse(JSON.stringify(initialComp)));
   const [editDiv, setEditDiv] = useState(1);
-  const [drawModal, setDrawModal] = useState<any>(null);
+  const [drawModal, setDrawModal] = useState(null); 
 
   const hasStarted = initialComp.type === 'league' 
     ? (initialComp.matchday > 0 || initialComp.matchday2 > 0 || initialComp.history?.length > 0)
     : (initialComp.matchday > 0 || initialComp.history?.length > 0);
 
   const currentTeams = editDiv === 2 ? draft.teams2 : draft.teams;
-
-  const updateTeamAttr = (id: number, field: string, val: any) => {
+  const updateTeamAttr = (id, field, val) => {
     if (editDiv === 2) {
-      setDraft((prev: any) => ({ ...prev, teams2: prev.teams2.map((t: any) => t.id === id ? { ...t, [field]: val } : t) }));
+      setDraft(prev => ({ ...prev, teams2: prev.teams2.map(t => t.id === id ? { ...t, [field]: val } : t) }));
     } else {
-      setDraft((prev: any) => ({ ...prev, teams: prev.teams.map((t: any) => t.id === id ? { ...t, [field]: val } : t) }));
+      setDraft(prev => ({ ...prev, teams: prev.teams.map(t => t.id === id ? { ...t, [field]: val } : t) }));
     }
   };
 
-  const handleDrawUI = (type: string) => {
+  const handleDrawUI = (type) => {
     if (hasStarted) return;
     const isWC = compId === 'C2';
-    const compsState = JSON.parse(window.localStorage.getItem(`${APP_ID}_comps`) || '{}');
+    // Construir pool usando estado guardado actual para incluir equipos ascendidos
+    const compsState = JSON.parse(window.localStorage.getItem(`${APP_ID}_comps`));
     const pool = isWC ? [...PRESETS.WC] : buildCLPool(compsState || getDefaultComps());
     const initializedPool = pool.map((t, i) => ({ ...t, id: i + 1, p: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, pts: 0 }));
+
     initializedPool.sort((a, b) => (b.att + b.opp + b.def) - (a.att + a.opp + a.def));
     const pots = [
       initializedPool.slice(0, 8), initializedPool.slice(8, 16),
@@ -1001,7 +1018,7 @@ const ConfigPanel = ({ initialComp, compId, onSave, onCancel, onTotalReset }: an
               {drawModal.step === 'pots' ? (
                   <div className='space-y-4 mb-20'>
                        <p className='text-[10px] text-center text-slate-300 font-bold mb-4 uppercase'>Equipos ordenados por ranking de fuerza en 4 bombos.</p>
-                       {drawModal.pots.map((pot: any[], i: number) => (
+                       {drawModal.pots.map((pot, i) => (
                            <div key={i} className='bg-slate-900/50 p-4 rounded-2xl border border-white/10'>
                                <h3 className='text-sm font-black uppercase text-blue-400 mb-3 flex items-center gap-2'><ShieldIcon size={14}/> Bombo {i+1}</h3>
                                <div className='grid grid-cols-2 gap-2'>
@@ -1020,14 +1037,14 @@ const ConfigPanel = ({ initialComp, compId, onSave, onCancel, onTotalReset }: an
                   <div className='space-y-4 mb-20'>
                        <p className='text-[10px] text-center text-slate-300 font-bold mb-4 uppercase'>Grupos formados respetando reglas de confederación.</p>
                        <div className='grid grid-cols-1 gap-4'>
-                           {drawModal.groups.map((g: any, i: number) => (
+                           {drawModal.groups.map((g, i) => (
                                <div key={i} className='bg-slate-900/50 p-4 rounded-2xl border border-white/10'>
                                    <h3 className='text-[11px] font-black uppercase text-emerald-400 mb-2 flex justify-between'>
                                       <span>{g.name}</span>
                                    </h3>
                                    <div className='space-y-1.5'>
-                                       {g.teamIds.map((id: number) => {
-                                           const t = drawModal.drawData.teams.find((x: any) => x.id === id);
+                                       {g.teamIds.map(id => {
+                                           const t = drawModal.drawData.teams.find(x => x.id === id);
                                            return (
                                                <div key={id} className='flex items-center justify-between text-[10px] bg-black/30 p-2 rounded-xl border border-white/5'>
                                                    <div className='flex items-center gap-2'>
@@ -1043,7 +1060,7 @@ const ConfigPanel = ({ initialComp, compId, onSave, onCancel, onTotalReset }: an
                        </div>
                        <div className='flex gap-3 mt-6'>
                           <button onClick={() => setDrawModal(null)} className='flex-1 bg-slate-800 border border-white/10 py-4 rounded-xl font-black uppercase italic text-white active:scale-95 transition-all'>Cancelar</button>
-                          <button onClick={() => { setDraft((prev: any) => ({...prev, ...drawModal.drawData})); setDrawModal(null); }} className='flex-[2] bg-blue-600 py-4 rounded-xl font-black uppercase italic text-white active:scale-95 shadow-lg shadow-blue-500/20 transition-all'>Confirmar y Guardar</button>
+                          <button onClick={() => { setDraft(prev => ({...prev, ...drawModal.drawData})); setDrawModal(null); }} className='flex-[2] bg-blue-600 py-4 rounded-xl font-black uppercase italic text-white active:scale-95 shadow-lg shadow-blue-500/20 transition-all'>Confirmar y Guardar</button>
                        </div>
                   </div>
               )}
@@ -1090,9 +1107,9 @@ const ConfigPanel = ({ initialComp, compId, onSave, onCancel, onTotalReset }: an
               <div className='flex-grow'>
                 <input className='bg-black/30 w-full rounded-xl p-2 text-sm font-black italic uppercase border border-white/10 focus:border-blue-500 focus:bg-slate-800/80 outline-none text-white transition-colors backdrop-blur-sm' value={t?.name} onChange={(e) => updateTeamAttr(t.id, 'name', e.target.value)} />
                 <div className='grid grid-cols-3 gap-2 mt-3'>
-                  <AttrStepper label="Atk (1-5)" val={t.att} min={1} max={5} onUpdate={(v: any) => updateTeamAttr(t.id, 'att', v)} />
-                  <AttrStepper label="Opp (1-5)" val={t.opp} min={1} max={5} onUpdate={(v: any) => updateTeamAttr(t.id, 'opp', v)} />
-                  <AttrStepper label="Def (1-4)" val={t.def} min={1} max={4} onUpdate={(v: any) => updateTeamAttr(t.id, 'def', v)} />
+                  <AttrStepper label="Atk (1-5)" val={t.att} min={1} max={5} onUpdate={(v) => updateTeamAttr(t.id, 'att', v)} />
+                  <AttrStepper label="Opp (1-5)" val={t.opp} min={1} max={5} onUpdate={(v) => updateTeamAttr(t.id, 'opp', v)} />
+                  <AttrStepper label="Def (1-4)" val={t.def} min={1} max={4} onUpdate={(v) => updateTeamAttr(t.id, 'def', v)} />
                 </div>
                 <div className='flex gap-2 mt-3 bg-black/30 p-1.5 rounded-xl border border-white/5 w-max backdrop-blur-sm'>
                   <input type='color' value={t.color1} onChange={(e) => updateTeamAttr(t.id, 'color1', e.target.value)} className='w-8 h-8 rounded-lg bg-transparent cursor-pointer border-none p-0' />
@@ -1117,7 +1134,7 @@ const ConfigPanel = ({ initialComp, compId, onSave, onCancel, onTotalReset }: an
 
 export default function App() {
   const [view, setView] = useState('hub');
-  const [activeCompId, setActiveCompId] = useState<any>(null);
+  const [activeCompId, setActiveCompId] = useState(null);
   const [compView, setCompView] = useState('main');
   const [viewDiv, setViewDiv] = useState(1); 
   const [showPromoModal, setShowPromoModal] = useState(false);
@@ -1132,7 +1149,7 @@ export default function App() {
     return () => window.removeEventListener('popstate', handlePopState);
   }, [view, compView]);
 
-  const [archive, setArchive] = useState<any[]>(() => {
+  const [archive, setArchive] = useState(() => {
     try { const saved = window.localStorage.getItem(`${APP_ID}_archive`); if (saved) return JSON.parse(saved); } catch (e) {} return [];
   });
   useEffect(() => { try { window.localStorage.setItem(`${APP_ID}_archive`, JSON.stringify(archive)); } catch(e){} }, [archive]);
@@ -1140,13 +1157,13 @@ export default function App() {
   const [selectedArchiveEntry, setSelectedArchiveEntry] = useState(null);
 
   useEffect(() => {
-    const handler = (e: any) => { if (e.target.closest('button')) playClick(); };
+    const handler = (e) => { if (e.target.closest('button')) playClick(); };
     window.addEventListener('mousedown', handler);
     return () => window.removeEventListener('mousedown', handler);
   }, []);
 
-  const [comps, setComps] = useState<any>(() => {
-    const defaultComps: any = getDefaultComps();
+  const [comps, setComps] = useState(() => {
+    const defaultComps = getDefaultComps();
     try {
       const saved = window.localStorage.getItem(`${APP_ID}_comps`);
       if (saved) {
@@ -1164,19 +1181,19 @@ export default function App() {
   useEffect(() => { try { window.localStorage.setItem(`${APP_ID}_comps`, JSON.stringify(comps)); } catch(e){} }, [comps]);
 
   const activeComp = comps[activeCompId];
+  const updateActiveComp = (newData) => setComps(prev => ({ ...prev, [activeCompId]: { ...prev[activeCompId], ...newData } }));
 
-  const updateActiveComp = (newData: any) => setComps((prev: any) => ({ ...prev, [activeCompId]: { ...prev[activeCompId], ...newData } }));
-
+  // Helper para asegurar persistencia manual
   const manualSave = () => {
-    try { window.localStorage.setItem(`${APP_ID}_comps`, JSON.stringify(comps));
-      alert('Progreso guardado manualmente.'); } catch(e) {}
+    try { window.localStorage.setItem(`${APP_ID}_comps`, JSON.stringify(comps)); alert('Progreso guardado manualmente.'); } catch(e) {}
   };
 
-  const archiveCompetition = (compId: string, div: number, customWinner = null) => {
+  const archiveCompetition = (compId, div, customWinner = null) => {
     const comp = comps[compId];
     if (!comp) return;
     const isDiv2 = div === 2;
     const t = isDiv2 ? comp.teams2 : comp.teams;
+
     let winner = customWinner;
     if (!winner) {
       if (comp.type === 'league') {
@@ -1184,9 +1201,9 @@ export default function App() {
       } else {
         const final = comp.bracket?.Final?.[0] || comp.bracket?.Final;
         if (final && final.sh !== null) {
-          if (final.sh > final.sa) winner = t.find((x: any) => x.id === final.hId);
-          else if (final.sa > final.sh) winner = t.find((x: any) => x.id === final.aId);
-          else winner = t.find((x: any) => x.id === (final.penH > final.penA ? final.hId : final.aId));
+          if (final.sh > final.sa) winner = t.find(x => x.id === final.hId);
+          else if (final.sa > final.sh) winner = t.find(x => x.id === final.aId);
+          else winner = t.find(x => x.id === (final.penH > final.penA ? final.hId : final.aId));
         }
       }
     }
@@ -1198,23 +1215,23 @@ export default function App() {
     setArchive(prev => [entry, ...prev].slice(0, 5));
   };
 
-  const [matchState, setMatchState] = useState<any>(null);
+  const [matchState, setMatchState] = useState(null);
   const [rolling, setRolling] = useState(false);
-  const rollIntervalRef = useRef<any>(null);
+  const rollIntervalRef = useRef(null);
 
   useEffect(() => () => rollIntervalRef.current && clearInterval(rollIntervalRef.current), []);
 
-  const startMatch = (homeId: number, awayId: number, isDiv2Context: boolean) => {
+  const startMatch = (homeId, awayId, isDiv2Context) => {
     const sourceTeams = isDiv2Context ? activeComp.teams2 : activeComp.teams;
-    const home = sourceTeams.find((t: any) => t.id === homeId);
-    const away = sourceTeams.find((t: any) => t.id === awayId);
+    const home = sourceTeams.find(t => t.id === homeId);
+    const away = sourceTeams.find(t => t.id === awayId);
     if (!home || !away) return;
 
     const isVuelta = activeCompId === 'C1' && activeComp.matchday % 2 !== 0 && activeComp.phase !== 'Final' && activeComp.phase !== 'groups';
     let aggregate = null;
     if (isVuelta && activeComp.bracket) {
       const matchArray = Array.isArray(activeComp.bracket[activeComp.phase]) ? activeComp.bracket[activeComp.phase] : [activeComp.bracket[activeComp.phase]];
-      const match = matchArray.find((m: any) => m && m.hId === awayId && m.aId === homeId);
+      const match = matchArray.find(m => m && m.hId === awayId && m.aId === homeId);
       if (match) aggregate = { sh: match.sa, sa: match.sh };
     }
 
@@ -1230,11 +1247,12 @@ export default function App() {
     if (rolling || matchState.finished) return;
     setRolling(true);
     if (rollIntervalRef.current) clearInterval(rollIntervalRef.current);
-    rollIntervalRef.current = setInterval(() => setMatchState((prev: any) => prev ? { ...prev, lastDie: Math.floor(Math.random() * 6) + 1 } : prev), 100);
+    rollIntervalRef.current = setInterval(() => setMatchState(prev => prev ? { ...prev, lastDie: Math.floor(Math.random() * 6) + 1 } : prev), 100);
+
     setTimeout(() => {
       if (rollIntervalRef.current) { clearInterval(rollIntervalRef.current); rollIntervalRef.current = null; }
       const die = Math.floor(Math.random() * 6) + 1;
-      setMatchState((prev: any) => {
+      setMatchState(prev => {
         if (!prev) return prev;
         if (prev.phase === 'penalties') {
           const isHome = prev.penalties.turn === 'H';
@@ -1277,14 +1295,11 @@ export default function App() {
 
         const isHome = prev.turn === 'H';
         const attacker = isHome ? prev.home : prev.away; const defender = isHome ? prev.away : prev.home;
-        let newLogs = [...prev.logs];
-        let { scoreH, scoreA, phase: newPhase } = prev;
+        let newLogs = [...prev.logs]; let { scoreH, scoreA, phase: newPhase } = prev;
 
         if (newPhase === 'att') {
           if (die <= attacker.att) { newLogs.unshift('🎯 ' + attacker.name + ' saca ' + die + '. ¡Va a portería!'); newPhase = 'gk'; } 
-          else { newLogs.unshift('❌ ' + attacker.name + ' falla (Dado: ' + die + ').');
-            return advanceTurn({ ...prev, lastDie: die, logs: newLogs, phase: 'att' });
-          }
+          else { newLogs.unshift('❌ ' + attacker.name + ' falla (Dado: ' + die + ').'); return advanceTurn({ ...prev, lastDie: die, logs: newLogs, phase: 'att' }); }
         } else {
           if (die > defender.def) { newLogs.unshift('⚽ ¡GOL de ' + attacker.name + '! (Dado: ' + die + ')'); isHome ? scoreH++ : scoreA++; } 
           else { newLogs.unshift('🧤 ¡PARADÓN! Evitó el gol (Dado: ' + die + ').'); }
@@ -1296,22 +1311,49 @@ export default function App() {
     }, 800);
   };
 
-  const advanceTurn = (state: any) => {
+  const advanceTurn = (state) => {
     let nextOppH = state.turn === 'H' ? state.oppH - 1 : state.oppH;
     let nextOppA = state.turn === 'A' ? state.oppA - 1 : state.oppA;
     let nextTurn = state.turn === 'H' ? 'A' : 'H';
     if (nextTurn === 'H' && nextOppH <= 0) nextTurn = 'A';
     if (nextTurn === 'A' && nextOppA <= 0) nextTurn = 'H';
+
     if (nextOppH <= 0 && nextOppA <= 0) {
       const isChampions = activeCompId === 'C1';
       const isIda = isChampions && activeComp.matchday % 2 === 0 && activeComp.phase !== 'Final' && activeComp.phase !== 'groups';
       const isVuelta = isChampions && activeComp.matchday % 2 !== 0 && activeComp.phase !== 'Final' && activeComp.phase !== 'groups';
       let needsPenalties = state.isKnockout && state.scoreH === state.scoreA && !isIda && !isVuelta;
       if (isVuelta && state.aggregate) if (state.aggregate.sh + state.scoreH === state.aggregate.sa + state.scoreA) needsPenalties = true;
+
       if (needsPenalties) return { ...state, oppH: 0, oppA: 0, phase: 'penalties', penalties: { scoreH: 0, scoreA: 0, turn: 'H', shotsH: 0, shotsA: 0, phase: 'att', finished: false, historyH: [], historyA: [] }, logs: ['⚖️ Empate. ¡Penaltis!', ...state.logs] };
       return { ...state, oppH: 0, oppA: 0, finished: true, logs: ['🏁 Final.', ...state.logs] };
     }
     return { ...state, oppH: nextOppH, oppA: nextOppA, turn: nextTurn, phase: 'att' };
+  };
+
+  const simulateDivisionMatchday = (teams: any[], matchday: number, history: any[]) => {
+    const schedule = generateLeagueSchedule(teams);
+    if (matchday >= schedule.length) return null;
+    const currentRound = Array.isArray(schedule) ? schedule[matchday] : [];
+    const results = currentRound.map((m: any) => {
+      const h = teams.find((t: any) => t.id === m.homeId); const a = teams.find((t: any) => t.id === m.awayId);
+      let sh = 0, sa = 0;
+      for(let i=0; i<(h?.opp||0); i++) if(Math.floor(Math.random()*6)+1 <= (h?.att||0) && Math.floor(Math.random()*6)+1 > (a?.def||0)) sh++;
+      for(let i=0; i<(a?.opp||0); i++) if(Math.floor(Math.random()*6)+1 <= (a?.att||0) && Math.floor(Math.random()*6)+1 > (h?.def||0)) sa++;
+      return { hId: m.homeId, aId: m.awayId, sh, sa };
+    });
+    const updatedTeams = teams.map((t: any) => {
+      const res = results.find((r: any) => r.hId === t.id || r.aId === t.id);
+      if (!res) return t;
+      const isHome = res.hId === t.id;
+      const gf = isHome ? res.sh : res.sa; const ga = isHome ? res.sa : res.sh;
+      const w = gf > ga ? 1 : 0; const d = gf === ga ? 1 : 0; const l = gf < ga ? 1 : 0;
+      return { ...t, p: t.p + 1, w: t.w + w, d: t.d + d, l: t.l + l, gf: t.gf + gf, ga: t.ga + ga, pts: t.pts + (w * 3 + d) };
+    });
+    const isFinished = matchday >= schedule.length - 1;
+    const nextMatchday = isFinished ? matchday : matchday + 1;
+    const newHistory = [{ day: matchday + 1, results }, ...history];
+    return { updatedTeams, nextMatchday, newHistory, isFinished };
   };
 
   const processMatchday = () => {
@@ -1323,6 +1365,7 @@ export default function App() {
 
       const schedule = generateLeagueSchedule(tArray);
       const currentRound = Array.isArray(schedule) ? schedule[tMatchday] : [];
+
       const results = currentRound.map((m: any) => {
         if (m.homeId === matchState.home.id || m.awayId === matchState.home.id || m.homeId === matchState.away.id || m.awayId === matchState.away.id) {
           if(m.homeId === matchState.home.id) return { hId: m.homeId, aId: m.awayId, sh: matchState.scoreH, sa: matchState.scoreA };
@@ -1336,7 +1379,7 @@ export default function App() {
       });
 
       const updatedTeams = tArray.map((t: any) => {
-        const res = results.find(r => r.hId === t.id || r.aId === t.id);
+        const res = results.find((r: any) => r.hId === t.id || r.aId === t.id);
         if (!res) return t;
         const isHome = res.hId === t.id;
         const gf = isHome ? res.sh : res.sa; const ga = isHome ? res.sa : res.sh;
@@ -1348,34 +1391,69 @@ export default function App() {
       const nextMatchday = isFinished ? tMatchday : tMatchday + 1;
       const newHistory = [{ day: tMatchday + 1, results }, ...tHistory];
 
+      // Datos de la división que el usuario jugó
+      const playedDivUpdate: any = {};
       if (isDiv2Context) {
-        updateActiveComp({ teams2: updatedTeams, history2: newHistory, matchday2: nextMatchday, showWinner2: isFinished });
+        playedDivUpdate.teams2 = updatedTeams;
+        playedDivUpdate.history2 = newHistory;
+        playedDivUpdate.matchday2 = nextMatchday;
+        playedDivUpdate.showWinner2 = isFinished;
       } else {
-        updateActiveComp({ teams: updatedTeams, history: newHistory, matchday: nextMatchday, showWinner: isFinished });
+        playedDivUpdate.teams = updatedTeams;
+        playedDivUpdate.history = newHistory;
+        playedDivUpdate.matchday = nextMatchday;
+        playedDivUpdate.showWinner = isFinished;
       }
 
+      // Simular simultáneamente la OTRA división
+      const otherTeams = isDiv2Context ? activeComp.teams : activeComp.teams2;
+      const otherMatchday = isDiv2Context ? activeComp.matchday : activeComp.matchday2;
+      const otherHistory = isDiv2Context ? activeComp.history : activeComp.history2;
+      const otherSchedule = generateLeagueSchedule(otherTeams);
+      const otherNotFinished = otherMatchday < otherSchedule.length;
+
+      if (otherTeams && otherTeams.length > 0 && otherNotFinished) {
+        const otherResult = simulateDivisionMatchday(otherTeams, otherMatchday, otherHistory);
+        if (otherResult) {
+          if (isDiv2Context) {
+            playedDivUpdate.teams = otherResult.updatedTeams;
+            playedDivUpdate.history = otherResult.newHistory;
+            playedDivUpdate.matchday = otherResult.nextMatchday;
+            playedDivUpdate.showWinner = otherResult.isFinished;
+          } else {
+            playedDivUpdate.teams2 = otherResult.updatedTeams;
+            playedDivUpdate.history2 = otherResult.newHistory;
+            playedDivUpdate.matchday2 = otherResult.nextMatchday;
+            playedDivUpdate.showWinner2 = otherResult.isFinished;
+          }
+        }
+      }
+
+      updateActiveComp(playedDivUpdate);
+
     } else {
+       // Copas y Mundiales mantienen la lógica original sin divisiones múltiples
+       // ... Lógica reducida de torneo (C1/C2) ...
        const results = [{ hId: matchState.home.id, aId: matchState.away.id, sh: matchState.scoreH, sa: matchState.scoreA, penH: matchState.penalties?.scoreH, penA: matchState.penalties?.scoreA }];
        if (activeComp.phase === 'groups') {
           const isWorldCup = activeCompId === 'C2';
           const maxMatchdays = isWorldCup ? 3 : 6;
-          activeComp.groups.forEach((group: any) => {
-             const groupTeams = activeComp.teams.filter((t: any) => group.teamIds.includes(t.id));
+          activeComp.groups.forEach(group => {
+             const groupTeams = activeComp.teams.filter(t => group.teamIds.includes(t.id));
              const currentRound = generateLeagueSchedule(groupTeams, !isWorldCup)[activeComp.matchday % maxMatchdays];
              if (currentRound) {
-                currentRound.forEach((m: any) => {
+                currentRound.forEach(m => {
                    if (m.homeId !== activeComp.userTeamId && m.awayId !== activeComp.userTeamId) {
-                      const h = activeComp.teams.find((t: any) => t.id === m.homeId); const a = activeComp.teams.find((t: any) => t.id === m.awayId);
+                      const h = activeComp.teams.find(t => t.id === m.homeId); const a = activeComp.teams.find(t => t.id === m.awayId);
                       let sh = 0, sa = 0;
                       for(let i=0; i<h.opp; i++) if(Math.floor(Math.random()*6)+1 <= h.att && Math.floor(Math.random()*6)+1 > a.def) sh++;
                       for(let i=0; i<a.opp; i++) if(Math.floor(Math.random()*6)+1 <= a.att && Math.floor(Math.random()*6)+1 > h.def) sa++;
-                      results.push({ hId: m.homeId, aId: m.awayId, sh, sa });
+                      results.push({ hId: m.homeId, aId: m.awayId, sh, sa, penH: null, penA: null });
                    }
                 });
              }
           });
-
-          const updatedTeams = activeComp.teams.map((t: any) => {
+          const updatedTeams = activeComp.teams.map(t => {
              const res = results.find(r => r.hId === t.id || r.aId === t.id);
              if (!res) return t;
              const isHome = res.hId === t.id;
@@ -1383,26 +1461,26 @@ export default function App() {
              const w = gf > ga ? 1 : 0; const d = gf === ga ? 1 : 0; const l = gf < ga ? 1 : 0;
              return { ...t, p: t.p + 1, w: t.w + w, d: t.d + d, l: t.l + l, gf: t.gf + gf, ga: t.ga + ga, pts: t.pts + (w * 3 + d) };
           });
-
           const nextMatchday = activeComp.matchday + 1;
           const isEndOfGroups = nextMatchday >= maxMatchdays;
           let newBracket = null;
           if (isEndOfGroups) newBracket = generateKnockoutBrackets({ ...activeComp, teams: updatedTeams });
           updateActiveComp({ teams: updatedTeams, history: [{ day: 'Jornada ' + nextMatchday, results }, ...activeComp.history], matchday: nextMatchday, phase: isEndOfGroups ? (newBracket.Octavos ? 'Octavos' : 'Cuartos') : 'groups', bracket: newBracket });
        } else {
+          // Eliminatorias
           const isChampions = activeCompId === 'C1';
           const phase = activeComp.phase;
           const isVuelta = isChampions && activeComp.matchday % 2 !== 0 && phase !== 'Final';
           const newBracket = { ...activeComp.bracket };
           const matchesToProcess = Array.isArray(newBracket[phase]) ? newBracket[phase] : [newBracket[phase]];
-          const allResults: any[] = [];
+          const allResults = [];
 
-          matchesToProcess.forEach((m: any) => {
+          matchesToProcess.forEach(m => {
              let sh, sa, penH, penA;
              if (m.hId === matchState.home.id && m.aId === matchState.away.id) { sh = matchState.scoreH; sa = matchState.scoreA; penH = matchState.penalties?.scoreH; penA = matchState.penalties?.scoreA; } 
              else if (isVuelta && m.hId === matchState.away.id && m.aId === matchState.home.id) { sh = matchState.scoreA; sa = matchState.scoreH; penH = matchState.penalties?.scoreA; penA = matchState.penalties?.scoreH; } 
              else {
-                const h = activeComp.teams.find((t: any) => t.id === (isVuelta ? m.aId : m.hId)); const a = activeComp.teams.find((t: any) => t.id === (isVuelta ? m.hId : m.aId));
+                const h = activeComp.teams.find(t => t.id === (isVuelta ? m.aId : m.hId)); const a = activeComp.teams.find(t => t.id === (isVuelta ? m.hId : m.aId));
                 let simH = 0, simA = 0;
                 for(let i=0; i<h.opp; i++) if(Math.floor(Math.random()*6)+1 <= h.att && Math.floor(Math.random()*6)+1 > a.def) simH++;
                 for(let i=0; i<a.opp; i++) if(Math.floor(Math.random()*6)+1 <= a.att && Math.floor(Math.random()*6)+1 > h.def) simA++;
@@ -1410,7 +1488,7 @@ export default function App() {
                 const isDraw = (isChampions && isVuelta && phase !== 'Final') ? (m.sh + sh === m.sa + sa) : (sh === sa);
                 if (isDraw && (!isChampions || isVuelta || phase === 'Final')) {
                    let spH=0, spA=0, shH=0, shA=0;
-                   const sim = (att: number, def: number) => (Math.floor(Math.random()*6)+1 <= att && Math.floor(Math.random()*6)+1 > def);
+                   const sim = (att, def) => (Math.floor(Math.random()*6)+1 <= att && Math.floor(Math.random()*6)+1 > def);
                    for(let i=0; i<5; i++){
                       if(sim(h.att, a.def)) spH++; shH++;
                       if(spH > spA + (5-shA) || spA > spH + (5-shH)) break;
@@ -1428,7 +1506,7 @@ export default function App() {
 
           let nextPhase = phase, showWinner = false;
           if (!isChampions || isVuelta || phase === 'Final') {
-             const winners = matchesToProcess.map((m: any) => {
+             const winners = matchesToProcess.map(m => {
                 const tH = isChampions && phase!=='Final' ? m.sh+m.sh2 : m.sh; const tA = isChampions && phase!=='Final' ? m.sa+m.sa2 : m.sa;
                 if(tH>tA) return m.hId; if(tA>tH) return m.aId; return m.penH>m.penA ? m.hId : m.aId;
              });
@@ -1448,30 +1526,34 @@ export default function App() {
   const handlePromotionAndNewSeason = () => {
     if (activeComp.type !== 'league') return;
 
+    // Archivamos a los campeones
     archiveCompetition(activeCompId, 1);
     archiveCompetition(activeCompId, 2);
 
     const sorted1 = [...activeComp.teams].sort((a, b) => b.pts - a.pts || (b.gf - b.ga) - (a.gf - a.ga));
     const sorted2 = [...activeComp.teams2].sort((a, b) => b.pts - a.pts || (b.gf - b.ga) - (a.gf - a.ga));
 
-    const bottom3 = sorted1.slice(-3); // Descienden
-    const top3 = sorted2.slice(0, 3);  // Ascienden
+    const bottom3 = sorted1.slice(-3); // Descienden (18, 19, 20)
+    const top3 = sorted2.slice(0, 3); // Ascienden (1, 2, 3)
 
+    // Guardar stats originales de los que descienden
     const origStats = bottom3.map(t => ({ att: t.att, opp: t.opp, def: t.def }));
 
+    // Aplicar stats fijos a los que descienden (boost en segunda)
     const boostedRelegated = [
-      { ...bottom3[0], att: 5, opp: 5, def: 3 }, // 18º o 16º
-      { ...bottom3[1], att: 4, opp: 4, def: 4 }, // 19º o 17º
-      { ...bottom3[2], att: 3, opp: 4, def: 3 }  // 20º o 18º
+      { ...bottom3[0], att: 5, opp: 5, def: 3 }, // 18º
+      { ...bottom3[1], att: 4, opp: 4, def: 4 }, // 19º
+      { ...bottom3[2], att: 3, opp: 4, def: 3 }  // 20º
     ];
 
+    // Aplicar stats originales a los que ascienden
     const adjustedPromoted = [
       { ...top3[0], att: origStats[0].att, opp: origStats[0].opp, def: origStats[0].def },
       { ...top3[1], att: origStats[1].att, opp: origStats[1].opp, def: origStats[1].def },
       { ...top3[2], att: origStats[2].att, opp: origStats[2].opp, def: origStats[2].def }
     ];
 
-    const resetStats = (t: any) => ({ ...t, p: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, pts: 0 });
+    const resetStats = (t) => ({ ...t, p: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, pts: 0 });
 
     const remaining1 = sorted1.slice(0, -3).map(resetStats);
     const remaining2 = sorted2.slice(3).map(resetStats);
@@ -1493,8 +1575,8 @@ export default function App() {
     setShowPromoModal(false);
   };
 
-  const handleTotalReset = (compId: string) => {
-    const defaultData = getDefaultComps()[compId as keyof ReturnType<typeof getDefaultComps>];
+  const handleTotalReset = (compId) => {
+    const defaultData = getDefaultComps()[compId];
     updateActiveComp({
       teams: defaultData.teams,
       teams2: defaultData.teams2,
@@ -1506,7 +1588,6 @@ export default function App() {
 
   const CompetitionView = () => {
     if (!activeComp) return null;
-
     const hasStarted = activeComp.type === 'league' 
       ? (activeComp.matchday > 0 || activeComp.matchday2 > 0 || activeComp.history?.length > 0)
       : (activeComp.matchday > 0 || activeComp.history?.length > 0);
@@ -1514,6 +1595,7 @@ export default function App() {
     const isLeague = activeComp.type === 'league';
     const isDiv2 = viewDiv === 2 && isLeague;
 
+    // Selectores dinámicos basados en la división actual
     const currentTeams = isDiv2 ? activeComp.teams2 : activeComp.teams;
     const currentMatchday = isDiv2 ? activeComp.matchday2 : activeComp.matchday;
     const currentHistory = isDiv2 ? activeComp.history2 : activeComp.history;
@@ -1529,13 +1611,13 @@ export default function App() {
             {!isLeague && (
               <>
                 <button onClick={() => {
-                   const compsState = JSON.parse(window.localStorage.getItem(`${APP_ID}_comps`) || '{}');
+                   const compsState = JSON.parse(window.localStorage.getItem(`${APP_ID}_comps`));
                    updateActiveComp(getAutoFillData(activeCompId, compsState));
                 }} className='w-full bg-blue-600/80 backdrop-blur-md hover:bg-blue-500 text-white py-4 rounded-2xl text-[11px] font-black uppercase italic tracking-widest shadow-xl transition-all active:scale-95 flex justify-center items-center gap-2'>
                   <Wand2 size={16}/> Auto-Rellenar
                 </button>
                 <button onClick={() => {
-                   const compsState = JSON.parse(window.localStorage.getItem(`${APP_ID}_comps`) || '{}');
+                   const compsState = JSON.parse(window.localStorage.getItem(`${APP_ID}_comps`));
                    updateActiveComp(getShuffleData(activeCompId, compsState));
                 }} className='w-full bg-emerald-600/80 backdrop-blur-md hover:bg-emerald-500 text-white py-4 rounded-2xl text-[11px] font-black uppercase italic tracking-widest shadow-xl transition-all active:scale-95 flex justify-center items-center gap-2'>
                   <Shuffle size={16}/> Sorteo Dinámico
@@ -1550,17 +1632,17 @@ export default function App() {
 
     const sortedTeams = [...currentTeams].sort((a, b) => b.pts - a.pts || (b.gf - b.ga) - (a.gf - a.ga));
 
-    const allTeamsContext = isLeague ? [...activeComp.teams, ...(activeComp.teams2 || [])] : activeComp.teams;
-    const userTeam = allTeamsContext.find((t: any) => t.id === activeComp.userTeamId) || activeComp.teams[0];
+    const currentUserTeamId = isDiv2 ? (activeComp.userTeamId2 || activeComp.teams2?.[0]?.id) : activeComp.userTeamId;
+    const userTeam = currentTeams.find(t => t.id === currentUserTeamId) || currentTeams[0];
 
     const winner = useMemo(() => {
       if (!currentTeams || currentTeams.length === 0) return null;
       if (isLeague) return sortedTeams[0];
       const final = activeComp.bracket?.Final?.[0] || activeComp.bracket?.Final;
       if (final && final.sh !== null) {
-        if (final.sh > final.sa) return activeComp.teams.find((t: any) => t.id === final.hId);
-        if (final.sa > final.sh) return activeComp.teams.find((t: any) => t.id === final.aId);
-        return activeComp.teams.find((t: any) => t.id === (final.penH > final.penA ? final.hId : final.aId));
+        if (final.sh > final.sa) return activeComp.teams.find(t => t.id === final.hId);
+        if (final.sa > final.sh) return activeComp.teams.find(t => t.id === final.aId);
+        return activeComp.teams.find(t => t.id === (final.penH > final.penA ? final.hId : final.aId));
       }
       return currentTeams[0];
     }, [activeComp, currentTeams, isLeague, sortedTeams]);
@@ -1578,19 +1660,18 @@ export default function App() {
 
       if (activeComp.phase === 'groups' && activeComp.groups) {
         const isWC = activeCompId === 'C2';
-        const group = activeComp.groups.find((g: any) => g.teamIds.includes(userTeam.id));
-        if (group) return (generateLeagueSchedule(activeComp.teams.filter((t: any) => group.teamIds.includes(t.id)), !isWC)[activeComp.matchday % (isWC ? 3 : 6)] || []).find(m => m.homeId === userTeam.id || m.awayId === userTeam.id);
-
+        const group = activeComp.groups.find(g => g.teamIds.includes(userTeam.id));
+        if (group) return (generateLeagueSchedule(activeComp.teams.filter(t => group.teamIds.includes(t.id)), !isWC)[activeComp.matchday % (isWC ? 3 : 6)] || []).find(m => m.homeId === userTeam.id || m.awayId === userTeam.id);
         for (const g of activeComp.groups) {
-          const m = (generateLeagueSchedule(activeComp.teams.filter((t: any) => g.teamIds.includes(t.id)), !isWC)[activeComp.matchday % (isWC ? 3 : 6)] || [])[0];
+          const m = (generateLeagueSchedule(activeComp.teams.filter(t => g.teamIds.includes(t.id)), !isWC)[activeComp.matchday % (isWC ? 3 : 6)] || [])[0];
           if (m) return m;
         }
       } else if (activeComp.bracket) {
         const matchArray = Array.isArray(activeComp.bracket[activeComp.phase]) ? activeComp.bracket[activeComp.phase] : [activeComp.bracket[activeComp.phase]];
         const isVuelta = activeCompId === 'C1' && activeComp.matchday % 2 !== 0 && activeComp.phase !== 'Final';
-        const userMatch = matchArray.find((m: any) => m && (m.hId === userTeam.id || m.aId === userTeam.id));
+        const userMatch = matchArray.find(m => m && (m.hId === userTeam.id || m.aId === userTeam.id));
         if (userMatch) return (isVuelta && userMatch.sh2 === null) || (!isVuelta && userMatch.sh === null) ? userMatch : null;
-        return matchArray.find((m: any) => m && (isVuelta ? m.sh2 === null : m.sh === null));
+        return matchArray.find(m => m && (isVuelta ? m.sh2 === null : m.sh === null));
       }
       return null;
     };
@@ -1600,13 +1681,13 @@ export default function App() {
     let awayId = currentMatch?.awayId || currentMatch?.aId;
 
     if (activeCompId === 'C1' && activeComp.matchday % 2 !== 0 && activeComp.phase !== 'Final' && activeComp.phase !== 'groups' && currentMatch?.hId) {
-      const temp = homeId;
-      homeId = awayId; awayId = temp;
+      const temp = homeId; homeId = awayId; awayId = temp;
     }
 
-    const homeTeam = currentTeams.find((t: any) => t.id === homeId);
-    const awayTeam = currentTeams.find((t: any) => t.id === awayId);
+    const homeTeam = currentTeams.find(t => t.id === homeId);
+    const awayTeam = currentTeams.find(t => t.id === awayId);
 
+    // Sistema de validación de ascensos (solo Ligas)
     const isMax1 = isLeague && activeComp.teams && activeComp.matchday >= generateLeagueSchedule(activeComp.teams).length - 1;
     const isMax2 = isLeague && activeComp.teams2 && activeComp.matchday2 >= generateLeagueSchedule(activeComp.teams2).length - 1;
     const readyForPromotion = isLeague && isMax1 && isMax2 && !activeComp.showWinner && !activeComp.showWinner2;
@@ -1615,7 +1696,7 @@ export default function App() {
       <ConfigPanel 
         initialComp={activeComp} 
         compId={activeCompId} 
-        onSave={(draftData: any) => { updateActiveComp(draftData); setCompView('main'); }}
+        onSave={(draftData) => { updateActiveComp(draftData); setCompView('main'); }}
         onCancel={() => setCompView('main')}
         onTotalReset={handleTotalReset}
       />
@@ -1624,6 +1705,7 @@ export default function App() {
     if (compView === 'main') return (
       <div className='flex-grow px-4 pb-20 relative'>
 
+        {/* MODAL ASCENSOS/DESCENSOS */}
         {showPromoModal && (
           <div className='fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-950/95 backdrop-blur-md'>
              <div className='bg-slate-900 rounded-[2.5rem] p-6 border border-white/20 w-full max-w-sm shadow-2xl relative overflow-hidden'>
@@ -1631,6 +1713,7 @@ export default function App() {
                 <h2 className='text-2xl font-black uppercase italic text-center mb-6 text-white drop-shadow-md relative z-10'>Resumen Temporada</h2>
 
                 <div className='space-y-6 relative z-10'>
+                  {/* ASCENSOS */}
                   <div className='bg-emerald-900/30 border border-emerald-500/30 p-4 rounded-3xl'>
                     <h3 className='text-xs font-black uppercase text-emerald-400 mb-3 flex items-center gap-2'><ArrowUpCircle size={16}/> Ascienden a 1ª</h3>
                     <div className='space-y-2'>
@@ -1643,6 +1726,7 @@ export default function App() {
                       ))}
                     </div>
                   </div>
+                  {/* DESCENSOS */}
                   <div className='bg-red-900/30 border border-red-500/30 p-4 rounded-3xl'>
                     <h3 className='text-xs font-black uppercase text-red-400 mb-3 flex items-center gap-2'><ArrowDownCircle size={16}/> Descienden a 2ª</h3>
                     <div className='space-y-2'>
@@ -1679,8 +1763,7 @@ export default function App() {
                 </div>
 
                 <button onClick={() => {
-                   if (isDiv2) updateActiveComp({ showWinner2: false });
-                   else updateActiveComp({ showWinner: false });
+                   if (isDiv2) updateActiveComp({ showWinner2: false }); else updateActiveComp({ showWinner: false });
                 }} className='w-full bg-yellow-500 text-slate-950 py-4 rounded-2xl text-[10px] font-black uppercase italic tracking-widest shadow-xl active:scale-95 transition-all mb-4'>Continuar</button>
               </motion.div>
             </motion.div>
@@ -1731,11 +1814,11 @@ export default function App() {
 
         {activeComp.type !== 'league' && activeComp.phase === 'groups' && Array.isArray(activeComp.groups) && (
           <div className='grid grid-cols-1 gap-6 mb-8'>
-            {activeComp.groups.map((group: any, gi: number) => (
+            {activeComp.groups.map((group, gi) => (
               <section key={gi} className='bg-slate-900/30 backdrop-blur-md rounded-[2rem] p-4 border border-white/10 shadow-lg'>
                 <h3 className='text-[10px] font-black uppercase text-blue-400 mb-3 flex items-center gap-2 drop-shadow-md'><ShieldIcon size={12} /> {group?.name}</h3>
                 <div className='space-y-1.5'>
-                  {activeComp.teams.filter((t: any) => group.teamIds.includes(t.id)).sort((a: any, b: any) => b.pts - a.pts || (b.gf - b.ga) - (a.gf - a.ga)).map((t: any, i: number) => (
+                  {activeComp.teams.filter(t => group.teamIds.includes(t.id)).sort((a, b) => b.pts - a.pts || (b.gf - b.ga) - (a.gf - a.ga)).map((t, i) => (
                     <div key={t.id} className={'flex items-center gap-3 p-2 rounded-xl ' + (t.id === activeComp.userTeamId ? 'bg-blue-600/40 border border-blue-400/50 shadow-inner' : 'bg-black/30')}>
                       <span className='text-[10px] font-black text-slate-300 italic w-4'>{i+1}</span>
                       <Shield color1={t.color1} color2={t.color2} initial={t.name} size='sm' isFlag={t.isFlag} />
@@ -1751,7 +1834,7 @@ export default function App() {
 
         {isLeague && (
           <section className='bg-slate-900/30 backdrop-blur-md rounded-[2rem] p-4 border border-white/10 mb-6 shadow-lg'>
-             <h3 className='text-[10px] font-black uppercase text-slate-200 mb-3 flex items-center gap-2 drop-shadow-md'><BarChart3 size={12} /> Top Clasificación {isDiv2 ? '2ª' : '1ª'} Div.</h3>
+            <h3 className='text-[10px] font-black uppercase text-slate-200 mb-3 flex items-center gap-2 drop-shadow-md'><BarChart3 size={12} /> Top Clasificación {isDiv2 ? '2ª' : '1ª'} Div.</h3>
             <div className='space-y-1.5'>
               {sortedTeams.slice(0, 6).map((t, i) => (
                 <div key={t.id} className={'flex items-center gap-3 p-2 rounded-xl ' + (t.id === activeComp.userTeamId ? 'bg-blue-600/40 border border-blue-400/50 shadow-inner' : (isDiv2 && i < 3 ? 'bg-emerald-900/30 border border-emerald-500/20' : 'bg-black/30'))}>
@@ -1782,15 +1865,15 @@ export default function App() {
                 <p className='mt-2 text-[10px] font-black uppercase italic truncate text-white drop-shadow-sm'>{awayTeam?.name}</p>
                 {awayTeam?.id === userTeam?.id && <span className='text-[7px] font-black bg-white/30 px-1.5 py-0.5 rounded uppercase backdrop-blur-sm'>Tu Equipo</span>}
               </div>
-             </div>
+            </div>
 
             {(() => {
               const schedule = generateLeagueSchedule(currentTeams);
-              const isDone = currentMatchday >= schedule.length - 1;
+              const isDone = currentMatchday >= schedule.length;
               if (isLeague && isDone) {
                  return (
                    <button disabled className='w-full bg-slate-800 text-slate-400 py-4 rounded-2xl text-[10px] font-black uppercase italic tracking-widest shadow-inner border border-white/10'>
-                     Esperando a {isDiv2 ? '1ª' : '2ª'} División...
+                     Temporada Finalizada
                    </button>
                  );
               }
@@ -1798,9 +1881,11 @@ export default function App() {
                 <button onClick={() => startMatch(homeId, awayId, isDiv2)} className='w-full bg-white/95 text-blue-900 py-4 rounded-2xl text-xs font-black uppercase italic tracking-widest shadow-xl active:scale-95 transition-all flex flex-col items-center justify-center'>
                   <span>{activeComp.phase === 'Final' ? 'Gran Final' : ('Jugar ' + (isLeague || activeComp.phase === 'groups' ? 'Jornada ' + (currentMatchday + 1) : activeComp.phase + (activeCompId === 'C1' ? (activeComp.matchday % 2 === 0 ? ' (Ida)' : ' (Vuelta)') : '')))}</span>
                   <span className='text-[7px] opacity-60 mt-0.5 tracking-normal'>{homeTeam?.opp} vs {awayTeam?.opp} TIROS DISPONIBLES</span>
+                  {isLeague && <span className='text-[7px] text-emerald-600 font-bold mt-0.5'>⚡ Ambas divisiones juegan simultáneamente</span>}
                 </button>
               );
             })()}
+
           </section>
         )}
       </div>
@@ -1844,7 +1929,8 @@ export default function App() {
           </div>
         ) : (
           <div className='space-y-8'>
-            {(activeComp.groups || []).map((group: any, gi: number) => (
+            {/* Lógica original de Copas y Eliminatorias */}
+            {(activeComp.groups || []).map((group, gi) => (
               <div key={gi} className='bg-slate-900/30 backdrop-blur-md rounded-[2rem] border border-white/10 overflow-x-auto custom-scrollbar relative shadow-xl'>
                 <div className='bg-[#0f172a] p-3 border-b border-white/10 sticky left-0 z-50'><h3 className='text-[10px] font-black uppercase text-blue-400 flex items-center gap-2'><ShieldIcon size={12} /> {group.name}</h3></div>
                 <table className='w-full text-left border-collapse min-w-[550px]'>
@@ -1857,7 +1943,7 @@ export default function App() {
                     </tr>
                   </thead>
                   <tbody className='divide-y divide-white/5'>
-                    {Array.isArray(activeComp.teams) && activeComp.teams.filter((t: any) => Array.isArray(group.teamIds) && group.teamIds.includes(t.id)).sort((a: any, b: any) => b.pts - a.pts || (b.gf - b.ga) - (a.gf - a.ga)).map((t: any, i: number) => (
+                    {Array.isArray(activeComp.teams) && activeComp.teams.filter(t => Array.isArray(group.teamIds) && group.teamIds.includes(t.id)).sort((a, b) => b.pts - a.pts || (b.gf - b.ga) - (a.gf - a.ga)).map((t, i) => (
                       <tr key={t.id} className={t.id === activeComp.userTeamId ? 'bg-blue-600/30' : ''}>
                         <td className='p-3 text-[10px] font-black italic text-slate-300 sticky z-40 bg-[#0f172a]' style={{ left: 0 }}>{i+1}</td>
                         <td className='p-3 flex items-center gap-2 sticky z-40 bg-[#0f172a]' style={{ left: '40px', minWidth: '130px' }}><Shield color1={t?.color1} color2={t?.color2} initial={t?.name} size='xs' isFlag={t?.isFlag} /><span className='text-[10px] font-bold uppercase truncate italic max-w-[80px]'>{t?.name}</span></td>
@@ -1886,7 +1972,7 @@ export default function App() {
             <div key={i} className='bg-slate-900/30 backdrop-blur-md rounded-3xl p-4 border border-white/10 shadow-lg'>
               <h3 className='text-[9px] font-black uppercase text-blue-300 mb-3 drop-shadow-md'>Jornada/Día: {h.day}</h3>
               <div className='space-y-2'>
-                {Array.isArray(h.results) && h.results.map((r: any, ri: number) => {
+                {Array.isArray(h.results) && h.results.map((r, ri) => {
                   const home = Array.isArray(currentTeams) ? currentTeams.find(t => t.id === r.hId) : null;
                   const away = Array.isArray(currentTeams) ? currentTeams.find(t => t.id === r.aId) : null;
                   return (
@@ -1925,9 +2011,9 @@ export default function App() {
                   <span className={'text-[7px] font-black uppercase px-2 py-0.5 rounded-full ' + (ri < currentMatchday ? 'bg-emerald-500/30 text-emerald-300' : ri === currentMatchday ? 'bg-blue-500/40 text-blue-200' : 'bg-slate-800/80 text-slate-300')}>{ri < currentMatchday ? 'Finalizado' : ri === currentMatchday ? 'En Curso' : 'Próximo'}</span>
                 </div>
                 <div className='space-y-2'>
-                  {round.map((m: any, mi: number) => {
+                  {round.map((m, mi) => {
                     const home = currentTeams.find(t => t.id === m.homeId); const away = currentTeams.find(t => t.id === m.awayId);
-                    const result = currentHistory.find((h: any) => h.day === (ri + 1))?.results.find((r: any) => (r.hId === m.homeId && r.aId === m.awayId) || (r.hId === m.awayId && r.aId === m.homeId));
+                    const result = currentHistory.find(h => h.day === (ri + 1))?.results.find(r => (r.hId === m.homeId && r.aId === m.awayId) || (r.hId === m.awayId && r.aId === m.homeId));
                     return (
                       <div key={mi} className='flex items-center justify-between bg-black/30 p-2 rounded-xl border border-white/5'>
                         <div className='flex items-center gap-2 w-24'><Shield color1={home?.color1} color2={home?.color2} initial={home?.name} size='xs' isFlag={home?.isFlag} /><span className='text-[9px] font-bold uppercase truncate italic'>{home?.name}</span></div>
@@ -1940,17 +2026,18 @@ export default function App() {
               </div>
             ))
           ) : (
+            // Lógica intacta para torneos
             <div className='space-y-8'>
               {(activeComp.groups || []).length > 0 && (
                 <div className='space-y-6'>
                   <h2 className='text-xs font-black uppercase text-slate-200 border-b border-white/20 pb-2 drop-shadow-md'>Fase de Grupos</h2>
-                  {(activeComp.groups || []).map((group: any, gi: number) => {
-                    const groupTeams = activeComp.teams.filter((t: any) => group.teamIds.includes(t.id));
+                  {(activeComp.groups || []).map((group, gi) => {
+                    const groupTeams = activeComp.teams.filter(t => group.teamIds.includes(t.id));
                     const isWorldCup = activeCompId === 'C2';
                     const groupSchedule = generateLeagueSchedule(groupTeams, !isWorldCup);
                     const maxMatchdays = isWorldCup ? 3 : 6;
                     return (
-                       <div key={gi} className='bg-slate-900/30 backdrop-blur-md rounded-3xl p-4 border border-white/10 shadow-lg'>
+                      <div key={gi} className='bg-slate-900/30 backdrop-blur-md rounded-3xl p-4 border border-white/10 shadow-lg'>
                         <h3 className='text-[10px] font-black uppercase text-blue-400 mb-4 flex items-center gap-2 drop-shadow-md'><ShieldIcon size={12} /> {group.name}</h3>
                         <div className='space-y-4'>
                           {(() => {
@@ -1962,15 +2049,15 @@ export default function App() {
                             const isCur = activeComp.phase === 'groups' && ri === (activeComp.matchday % maxMatchdays);
                             const isPast = activeComp.phase !== 'groups' || (activeComp.phase === 'groups' && ri < (activeComp.matchday % maxMatchdays));
 
-                             return (
+                            return (
                               <div key={ri} className={'p-3 rounded-2xl bg-black/30 border border-white/5 ' + (isCur ? 'border-blue-400/40 shadow-inner' : 'opacity-80')}>
                                 <div className='flex justify-between items-center mb-2'>
                                   <span className='text-[8px] font-black uppercase text-slate-300 italic'>Jornada {ri + 1}</span>
                                   <span className={'text-[7px] font-black uppercase px-2 py-0.5 rounded-full ' + (isPast ? 'bg-emerald-500/30 text-emerald-300' : isCur ? 'bg-blue-500/40 text-blue-200' : 'bg-slate-800/80 text-slate-300')}>{isPast ? 'Finalizado' : isCur ? 'En Curso' : 'Próximo'}</span>
                                 </div>
-                                {round.map((m: any, mi: number) => {
-                                  const home = activeComp.teams.find((t: any) => t.id === m.homeId); const away = activeComp.teams.find((t: any) => t.id === m.awayId);
-                                  const result = activeComp.history.find((h: any) => h.day === 'Jornada ' + (ri + 1))?.results.find((r: any) => (r.hId === m.homeId && r.aId === m.awayId) || (r.hId === m.awayId && r.aId === m.homeId));
+                                {round.map((m, mi) => {
+                                  const home = activeComp.teams.find(t => t.id === m.homeId); const away = activeComp.teams.find(t => t.id === m.awayId);
+                                  const result = activeComp.history.find(h => h.day === 'Jornada ' + (ri + 1))?.results.find(r => (r.hId === m.homeId && r.aId === m.awayId) || (r.hId === m.awayId && r.aId === m.homeId));
 
                                   return (
                                     <div key={mi} className='flex items-center justify-between py-1 border-b border-white/10 last:border-0'>
@@ -2005,7 +2092,7 @@ export default function App() {
                     const curIdx = po.indexOf(activeComp.phase);
                     if (curIdx === -1) return po; 
                     return [...po.slice(curIdx, curIdx + 1), ...po.slice(curIdx + 1), ...po.slice(0, curIdx).reverse()];
-                  })().map((phase: string) => {
+                  })().map(phase => {
                     const matches = activeComp.bracket[phase];
                     if (!matches || (Array.isArray(matches) && matches.length === 0)) return null;
                     const matchArray = Array.isArray(matches) ? matches : [matches];
@@ -2021,9 +2108,9 @@ export default function App() {
                           <span className={'text-[7px] font-black uppercase px-2 py-0.5 rounded-full ' + (status === 'Finalizado' ? 'bg-emerald-500/30 text-emerald-300' : status === 'En Curso' ? 'bg-blue-500/40 text-blue-200' : 'bg-slate-800/80 text-slate-300')}>{status}</span>
                         </div>
                         <div className='space-y-2'>
-                          {matchArray.map((m: any, mi: number) => {
+                          {matchArray.map((m, mi) => {
                             if (!m) return null;
-                            const home = activeComp.teams.find((t: any) => t.id === m.hId); const away = activeComp.teams.find((t: any) => t.id === m.aId);
+                            const home = activeComp.teams.find(t => t.id === m.hId); const away = activeComp.teams.find(t => t.id === m.aId);
                             const isChampions = activeCompId === 'C1';
                             const isPlayedIda = m.sh !== null; const isPlayedVuelta = m.sh2 !== null;
 
@@ -2083,11 +2170,10 @@ export default function App() {
               <div key={phase} className='min-w-[280px] flex-shrink-0'>
                 <h3 className='text-[10px] font-black uppercase text-blue-300 mb-4 px-3 border-l-2 border-blue-500 bg-slate-900/40 backdrop-blur-md rounded-r-xl py-1 drop-shadow-md'>{phase}</h3>
                 <div className='grid grid-cols-1 gap-3'>
-                  {(Array.isArray(activeComp.bracket[phase]) ? activeComp.bracket[phase] : [activeComp.bracket[phase]]).filter((m: any) => m !== null).map((m: any, mi: number) => {
-                    const h = activeComp.teams.find((t: any) => t.id === m.hId); const a = activeComp.teams.find((t: any) => t.id === m.aId);
+                  {(Array.isArray(activeComp.bracket[phase]) ? activeComp.bracket[phase] : [activeComp.bracket[phase]]).filter(m => m !== null).map((m, mi) => {
+                    const h = activeComp.teams.find(t => t.id === m.hId); const a = activeComp.teams.find(t => t.id === m.aId);
                     const isChampions = activeCompId === 'C1';
                     let winner = null;
-
                     if ((isChampions && phase !== 'Final' ? m.sh2 !== null : m.sh !== null)) {
                       if (isChampions && phase !== 'Final') {
                         const totH = (m.sh || 0) + (m.sh2 || 0); const totA = (m.sa || 0) + (m.sa2 || 0);
@@ -2199,8 +2285,8 @@ export default function App() {
         </div>
 
         <div className='mt-4 bg-slate-900/40 backdrop-blur-md rounded-3xl p-5 h-40 overflow-y-auto border border-white/10 space-y-2 shadow-lg custom-scrollbar'>
-          {matchState.logs.map((log: string, i: number) => (
-             <div key={i} className={'text-[10px] font-bold italic flex gap-3 ' + (i === 0 ? 'text-white drop-shadow-md' : 'text-slate-300')}><span className='opacity-60 shrink-0'>⚽</span><p>{log}</p></div>
+          {matchState.logs.map((log, i) => (
+            <div key={i} className={'text-[10px] font-bold italic flex gap-3 ' + (i === 0 ? 'text-white drop-shadow-md' : 'text-slate-300')}><span className='opacity-60 shrink-0'>⚽</span><p>{log}</p></div>
           ))}
         </div>
       </div>
@@ -2211,23 +2297,29 @@ export default function App() {
       <div className='flex-grow px-4 pb-20'>
         <div className='flex items-center gap-3 mb-6'>
           <button onClick={() => setCompView('main')} className='p-2 bg-slate-900/30 backdrop-blur-md rounded-xl active:scale-95 transition-all border border-white/10'><ChevronLeft /></button>
-          <h2 className='text-xl font-black italic uppercase drop-shadow-md'>Seleccionar Equipo</h2>
+          <h2 className='text-xl font-black italic uppercase drop-shadow-md'>Seleccionar Equipo {isDiv2 ? '(2ª Div)' : ''}</h2>
         </div>
+        {isLeague && (
+          <div className='flex mb-4 bg-slate-900/40 p-1 rounded-2xl border border-white/10 backdrop-blur-md'>
+            <button onClick={() => setViewDiv(1)} className={`flex-1 py-2 text-[10px] font-black uppercase italic rounded-[10px] transition-all ${!isDiv2 ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:text-white'}`}>1ª División</button>
+            <button onClick={() => setViewDiv(2)} className={`flex-1 py-2 text-[10px] font-black uppercase italic rounded-[10px] transition-all ${isDiv2 ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-400 hover:text-white'}`}>2ª División</button>
+          </div>
+        )}
         <div className='grid gap-3 overflow-y-auto max-h-[75vh] pr-2 custom-scrollbar'>
-          {Array.isArray(activeComp.teams) && activeComp.teams.map(t => (
-            <button key={t.id} onClick={() => { updateActiveComp({ userTeamId: t.id }); setCompView('main'); }} className={'flex items-center gap-4 p-4 rounded-3xl border transition-all active:scale-95 backdrop-blur-md ' + (t.id === activeComp.userTeamId ? 'bg-blue-600/60 border-blue-400 shadow-[0_0_20px_rgba(37,99,235,0.5)]' : 'bg-slate-900/40 border-white/10 hover:border-white/30')}>
+          {Array.isArray(currentTeams) && currentTeams.map(t => (
+            <button key={t.id} onClick={() => { updateActiveComp(isDiv2 ? { userTeamId2: t.id } : { userTeamId: t.id }); setCompView('main'); }} className={'flex items-center gap-4 p-4 rounded-3xl border transition-all active:scale-95 backdrop-blur-md ' + (t.id === currentUserTeamId ? 'bg-blue-600/60 border-blue-400 shadow-[0_0_20px_rgba(37,99,235,0.5)]' : 'bg-slate-900/40 border-white/10 hover:border-white/30')}>
               <Shield color1={t?.color1} color2={t?.color2} initial={t?.name} size='md' isFlag={t?.isFlag} />
               <div className='text-left'>
                 <p className='text-xs font-black uppercase italic text-white drop-shadow-md'>{t?.name}</p>
                 <p className='text-[8px] font-bold text-slate-200 uppercase bg-black/40 px-1.5 py-0.5 rounded inline-block mt-1'>{t?.att + '/' + t?.opp + '/' + t?.def}</p>
               </div>
-              {t.id === activeComp.userTeamId && <div className='ml-auto bg-white/30 p-1.5 rounded-full shadow-inner'><Check size={14} className="text-white"/></div>}
+              {t.id === currentUserTeamId && <div className='ml-auto bg-white/30 p-1.5 rounded-full shadow-inner'><Check size={14} className="text-white"/></div>}
             </button>
           ))}
         </div>
       </div>
     );
-    
+
     return null;
   };
 
