@@ -8,14 +8,14 @@ import {
   Trophy, Settings, Calendar, History, Swords, ChevronLeft, Save, 
   Users, BarChart3, Play, RotateCcw, Check, Dice1, Dice2, Dice3, 
   Dice4, Dice5, Dice6, Globe, Shield as ShieldIcon, Info, ArrowRight, Dices,
-  Wand2, Shuffle
+  Wand2, Shuffle, ArrowUpCircle, ArrowDownCircle, AlertTriangle
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // ==========================================
 // 1. CONSTANTES DEL SISTEMA Y PRESETS
 // ==========================================
-const APP_ID = 'dice-football-hub-elite-v5';
+const APP_ID = 'dice-football-hub-elite-v6'; // Actualizado v6
 
 const PRESETS = {
   ES: [
@@ -205,12 +205,164 @@ const PRESETS = {
 };
 
 // ==========================================
+// NUEVO: PRESETS SEGUNDA DIVISIÓN
+// ==========================================
+const PRESETS_2 = {
+  ES: [
+    { name: 'Almería', att: 5, opp: 5, def: 3, color1: '#e30613', color2: '#ffffff', league: 'ES' },
+    { name: 'Cádiz CF', att: 4, opp: 4, def: 4, color1: '#fde100', color2: '#0000ff', league: 'ES' },
+    { name: 'Granada CF', att: 4, opp: 5, def: 3, color1: '#c8102e', color2: '#ffffff', league: 'ES' },
+    { name: 'SD Eibar', att: 4, opp: 4, def: 4, color1: '#a71930', color2: '#004d98', league: 'ES' },
+    { name: 'Sporting Gijón', att: 4, opp: 4, def: 3, color1: '#e30613', color2: '#ffffff', league: 'ES' },
+    { name: 'Real Oviedo', att: 3, opp: 4, def: 4, color1: '#00529f', color2: '#ffffff', league: 'ES' },
+    { name: 'Levante UD', att: 4, opp: 4, def: 3, color1: '#a71930', color2: '#004d98', league: 'ES' },
+    { name: 'Real Zaragoza', att: 3, opp: 4, def: 4, color1: '#ffffff', color2: '#00529f', league: 'ES' },
+    { name: 'Racing Santander', att: 4, opp: 4, def: 3, color1: '#ffffff', color2: '#006400', league: 'ES' },
+    { name: 'Elche CF', att: 3, opp: 4, def: 3, color1: '#ffffff', color2: '#006400', league: 'ES' },
+    { name: 'CD Tenerife', att: 3, opp: 3, def: 4, color1: '#ffffff', color2: '#00529f', league: 'ES' },
+    { name: 'Burgos CF', att: 2, opp: 3, def: 4, color1: '#ffffff', color2: '#000000', league: 'ES' },
+    { name: 'SD Huesca', att: 2, opp: 3, def: 4, color1: '#a71930', color2: '#004d98', league: 'ES' },
+    { name: 'Málaga CF', att: 3, opp: 3, def: 3, color1: '#ffffff', color2: '#87ceeb', league: 'ES' },
+    { name: 'Dep. La Coruña', att: 3, opp: 4, def: 3, color1: '#ffffff', color2: '#00529f', league: 'ES' },
+    { name: 'Castellón', att: 4, opp: 4, def: 2, color1: '#000000', color2: '#ffffff', league: 'ES' },
+    { name: 'Córdoba CF', att: 3, opp: 3, def: 3, color1: '#ffffff', color2: '#006400', league: 'ES' },
+    { name: 'Albacete', att: 2, opp: 3, def: 3, color1: '#ffffff', color2: '#8b0000', league: 'ES' },
+    { name: 'Mirandés', att: 2, opp: 2, def: 4, color1: '#e30613', color2: '#000000', league: 'ES' },
+    { name: 'Eldense', att: 2, opp: 3, def: 2, color1: '#e30613', color2: '#0000ff', league: 'ES' }
+  ],
+  EN: [
+    { name: 'Leeds United', att: 5, opp: 5, def: 4, color1: '#ffffff', color2: '#1d428a', league: 'EN' },
+    { name: 'Burnley', att: 4, opp: 5, def: 4, color1: '#6c1d45', color2: '#87ceeb', league: 'EN' },
+    { name: 'Sheffield United', att: 4, opp: 4, def: 4, color1: '#ee2737', color2: '#ffffff', league: 'EN' },
+    { name: 'Luton Town', att: 4, opp: 4, def: 3, color1: '#f78f1e', color2: '#000000', league: 'EN' },
+    { name: 'West Bromwich', att: 3, opp: 4, def: 4, color1: '#002f68', color2: '#ffffff', league: 'EN' },
+    { name: 'Norwich City', att: 4, opp: 4, def: 3, color1: '#fff200', color2: '#00a650', league: 'EN' },
+    { name: 'Sunderland', att: 4, opp: 4, def: 3, color1: '#ff0000', color2: '#ffffff', league: 'EN' },
+    { name: 'Middlesbrough', att: 4, opp: 4, def: 3, color1: '#e30613', color2: '#ffffff', league: 'EN' },
+    { name: 'Coventry City', att: 3, opp: 4, def: 3, color1: '#87ceeb', color2: '#ffffff', league: 'EN' },
+    { name: 'Hull City', att: 3, opp: 4, def: 3, color1: '#f5a12d', color2: '#000000', league: 'EN' },
+    { name: 'Watford', att: 3, opp: 3, def: 3, color1: '#fbee21', color2: '#ed2127', league: 'EN' },
+    { name: 'Bristol City', att: 3, opp: 3, def: 4, color1: '#e30613', color2: '#ffffff', league: 'EN' },
+    { name: 'Swansea City', att: 3, opp: 4, def: 2, color1: '#ffffff', color2: '#000000', league: 'EN' },
+    { name: 'Preston N.E.', att: 2, opp: 3, def: 4, color1: '#ffffff', color2: '#000040', league: 'EN' },
+    { name: 'QPR', att: 2, opp: 3, def: 3, color1: '#ffffff', color2: '#0033a0', league: 'EN' },
+    { name: 'Stoke City', att: 2, opp: 3, def: 3, color1: '#e30613', color2: '#ffffff', league: 'EN' },
+    { name: 'Sheffield Wed', att: 2, opp: 3, def: 3, color1: '#0033a0', color2: '#ffffff', league: 'EN' },
+    { name: 'Blackburn', att: 3, opp: 3, def: 2, color1: '#0033a0', color2: '#ffffff', league: 'EN' },
+    { name: 'Millwall', att: 2, opp: 2, def: 4, color1: '#000040', color2: '#ffffff', league: 'EN' },
+    { name: 'Derby County', att: 2, opp: 3, def: 3, color1: '#ffffff', color2: '#000000', league: 'EN' }
+  ],
+  IT: [
+    { name: 'Sassuolo', att: 5, opp: 5, def: 3, color1: '#000000', color2: '#00a650', league: 'IT' },
+    { name: 'Frosinone', att: 4, opp: 4, def: 3, color1: '#ffcc00', color2: '#0033a0', league: 'IT' },
+    { name: 'Salernitana', att: 4, opp: 4, def: 3, color1: '#8b0000', color2: '#ffffff', league: 'IT' },
+    { name: 'Sampdoria', att: 4, opp: 5, def: 3, color1: '#0033a0', color2: '#ffffff', league: 'IT' },
+    { name: 'Palermo', att: 4, opp: 4, def: 3, color1: '#ffc0cb', color2: '#000000', league: 'IT' },
+    { name: 'Cremonese', att: 4, opp: 4, def: 4, color1: '#8b0000', color2: '#a9a9a9', league: 'IT' },
+    { name: 'Brescia', att: 3, opp: 4, def: 4, color1: '#0033a0', color2: '#ffffff', league: 'IT' },
+    { name: 'Bari', att: 3, opp: 4, def: 3, color1: '#ffffff', color2: '#e30613', league: 'IT' },
+    { name: 'Pisa', att: 4, opp: 4, def: 3, color1: '#000000', color2: '#0033a0', league: 'IT' },
+    { name: 'Spezia', att: 3, opp: 3, def: 4, color1: '#ffffff', color2: '#000000', league: 'IT' },
+    { name: 'Catanzaro', att: 3, opp: 4, def: 2, color1: '#ffcc00', color2: '#e30613', league: 'IT' },
+    { name: 'Reggiana', att: 2, opp: 3, def: 4, color1: '#8b0000', color2: '#ffffff', league: 'IT' },
+    { name: 'Südtirol', att: 2, opp: 3, def: 4, color1: '#ffffff', color2: '#e30613', league: 'IT' },
+    { name: 'Modena', att: 3, opp: 3, def: 3, color1: '#ffcc00', color2: '#0033a0', league: 'IT' },
+    { name: 'Cosenza', att: 2, opp: 3, def: 3, color1: '#0033a0', color2: '#e30613', league: 'IT' },
+    { name: 'Cittadella', att: 2, opp: 2, def: 4, color1: '#8b0000', color2: '#ffffff', league: 'IT' },
+    { name: 'Mantova', att: 3, opp: 4, def: 2, color1: '#ffffff', color2: '#e30613', league: 'IT' },
+    { name: 'Cesena', att: 3, opp: 3, def: 3, color1: '#ffffff', color2: '#000000', league: 'IT' },
+    { name: 'Juve Stabia', att: 2, opp: 3, def: 3, color1: '#ffcc00', color2: '#0033a0', league: 'IT' },
+    { name: 'Carrarese', att: 2, opp: 2, def: 3, color1: '#ffcc00', color2: '#0033a0', league: 'IT' }
+  ],
+  DE: [
+    { name: 'FC Köln', att: 5, opp: 5, def: 3, color1: '#e30613', color2: '#ffffff', league: 'DE' },
+    { name: 'Darmstadt 98', att: 4, opp: 4, def: 4, color1: '#0033a0', color2: '#ffffff', league: 'DE' },
+    { name: 'Hamburger SV', att: 5, opp: 5, def: 3, color1: '#ffffff', color2: '#0033a0', league: 'DE' },
+    { name: 'Hertha BSC', att: 4, opp: 4, def: 3, color1: '#0033a0', color2: '#ffffff', league: 'DE' },
+    { name: 'Schalke 04', att: 4, opp: 4, def: 3, color1: '#0033a0', color2: '#ffffff', league: 'DE' },
+    { name: 'Hannover 96', att: 4, opp: 4, def: 4, color1: '#e30613', color2: '#000000', league: 'DE' },
+    { name: 'F. Düsseldorf', att: 4, opp: 4, def: 4, color1: '#e30613', color2: '#ffffff', league: 'DE' },
+    { name: 'Karlsruher SC', att: 4, opp: 4, def: 3, color1: '#0033a0', color2: '#ffffff', league: 'DE' },
+    { name: 'FC Nürnberg', att: 3, opp: 3, def: 3, color1: '#8b0000', color2: '#ffffff', league: 'DE' },
+    { name: 'SC Paderborn', att: 4, opp: 4, def: 3, color1: '#000000', color2: '#0033a0', league: 'DE' },
+    { name: 'Greuther Fürth', att: 3, opp: 4, def: 3, color1: '#00a650', color2: '#ffffff', league: 'DE' },
+    { name: 'SV Elversberg', att: 3, opp: 4, def: 2, color1: '#ffffff', color2: '#000000', league: 'DE' },
+    { name: 'FC Magdeburg', att: 4, opp: 4, def: 2, color1: '#0033a0', color2: '#ffffff', league: 'DE' },
+    { name: 'E. Braunschweig', att: 2, opp: 3, def: 3, color1: '#ffcc00', color2: '#0033a0', league: 'DE' },
+    { name: 'Kaiserslautern', att: 3, opp: 3, def: 3, color1: '#e30613', color2: '#ffffff', league: 'DE' },
+    { name: 'SSV Ulm', att: 2, opp: 2, def: 4, color1: '#000000', color2: '#ffffff', league: 'DE' },
+    { name: 'Preußen Münster', att: 2, opp: 3, def: 3, color1: '#00a650', color2: '#000000', league: 'DE' },
+    { name: 'Jahn Regensburg', att: 2, opp: 2, def: 3, color1: '#ffffff', color2: '#e30613', league: 'DE' }
+  ],
+  FR: [
+    { name: 'Clermont Foot', att: 4, opp: 4, def: 4, color1: '#e30613', color2: '#0033a0', league: 'FR' },
+    { name: 'FC Lorient (2)', att: 5, opp: 5, def: 3, color1: '#f5a12d', color2: '#000000', league: 'FR' },
+    { name: 'FC Metz (2)', att: 4, opp: 4, def: 4, color1: '#8b0000', color2: '#ffffff', league: 'FR' },
+    { name: 'Paris FC', att: 4, opp: 5, def: 4, color1: '#0033a0', color2: '#ffffff', league: 'FR' },
+    { name: 'Rodez AF', att: 3, opp: 4, def: 3, color1: '#e30613', color2: '#ffcc00', league: 'FR' },
+    { name: 'SM Caen', att: 3, opp: 4, def: 3, color1: '#0033a0', color2: '#e30613', league: 'FR' },
+    { name: 'EA Guingamp', att: 3, opp: 4, def: 3, color1: '#e30613', color2: '#000000', league: 'FR' },
+    { name: 'Amiens SC', att: 3, opp: 3, def: 4, color1: '#ffffff', color2: '#000000', league: 'FR' },
+    { name: 'SC Bastia', att: 3, opp: 3, def: 4, color1: '#0033a0', color2: '#ffffff', league: 'FR' },
+    { name: 'Pau FC', att: 3, opp: 4, def: 2, color1: '#ffcc00', color2: '#0033a0', league: 'FR' },
+    { name: 'Grenoble Foot', att: 3, opp: 3, def: 3, color1: '#0033a0', color2: '#ffffff', league: 'FR' },
+    { name: 'FC Annecy', att: 3, opp: 4, def: 2, color1: '#e30613', color2: '#ffffff', league: 'FR' },
+    { name: 'ES Troyes AC', att: 2, opp: 3, def: 3, color1: '#0033a0', color2: '#ffffff', league: 'FR' },
+    { name: 'AC Ajaccio', att: 2, opp: 3, def: 4, color1: '#ffffff', color2: '#e30613', league: 'FR' },
+    { name: 'USL Dunkerque', att: 2, opp: 3, def: 3, color1: '#87ceeb', color2: '#ffffff', league: 'FR' },
+    { name: 'Red Star FC', att: 2, opp: 3, def: 3, color1: '#00a650', color2: '#ffffff', league: 'FR' },
+    { name: 'FC Martigues', att: 2, opp: 2, def: 3, color1: '#e30613', color2: '#ffcc00', league: 'FR' },
+    { name: 'Stade Lavallois', att: 2, opp: 2, def: 4, color1: '#f5a12d', color2: '#000000', league: 'FR' }
+  ],
+  NL: [
+    { name: 'Excelsior', att: 5, opp: 5, def: 3, color1: '#000000', color2: '#e30613', league: 'NL' },
+    { name: 'Vitesse', att: 4, opp: 4, def: 4, color1: '#ffcc00', color2: '#000000', league: 'NL' },
+    { name: 'FC Volendam', att: 4, opp: 4, def: 3, color1: '#f5a12d', color2: '#000000', league: 'NL' },
+    { name: 'De Graafschap', att: 4, opp: 4, def: 3, color1: '#0033a0', color2: '#ffffff', league: 'NL' },
+    { name: 'ADO Den Haag', att: 4, opp: 4, def: 3, color1: '#00a650', color2: '#ffcc00', league: 'NL' },
+    { name: 'SC Cambuur', att: 4, opp: 5, def: 2, color1: '#ffcc00', color2: '#0033a0', league: 'NL' },
+    { name: 'FC Emmen', att: 3, opp: 3, def: 4, color1: '#e30613', color2: '#ffffff', league: 'NL' },
+    { name: 'Roda JC', att: 3, opp: 4, def: 3, color1: '#ffcc00', color2: '#000000', league: 'NL' },
+    { name: 'MVV Maastricht', att: 3, opp: 3, def: 3, color1: '#e30613', color2: '#ffffff', league: 'NL' },
+    { name: 'VVV-Venlo', att: 3, opp: 3, def: 3, color1: '#ffcc00', color2: '#000000', league: 'NL' },
+    { name: 'FC Dordrecht', att: 4, opp: 4, def: 2, color1: '#00a650', color2: '#ffffff', league: 'NL' },
+    { name: 'Helmond Sport', att: 3, opp: 3, def: 3, color1: '#e30613', color2: '#000000', league: 'NL' },
+    { name: 'FC Eindhoven', att: 2, opp: 3, def: 3, color1: '#0033a0', color2: '#ffffff', league: 'NL' },
+    { name: 'SC Telstar', att: 2, opp: 3, def: 3, color1: '#ffffff', color2: '#0033a0', league: 'NL' },
+    { name: 'TOP Oss', att: 2, opp: 2, def: 3, color1: '#e30613', color2: '#ffffff', league: 'NL' },
+    { name: 'FC Den Bosch', att: 3, opp: 3, def: 3, color1: '#0033a0', color2: '#ffffff', league: 'NL' },
+    { name: 'Jong Ajax', att: 3, opp: 4, def: 2, color1: '#ffffff', color2: '#e30613', league: 'NL' },
+    { name: 'Jong PSV', att: 3, opp: 4, def: 2, color1: '#ff0000', color2: '#ffffff', league: 'NL' }
+  ],
+  MI: [
+    { name: 'SC Braga', att: 4, opp: 5, def: 3, color1: '#e30613', color2: '#ffffff', league: 'MI' },
+    { name: 'Besiktas', att: 4, opp: 4, def: 4, color1: '#000000', color2: '#ffffff', league: 'MI' },
+    { name: 'AEK Athens', att: 4, opp: 4, def: 3, color1: '#fde100', color2: '#000000', league: 'MI' },
+    { name: 'PAOK', att: 4, opp: 4, def: 3, color1: '#000000', color2: '#ffffff', league: 'MI' },
+    { name: 'KRC Genk', att: 4, opp: 4, def: 3, color1: '#0033a0', color2: '#ffffff', league: 'MI' },
+    { name: 'Royal Antwerp', att: 3, opp: 4, def: 4, color1: '#e30613', color2: '#ffffff', league: 'MI' },
+    { name: 'Young Boys', att: 4, opp: 4, def: 3, color1: '#ffd700', color2: '#000000', league: 'MI' },
+    { name: 'FC Basel', att: 3, opp: 3, def: 3, color1: '#e30613', color2: '#0033a0', league: 'MI' },
+    { name: 'Trabzonspor', att: 3, opp: 4, def: 3, color1: '#8b0000', color2: '#87ceeb', league: 'MI' },
+    { name: 'Hajduk Split', att: 3, opp: 3, def: 3, color1: '#ffffff', color2: '#0033a0', league: 'MI' },
+    { name: 'FC Midtjylland', att: 3, opp: 4, def: 3, color1: '#000000', color2: '#e30613', league: 'MI' },
+    { name: 'Brøndby IF', att: 3, opp: 3, def: 3, color1: '#ffd700', color2: '#0033a0', league: 'MI' },
+    { name: 'Sturm Graz', att: 3, opp: 3, def: 3, color1: '#000000', color2: '#ffffff', league: 'MI' },
+    { name: 'Viktoria Plzen', att: 3, opp: 3, def: 4, color1: '#e30613', color2: '#0033a0', league: 'MI' },
+    { name: 'Ferencvaros', att: 3, opp: 3, def: 3, color1: '#00a650', color2: '#ffffff', league: 'MI' },
+    { name: 'Ludogorets', att: 3, opp: 4, def: 2, color1: '#00a650', color2: '#ffffff', league: 'MI' },
+    { name: 'Bodo/Glimt', att: 4, opp: 4, def: 2, color1: '#ffff00', color2: '#000000', league: 'MI' },
+    { name: 'Qarabag FK', att: 3, opp: 3, def: 3, color1: '#000000', color2: '#ffffff', league: 'MI' },
+    { name: 'Maccabi Tel Aviv', att: 3, opp: 3, def: 2, color1: '#ffd700', color2: '#0033a0', league: 'MI' },
+    { name: 'Legia Warsaw', att: 3, opp: 3, def: 3, color1: '#ffffff', color2: '#000000', league: 'MI' }
+  ]
+};
+
+// ==========================================
 // 2. HELPERS Y GENERADORES
 // ==========================================
 
-// Global context para prevenir el error de "hardware contexts provided (6) is greater than..."
 let globalAudioCtx = null;
-
 const playClick = () => {
   try {
     if (!globalAudioCtx) {
@@ -219,7 +371,7 @@ const playClick = () => {
     }
     if (!globalAudioCtx) return;
     if (globalAudioCtx.state === 'suspended') globalAudioCtx.resume();
-    
+
     const osc = globalAudioCtx.createOscillator();
     const gain = globalAudioCtx.createGain();
     osc.connect(gain);
@@ -234,45 +386,58 @@ const playClick = () => {
   } catch (e) {}
 };
 
+// MODIFICADO: Genera ambas divisiones para las ligas
 const getDefaultComps = () => {
-  const baseTeam = (preset) => PRESETS[preset].map((t, i) => ({ ...t, id: i + 1, p: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, pts: 0 }));
+  const baseTeam = (preset, isDiv2 = false) => {
+    const list = isDiv2 ? PRESETS_2[preset] : PRESETS[preset];
+    if (!list) return [];
+    const offset = isDiv2 ? 100 : 0; // Previene colisiones de ID
+    return list.map((t, i) => ({ ...t, id: i + 1 + offset, p: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, pts: 0 }));
+  };
+
+  const getLeagueData = (name, code) => ({
+    type: 'league', name, 
+    teams: baseTeam(code), matchday: 0, history: [], showWinner: false, 
+    teams2: baseTeam(code, true), matchday2: 0, history2: [], showWinner2: false,
+    userTeamId: 1, disqualified: false,
+    promotionsLogs: null
+  });
+
   return {
-    'L1': { type: 'league', name: 'Liga Española', teams: baseTeam('ES'), matchday: 0, history: [], userTeamId: 1, showWinner: false, disqualified: false },
-    'L2': { type: 'league', name: 'Liga Italiana', teams: baseTeam('IT'), matchday: 0, history: [], userTeamId: 1, showWinner: false, disqualified: false },
-    'L3': { type: 'league', name: 'Liga Inglesa', teams: baseTeam('EN'), matchday: 0, history: [], userTeamId: 1, showWinner: false, disqualified: false },
-    'L4': { type: 'league', name: 'Liga Alemana', teams: baseTeam('DE'), matchday: 0, history: [], userTeamId: 1, showWinner: false, disqualified: false },
-    'L5': { type: 'league', name: 'Liga Holandesa', teams: baseTeam('NL'), matchday: 0, history: [], userTeamId: 1, showWinner: false, disqualified: false },
-    'L6': { type: 'league', name: 'Liga Francesa', teams: baseTeam('FR'), matchday: 0, history: [], userTeamId: 1, showWinner: false, disqualified: false },
-    'L7': { type: 'league', name: 'Miscelánea', teams: baseTeam('MI'), matchday: 0, history: [], userTeamId: 1, showWinner: false, disqualified: false },
+    'L1': getLeagueData('Liga Española', 'ES'),
+    'L2': getLeagueData('Liga Italiana', 'IT'),
+    'L3': getLeagueData('Liga Inglesa', 'EN'),
+    'L4': getLeagueData('Liga Alemana', 'DE'),
+    'L5': getLeagueData('Liga Holandesa', 'NL'),
+    'L6': getLeagueData('Liga Francesa', 'FR'),
+    'L7': getLeagueData('Miscelánea', 'MI'),
     'C1': { type: 'cup', name: 'Champions League', teams: [], matchday: 0, history: [], userTeamId: 1, showWinner: false, phase: 'groups', bracket: null, disqualified: false },
     'C2': { type: 'cup', name: 'Copa del Mundo', teams: [], matchday: 0, history: [], userTeamId: 1, showWinner: false, phase: 'groups', bracket: null, disqualified: false }
   };
 };
 
-const pickLeague = (preset, guaranteed, extra) => {
-  const top = preset.slice(0, guaranteed);
-  const rest = [...preset.slice(guaranteed, guaranteed + 6)].sort(() => Math.random() - 0.5).slice(0, extra);
-  return [...top, ...rest];
+// MODIFICADO: CL se construye desde el estado actual de comps, no desde los presets originales,
+// para que los equipos ascendidos puedan jugarla.
+const buildCLPool = (compsState) => {
+  const pull = (compKey, guaranteed, extra) => {
+    if (!compsState[compKey] || !compsState[compKey].teams) return [];
+    const t = [...compsState[compKey].teams].sort((a,b) => b.pts - a.pts || (b.gf - b.ga) - (a.gf - a.ga));
+    const top = t.slice(0, guaranteed);
+    const rest = [...t.slice(guaranteed, guaranteed + 6)].sort(() => Math.random() - 0.5).slice(0, extra);
+    return [...top, ...rest];
+  }
+  return [
+    ...pull('L1', 3, 2), ...pull('L3', 3, 2), ...pull('L4', 3, 2), ...pull('L2', 3, 2),
+    ...pull('L6', 3, 1), ...pull('L5', 3, 1), ...pull('L7', 3, 1),
+  ];
 };
-
-const buildCLPool = () => [
-  ...pickLeague(PRESETS.ES, 3, 2),
-  ...pickLeague(PRESETS.EN, 3, 2),
-  ...pickLeague(PRESETS.DE, 3, 2),
-  ...pickLeague(PRESETS.IT, 3, 2),
-  ...pickLeague(PRESETS.FR, 3, 1),
-  ...pickLeague(PRESETS.NL, 3, 1),
-  ...pickLeague(PRESETS.MI, 3, 1),
-];
 
 const drawKnockoutGroups = (pool, isWC, randomize) => {
   let groups = Array.from({length: 8}, () => []);
   const sortedPool = [...pool].sort((a, b) => (b.att + b.opp + b.def) - (a.att + a.opp + a.def));
   let pots = [sortedPool.slice(0, 8), sortedPool.slice(8, 16), sortedPool.slice(16, 24), sortedPool.slice(24, 32)];
 
-  if (randomize) {
-     pots = pots.map(pot => [...pot].sort(() => Math.random() - 0.5));
-  }
+  if (randomize) pots = pots.map(pot => [...pot].sort(() => Math.random() - 0.5));
 
   if (isWC) {
      const solve = (potIdx, groupIdx) => {
@@ -298,14 +463,10 @@ const drawKnockoutGroups = (pool, isWC, randomize) => {
         }
         return false;
      };
-
      let workingPots = pots.map(pot => pot.map(t => ({...t, used: false})));
      pots = workingPots;
      let success = solve(0, 0);
-
-     if (!success) {
-        groups = Array.from({length: 8}, (_, i) => [pots[0][i], pots[1][i], pots[2][i], pots[3][i]]);
-     }
+     if (!success) groups = Array.from({length: 8}, (_, i) => [pots[0][i], pots[1][i], pots[2][i], pots[3][i]]);
   } else {
      const solve = (potIdx, groupIdx) => {
         if (potIdx === 4) return true;
@@ -329,26 +490,23 @@ const drawKnockoutGroups = (pool, isWC, randomize) => {
      let workingPots = pots.map(pot => pot.map(t => ({...t, used: false})));
      pots = workingPots;
      let success = solve(0, 0);
-     if (!success) {
-        groups = Array.from({length: 8}, (_, i) => [pots[0][i], pots[1][i], pots[2][i], pots[3][i]]);
-     }
+     if (!success) groups = Array.from({length: 8}, (_, i) => [pots[0][i], pots[1][i], pots[2][i], pots[3][i]]);
   }
 
   const formattedGroups = groups.map((g, i) => ({ name: 'Grupo ' + String.fromCharCode(65 + i), teamIds: g.map(t => t.id) }));
-
   return { teams: pool, groups: formattedGroups, matchday: 0, history: [], phase: 'groups', showWinner: false, disqualified: false, userTeamId: pool[0].id, bracket: null };
 };
 
-const getAutoFillData = (compId) => {
+const getAutoFillData = (compId, compsState) => {
   const isWC = compId === 'C2';
-  let pool = isWC ? [...PRESETS.WC] : buildCLPool();
+  let pool = isWC ? [...PRESETS.WC] : buildCLPool(compsState);
   pool = pool.map((t, i) => ({ ...t, id: i + 1, p: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, pts: 0 }));
   return drawKnockoutGroups(pool, isWC, false);
 };
 
-const getShuffleData = (compId) => {
+const getShuffleData = (compId, compsState) => {
   const isWC = compId === 'C2';
-  let pool = isWC ? [...PRESETS.WC] : buildCLPool();
+  let pool = isWC ? [...PRESETS.WC] : buildCLPool(compsState);
   pool = pool.map((t, i) => ({ ...t, id: i + 1, p: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, pts: 0 }));
   return drawKnockoutGroups(pool, isWC, true);
 };
@@ -413,6 +571,7 @@ const generateLeagueSchedule = (teams, twoLegged = true) => {
 // ==========================================
 // 3. COMPONENTES ATÓMICOS
 // ==========================================
+// [Se mantienen intactos]
 const COUNTRY_CODES = {
   'afghanistan': 'af', 'afganistán': 'af', 'albania': 'al', 'algeria': 'dz', 'argelia': 'dz',
   'andorra': 'ad', 'angola': 'ao', 'argentina': 'ar', 'armenia': 'am', 'australia': 'au',
@@ -472,8 +631,7 @@ const COUNTRY_CODES = {
 
 const getCountryCode = (name) => {
   if (!name) return null;
-  const key = name.toLowerCase().trim();
-  return COUNTRY_CODES[key] || null;
+  return COUNTRY_CODES[name.toLowerCase().trim()] || null;
 };
 
 const Shield = ({ color1, color2, initial, size = 'md', isFlag = false }) => {
@@ -487,12 +645,7 @@ const Shield = ({ color1, color2, initial, size = 'md', isFlag = false }) => {
     if (code) {
       return (
         <div className={`${imgDims} relative overflow-hidden shadow-md rounded-sm border border-white/10 shrink-0`}>
-          <img
-            src={`https://flagcdn.com/${code}.svg`}
-            alt={initial}
-            className='w-full h-full object-cover'
-            onError={(e) => { e.target.style.display = 'none'; }}
-          />
+          <img src={`https://flagcdn.com/${code}.svg`} alt={initial} className='w-full h-full object-cover' onError={(e) => { e.target.style.display = 'none'; }} />
         </div>
       );
     }
@@ -610,7 +763,7 @@ const ArchiveView = ({ setView, archive, selectedArchiveEntry, setSelectedArchiv
     <div className='px-4 pb-8'>
       {!selectedArchiveEntry ? (
         <div className='space-y-4'>
-          <p className="text-[10px] text-slate-300 font-bold uppercase italic tracking-widest text-center mb-6 drop-shadow-md">Últimos 5 Campeones Registrados</p>
+          <p className="text-[10px] text-slate-300 font-bold uppercase italic tracking-widest text-center mb-6 drop-shadow-md">Últimos Registros</p>
           {archive.length === 0 ? (
             <div className='text-center py-20 bg-slate-900/30 backdrop-blur-md rounded-3xl border border-white/10 shadow-xl'>
               <History size={48} className='mx-auto mb-4 text-slate-400' />
@@ -621,7 +774,7 @@ const ArchiveView = ({ setView, archive, selectedArchiveEntry, setSelectedArchiv
               <button key={entry.id || idx} onClick={() => setSelectedArchiveEntry(entry)} className='w-full p-4 bg-slate-900/30 backdrop-blur-md rounded-3xl border border-white/10 flex items-center gap-4 hover:bg-slate-800/50 active:scale-95 transition-all text-left shadow-lg group'>
                 <div className='w-12 h-12 rounded-2xl bg-yellow-500/20 flex items-center justify-center text-yellow-500 shrink-0 group-hover:scale-110 transition-transform'><Trophy size={24} /></div>
                 <div className='flex-grow overflow-hidden'>
-                  <h3 className='text-sm font-black uppercase italic truncate text-white'>{entry.name}</h3>
+                  <h3 className='text-sm font-black uppercase italic truncate text-white'>{entry.name} {entry.div === 2 ? '(2ª Div)' : ''}</h3>
                   <p className='text-[10px] text-slate-300 font-bold'>{entry.date} • Campeón: {entry.winner?.name || 'Desconocido'}</p>
                 </div>
                 <ArrowRight size={16} className='text-slate-400 shrink-0 group-hover:text-yellow-500 transition-colors' />
@@ -634,9 +787,9 @@ const ArchiveView = ({ setView, archive, selectedArchiveEntry, setSelectedArchiv
           <div className='absolute inset-0 bg-gradient-to-b from-yellow-500/10 to-transparent pointer-events-none'></div>
           <div className="text-center relative z-10">
             <Trophy size={56} className='text-yellow-400 mx-auto mb-4 drop-shadow-[0_0_15px_rgba(250,204,21,0.6)]' />
-            <h3 className='text-2xl font-black italic uppercase mb-1 text-white'>{selectedArchiveEntry.name}</h3>
+            <h3 className='text-2xl font-black italic uppercase mb-1 text-white'>{selectedArchiveEntry.name} {selectedArchiveEntry.div === 2 ? '(2ª Div)' : ''}</h3>
             <p className='text-[10px] font-bold text-slate-300 uppercase tracking-widest mb-6'>{selectedArchiveEntry.date}</p>
-            
+
             <div className='bg-black/30 rounded-3xl p-6 mb-6 border border-white/10 backdrop-blur-sm'>
               <h4 className='text-[10px] font-black uppercase text-yellow-500/80 mb-4 tracking-widest'>Campeón del Torneo</h4>
               <div className='flex flex-col items-center justify-center gap-3'>
@@ -706,20 +859,16 @@ const RulesView = ({ setView }) => (
     </header>
     <div className='space-y-4'>
       <div className='bg-slate-900/30 backdrop-blur-md p-6 rounded-3xl border border-white/10 shadow-lg'>
-        <h4 className='text-xs font-black uppercase italic text-emerald-400 mb-2'>1. El Sistema de Dados</h4>
-        <p className='text-[11px] font-bold text-slate-200 leading-relaxed'>Cada partido se decide por turnos de ataque. Los equipos tienen un número limitado de tiros (OPORT) basado en su fortaleza.</p>
+        <h4 className='text-xs font-black uppercase italic text-emerald-400 mb-2'>1. Dos Divisiones</h4>
+        <p className='text-[11px] font-bold text-slate-200 leading-relaxed'>Cada liga tiene 1ª y 2ª división. Al finalizar ambas, los 3 últimos de Primera descienden y los 3 primeros de Segunda ascienden, heredando e intercambiando estadísticas.</p>
       </div>
       <div className='bg-slate-900/30 backdrop-blur-md p-6 rounded-3xl border border-white/10 shadow-lg'>
         <h4 className='text-xs font-black uppercase italic text-blue-400 mb-2'>2. Ataque y Defensa</h4>
-        <p className='text-[11px] font-bold text-slate-200 leading-relaxed'>Para marcar gol, el atacante debe sacar un número menor o igual a su ATK. Si lo logra, el portero rival debe sacar un número <strong className='text-white'>menor o igual a su DEF</strong> para detenerlo. Si saca mayor, es GOL.</p>
+        <p className='text-[11px] font-bold text-slate-200 leading-relaxed'>Para marcar gol, el atacante debe sacar un número menor o igual a su ATK. Si lo logra, el portero rival debe sacar un número <strong className='text-white'>menor o igual a su DEF</strong> para detenerlo.</p>
       </div>
       <div className='bg-slate-900/30 backdrop-blur-md p-6 rounded-3xl border border-white/10 shadow-lg'>
-        <h4 className='text-xs font-black uppercase italic text-yellow-400 mb-2'>3. Formatos y Fechas</h4>
-        <p className='text-[11px] font-bold text-slate-200 leading-relaxed'>Ligas de 18 o 20 equipos calculan sus jornadas automáticamente. Las copas tienen grupos, ida, vuelta, y una Final a partido único.</p>
-      </div>
-      <div className='bg-slate-900/30 backdrop-blur-md p-6 rounded-3xl border border-white/10 shadow-lg'>
-        <h4 className='text-xs font-black uppercase italic text-purple-400 mb-2'>4. Guardado Automático</h4>
-        <p className='text-[11px] font-bold text-slate-200 leading-relaxed'>Tu progreso de todas las ligas, torneos e historial de campeones se guarda automáticamente en el almacenamiento local (caché) de tu dispositivo.</p>
+        <h4 className='text-xs font-black uppercase italic text-purple-400 mb-2'>3. Guardado Automático</h4>
+        <p className='text-[11px] font-bold text-slate-200 leading-relaxed'>Tu progreso de todas las ligas se guarda automáticamente. Cualquier edición que hagas en los equipos perdurará durante tus temporadas.</p>
       </div>
     </div>
   </div>
@@ -736,7 +885,7 @@ const HubView = ({ setView, setActiveCompId, setCompView, comps }) => {
   <div className='flex-grow flex flex-col px-4 pb-8'>
     <header className='py-10 text-center'>
       <h1 className='text-5xl font-black uppercase italic tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-emerald-400 to-green-400 drop-shadow-[0_0_20px_rgba(52,211,153,0.3)]'>Football Hub</h1>
-      <p className='text-[11px] text-slate-200 font-bold uppercase tracking-widest mt-3 drop-shadow-md'>Elite Dice Engine</p>
+      <p className='text-[11px] text-slate-200 font-bold uppercase tracking-widest mt-3 drop-shadow-md'>Elite Dice Engine v6</p>
     </header>
 
     <div className='space-y-8 flex-grow'>
@@ -762,7 +911,7 @@ const HubView = ({ setView, setActiveCompId, setCompView, comps }) => {
         <h3 className='text-xs font-black uppercase text-slate-200 mb-4 flex items-center gap-2 drop-shadow-md tracking-wider'><Trophy size={14} className="text-yellow-400 drop-shadow-[0_0_8px_rgba(234,179,8,0.8)]" /> Torneos Internacionales</h3>
         <div className='grid grid-cols-2 gap-4'>
           {['C1', 'C2'].map(id => (
-            <button key={id} onClick={() => { setActiveCompId(id); setView('competition'); setCompView('main'); }} className='p-6 bg-slate-900/30 backdrop-blur-md rounded-[2rem] border border-white/10 flex flex-col items-center gap-4 hover:bg-slate-800/40 hover:border-white/20 hover:shadow-[0_0_25px_rgba(255,255,255,0.1)] active:scale-[0.98] transition-all duration-300 group'>
+            <button key={id} onClick={() => { setActiveCompId(id); setCompView('main'); setView('competition'); }} className='p-6 bg-slate-900/30 backdrop-blur-md rounded-[2rem] border border-white/10 flex flex-col items-center gap-4 hover:bg-slate-800/40 hover:border-white/20 hover:shadow-[0_0_25px_rgba(255,255,255,0.1)] active:scale-[0.98] transition-all duration-300 group'>
               <div className={`w-14 h-14 rounded-full bg-slate-950/40 flex items-center justify-center text-white border border-white/5 shadow-inner group-hover:scale-110 transition-transform duration-300 ${id === 'C1' ? 'drop-shadow-[0_0_15px_rgba(96,165,250,0.5)]' : 'drop-shadow-[0_0_15px_rgba(52,211,153,0.5)]'}`}>
                 {id === 'C1' ? <Trophy size={28} className="text-blue-400" /> : <Globe size={28} className="text-emerald-400" />}
               </div>
@@ -783,7 +932,7 @@ const HubView = ({ setView, setActiveCompId, setCompView, comps }) => {
             </div>
             <div className='text-left'>
               <h3 className='text-sm font-black uppercase italic text-white tracking-wide group-hover:text-emerald-50 transition-colors'>Ligas Nacionales</h3>
-              <p className='text-[10px] text-slate-300 font-bold uppercase tracking-widest mt-1'>Selecciona tu liga local</p>
+              <p className='text-[10px] text-slate-300 font-bold uppercase tracking-widest mt-1'>1ª y 2ª División con Ascensos</p>
             </div>
           </div>
           <motion.div animate={{ rotate: showLeagues ? 90 : 0 }} transition={{ type: "spring", stiffness: 200 }} className='w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-slate-200 group-hover:bg-emerald-500/20 group-hover:text-emerald-400 transition-colors'>
@@ -799,12 +948,12 @@ const HubView = ({ setView, setActiveCompId, setCompView, comps }) => {
                   const comp = comps[id]; if (!comp) return null;
                   const isConf = comp.teams && comp.teams.length > 0;
                   return (
-                    <motion.button initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} key={id} onClick={() => { setActiveCompId(id); setView('competition'); setCompView('main'); }} className='p-4 bg-slate-900/30 backdrop-blur-md rounded-[1.5rem] border border-white/5 flex items-center justify-between hover:bg-slate-800/50 hover:border-emerald-500/20 hover:shadow-[0_0_15px_rgba(52,211,153,0.1)] active:scale-[0.98] transition-all duration-200 group'>
+                    <motion.button initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} key={id} onClick={() => { setActiveCompId(id); setCompView('main'); setView('competition'); }} className='p-4 bg-slate-900/30 backdrop-blur-md rounded-[1.5rem] border border-white/5 flex items-center justify-between hover:bg-slate-800/50 hover:border-emerald-500/20 hover:shadow-[0_0_15px_rgba(52,211,153,0.1)] active:scale-[0.98] transition-all duration-200 group'>
                       <div className='flex items-center gap-4'>
                         <div className='w-10 h-10 rounded-xl bg-slate-950/40 flex items-center justify-center text-slate-200 border border-white/5 group-hover:text-emerald-400 group-hover:border-emerald-500/30 transition-all'><BarChart3 size={18} /></div>
                         <div className='text-left'>
                           <h4 className='text-xs font-black uppercase italic text-slate-100 group-hover:text-white transition-colors tracking-wide'>{comp.name}</h4>
-                          <p className='text-[9px] font-bold text-slate-400 uppercase tracking-wider mt-0.5'>{isConf ? `Jornada ${(comp.matchday || 0) + 1} de ${(comp.teams.length - 1) * 2}` : 'No Inicializada'}</p>
+                          <p className='text-[9px] font-bold text-slate-400 uppercase tracking-wider mt-0.5'>{isConf ? `Jornadas: 1ª(${comp.matchday}) / 2ª(${comp.matchday2 || 0})` : 'No Inicializada'}</p>
                         </div>
                       </div>
                       <ArrowRight size={16} className='text-slate-400 group-hover:text-emerald-400 transition-colors' />
@@ -817,48 +966,43 @@ const HubView = ({ setView, setActiveCompId, setCompView, comps }) => {
         </AnimatePresence>
       </section>
     </div>
-    <footer className='py-6 text-center opacity-40'><p className='text-[9px] font-black uppercase tracking-widest text-white drop-shadow-md'>Powered by Dice Engine v5.0</p></footer>
+    <footer className='py-6 text-center opacity-40'><p className='text-[9px] font-black uppercase tracking-widest text-white drop-shadow-md'>Powered by Dice Engine v6.0</p></footer>
   </div>
 )};
 
-const ConfigPanel = ({ initialComp, compId, hasStarted, onSave, onCancel }) => {
+const ConfigPanel = ({ initialComp, compId, onSave, onCancel, onTotalReset }) => {
   const [draft, setDraft] = useState(() => JSON.parse(JSON.stringify(initialComp)));
+  const [editDiv, setEditDiv] = useState(1);
   const [drawModal, setDrawModal] = useState(null); 
 
-  const updateTeamAttr = (id, field, val) => {
-    setDraft(prev => ({ ...prev, teams: prev.teams.map(t => t.id === id ? { ...t, [field]: val } : t) }));
-  };
+  const hasStarted = initialComp.type === 'league' 
+    ? (initialComp.matchday > 0 || initialComp.matchday2 > 0 || initialComp.history?.length > 0)
+    : (initialComp.matchday > 0 || initialComp.history?.length > 0);
 
-  const handleLeaguePreset = (presetId) => {
-    if (hasStarted) return;
-    setDraft(prev => ({ ...prev, teams: PRESETS[presetId].map((t, i) => ({ ...t, id: i + 1, p: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, pts: 0 })) }));
+  const currentTeams = editDiv === 2 ? draft.teams2 : draft.teams;
+  const updateTeamAttr = (id, field, val) => {
+    if (editDiv === 2) {
+      setDraft(prev => ({ ...prev, teams2: prev.teams2.map(t => t.id === id ? { ...t, [field]: val } : t) }));
+    } else {
+      setDraft(prev => ({ ...prev, teams: prev.teams.map(t => t.id === id ? { ...t, [field]: val } : t) }));
+    }
   };
 
   const handleDrawUI = (type) => {
     if (hasStarted) return;
     const isWC = compId === 'C2';
-    const pool = isWC ? [...PRESETS.WC] : buildCLPool();
+    // Construir pool usando estado guardado actual para incluir equipos ascendidos
+    const compsState = JSON.parse(window.localStorage.getItem(`${APP_ID}_comps`));
+    const pool = isWC ? [...PRESETS.WC] : buildCLPool(compsState || getDefaultComps());
     const initializedPool = pool.map((t, i) => ({ ...t, id: i + 1, p: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, pts: 0 }));
-    
-    // 1. Crear y ordenar bombos
+
     initializedPool.sort((a, b) => (b.att + b.opp + b.def) - (a.att + a.opp + a.def));
     const pots = [
-      initializedPool.slice(0, 8),
-      initializedPool.slice(8, 16),
-      initializedPool.slice(16, 24),
-      initializedPool.slice(24, 32)
+      initializedPool.slice(0, 8), initializedPool.slice(8, 16),
+      initializedPool.slice(16, 24), initializedPool.slice(24, 32)
     ];
-
-    // 2. Realizar el Sorteo
     const drawData = drawKnockoutGroups(initializedPool, isWC, type === 'shuffle');
-
-    // 3. Mostrar Modal Visual interactivo
-    setDrawModal({
-      step: 'pots',
-      pots,
-      groups: drawData.groups,
-      drawData
-    });
+    setDrawModal({ step: 'pots', pots, groups: drawData.groups, drawData });
   };
 
   return (
@@ -904,7 +1048,6 @@ const ConfigPanel = ({ initialComp, compId, hasStarted, onSave, onCancel }) => {
                                                        <Shield color1={t.color1} color2={t.color2} initial={t.name} size='xs' isFlag={t.isFlag} />
                                                        <span className='font-bold uppercase'>{t.name}</span>
                                                    </div>
-                                                   {compId === 'C2' && <span className='text-[8px] font-black text-slate-400 bg-slate-800 px-1.5 py-0.5 rounded border border-white/5'>{t.region}</span>}
                                                </div>
                                            );
                                        })}
@@ -923,35 +1066,38 @@ const ConfigPanel = ({ initialComp, compId, hasStarted, onSave, onCancel }) => {
 
       <div className='flex items-center gap-3 mb-6'>
         <button onClick={onCancel} className='p-2 bg-slate-900/30 backdrop-blur-md rounded-xl active:scale-95 transition-all border border-white/10'><ChevronLeft /></button>
-        <h2 className='text-xl font-black italic uppercase drop-shadow-md'>Configuración</h2>
+        <h2 className='text-xl font-black italic uppercase drop-shadow-md'>Ajustes</h2>
       </div>
 
-      <div className='grid grid-cols-2 gap-2 mb-6'>
-        {draft.type === 'league' ? (
-          [
-            {id: 'ES', label: 'Liga Española', color: 'blue'}, {id: 'IT', label: 'Liga Italiana', color: 'emerald'},
-            {id: 'EN', label: 'Liga Inglesa', color: 'orange'}, {id: 'DE', label: 'Liga Alemana', color: 'purple'},
-            {id: 'NL', label: 'Liga Holandesa', color: 'red'}, {id: 'FR', label: 'Liga Francesa', color: 'indigo'},
-            {id: 'MI', label: 'Miscelánea', color: 'pink'}
-          ].map(l => (
-            <button key={l.id} onClick={() => handleLeaguePreset(l.id)} disabled={hasStarted} className={`p-3 bg-${l.color}-600/20 backdrop-blur-md text-${l.color}-200 border border-${l.color}-500/40 rounded-2xl text-[8px] font-black uppercase italic transition-all ${l.id === 'MI' ? 'col-span-2' : ''} ${hasStarted ? 'opacity-40 cursor-not-allowed' : 'active:scale-95 hover:bg-' + l.color + '-600/40'}`}>{l.label}</button>
-          ))
-        ) : (
-          <>
-            <button onClick={() => handleDrawUI('auto')} disabled={hasStarted} className={`p-3 border rounded-2xl text-[8px] font-black uppercase italic flex flex-col items-center justify-center gap-1 transition-all backdrop-blur-md ${hasStarted ? 'opacity-40 cursor-not-allowed bg-yellow-900/20 border-yellow-500/10 text-yellow-500/50' : 'bg-yellow-600/20 text-yellow-200 border-yellow-500/40 hover:bg-yellow-600/40 active:scale-95'}`}>
-              <Wand2 size={16}/> Auto-Rellenar
-            </button>
-            <button onClick={() => handleDrawUI('shuffle')} disabled={hasStarted} className={`p-3 border rounded-2xl text-[8px] font-black uppercase italic flex flex-col items-center justify-center gap-1 transition-all backdrop-blur-md ${hasStarted ? 'opacity-40 cursor-not-allowed bg-emerald-900/20 border-emerald-500/10 text-emerald-500/50' : 'bg-emerald-600/20 text-emerald-200 border-emerald-500/40 hover:bg-emerald-600/40 active:scale-95'}`}>
-              <Shuffle size={16}/> Sorteo Dinámico
-            </button>
-            {hasStarted && <p className='col-span-2 text-[8px] text-center text-red-400 font-bold uppercase italic mt-1 drop-shadow-md'>No puedes mezclar/rellenar en temporada activa.</p>}
-          </>
-        )}
+      <div className='bg-slate-900/30 backdrop-blur-md rounded-2xl p-4 border border-white/10 shadow-lg mb-6'>
+        <h3 className='text-xs font-black text-red-400 uppercase italic mb-3 flex items-center gap-2'><AlertTriangle size={14}/> Zona de Peligro</h3>
+        <button onClick={() => { if(window.confirm('Esto borrará el progreso de esta competición y restaurará los equipos originales. ¿Continuar?')) onTotalReset(compId); }} className='w-full py-3 bg-red-900/30 text-red-300 font-bold uppercase tracking-wider text-[10px] rounded-xl border border-red-500/30 active:scale-95 transition-all'>
+           Restaurar a Valores Originales
+        </button>
       </div>
+
+      {draft.type === 'league' && (
+        <div className='flex mb-4 bg-slate-900/50 p-1 rounded-2xl border border-white/10 backdrop-blur-sm'>
+          <button onClick={() => setEditDiv(1)} className={`flex-1 py-2 text-[10px] font-black uppercase italic rounded-xl transition-all ${editDiv === 1 ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400'}`}>1ª División</button>
+          <button onClick={() => setEditDiv(2)} className={`flex-1 py-2 text-[10px] font-black uppercase italic rounded-xl transition-all ${editDiv === 2 ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400'}`}>2ª División</button>
+        </div>
+      )}
+
+      {draft.type !== 'league' && (
+        <div className='grid grid-cols-2 gap-2 mb-6'>
+          <button onClick={() => handleDrawUI('auto')} disabled={hasStarted} className={`p-3 border rounded-2xl text-[8px] font-black uppercase italic flex flex-col items-center justify-center gap-1 transition-all backdrop-blur-md ${hasStarted ? 'opacity-40 cursor-not-allowed bg-yellow-900/20 border-yellow-500/10 text-yellow-500/50' : 'bg-yellow-600/20 text-yellow-200 border-yellow-500/40 hover:bg-yellow-600/40 active:scale-95'}`}>
+            <Wand2 size={16}/> Auto-Rellenar
+          </button>
+          <button onClick={() => handleDrawUI('shuffle')} disabled={hasStarted} className={`p-3 border rounded-2xl text-[8px] font-black uppercase italic flex flex-col items-center justify-center gap-1 transition-all backdrop-blur-md ${hasStarted ? 'opacity-40 cursor-not-allowed bg-emerald-900/20 border-emerald-500/10 text-emerald-500/50' : 'bg-emerald-600/20 text-emerald-200 border-emerald-500/40 hover:bg-emerald-600/40 active:scale-95'}`}>
+            <Shuffle size={16}/> Sorteo Dinámico
+          </button>
+          {hasStarted && <p className='col-span-2 text-[8px] text-center text-red-400 font-bold uppercase italic mt-1 drop-shadow-md'>No puedes re-sortear torneos en curso.</p>}
+        </div>
+      )}
 
       <div className='grid gap-4'>
-        {(!Array.isArray(draft.teams) || draft.teams.length === 0) && <div className='text-center py-10 bg-slate-900/30 backdrop-blur-md rounded-[2rem] border border-dashed border-white/20'><p className='text-[10px] font-bold text-slate-300 uppercase italic'>No hay equipos configurados.</p></div>}
-        {Array.isArray(draft.teams) && draft.teams.map(t => (
+        {(!Array.isArray(currentTeams) || currentTeams.length === 0) && <div className='text-center py-10 bg-slate-900/30 backdrop-blur-md rounded-[2rem] border border-dashed border-white/20'><p className='text-[10px] font-bold text-slate-300 uppercase italic'>No hay equipos configurados.</p></div>}
+        {Array.isArray(currentTeams) && currentTeams.map(t => (
           <div key={t.id} className='bg-slate-900/30 backdrop-blur-md p-5 rounded-[2rem] border border-white/10 shadow-lg space-y-4'>
             <div className='flex items-center gap-4'>
               <Shield color1={t?.color1} color2={t?.color2} initial={t?.name} size='lg' isFlag={t?.isFlag} />
@@ -973,7 +1119,7 @@ const ConfigPanel = ({ initialComp, compId, hasStarted, onSave, onCancel }) => {
       </div>
 
       <div className='fixed bottom-6 left-1/2 -translate-x-1/2 w-full max-w-xs px-6 z-50'>
-        <button onClick={() => onSave(draft)} className='w-full bg-blue-600/80 backdrop-blur-md text-white py-4 rounded-2xl font-black uppercase italic tracking-widest shadow-[0_10px_20px_rgba(0,0,0,0.5)] flex items-center justify-center gap-2 active:scale-95 transition-all border border-blue-400'><Save size={18} /> Guardar</button>
+        <button onClick={() => onSave(draft)} className='w-full bg-blue-600/80 backdrop-blur-md text-white py-4 rounded-2xl font-black uppercase italic tracking-widest shadow-[0_10px_20px_rgba(0,0,0,0.5)] flex items-center justify-center gap-2 active:scale-95 transition-all border border-blue-400'><Save size={18} /> Guardar Cambios</button>
       </div>
     </div>
   );
@@ -987,47 +1133,23 @@ export default function App() {
   const [view, setView] = useState('hub');
   const [activeCompId, setActiveCompId] = useState(null);
   const [compView, setCompView] = useState('main');
+  const [viewDiv, setViewDiv] = useState(1); 
+  const [showPromoModal, setShowPromoModal] = useState(false);
 
-  // MANEJO DE NAVEGACIÓN Y BOTÓN FÍSICO (ANDROID/PWA)
   useEffect(() => {
-    // Solo atrapamos el historial si no estamos en la vista principal
-    if (view !== 'hub' || compView !== 'main') {
-      window.history.pushState(null, '', window.location.href);
-    }
-
+    if (view !== 'hub' || compView !== 'main') window.history.pushState(null, '', window.location.href);
     const handlePopState = () => {
-      if (view === 'competition' && compView !== 'main') {
-        setCompView('main');
-      } else if (view !== 'hub') {
-        setView('hub');
-        setActiveCompId(null);
-        setCompView('main');
-      }
-      // Si estamos en la vista 'hub' y 'main', permitimos que el navegador salga de la app de forma natural
+      if (compView !== 'main') { setCompView('main'); }
+      else if (view !== 'hub') { setView('hub'); setActiveCompId(null); }
     };
-
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
   }, [view, compView]);
 
-  // IMPLEMENTACIÓN PROFESIONAL DE LOCALSTORAGE (EVITA PÉRDIDA DE DATOS)
   const [archive, setArchive] = useState(() => {
-    try {
-      const saved = window.localStorage.getItem(`${APP_ID}_archive`);
-      if (saved) return JSON.parse(saved);
-    } catch (e) {
-      console.error("Error al cargar historial desde localStorage", e);
-    }
-    return [];
+    try { const saved = window.localStorage.getItem(`${APP_ID}_archive`); if (saved) return JSON.parse(saved); } catch (e) {} return [];
   });
-
-  useEffect(() => {
-    try {
-      window.localStorage.setItem(`${APP_ID}_archive`, JSON.stringify(archive));
-    } catch (e) {
-      console.warn("No se pudo guardar el historial en localStorage", e);
-    }
-  }, [archive]);
+  useEffect(() => { try { window.localStorage.setItem(`${APP_ID}_archive`, JSON.stringify(archive)); } catch(e){} }, [archive]);
 
   const [selectedArchiveEntry, setSelectedArchiveEntry] = useState(null);
 
@@ -1044,63 +1166,50 @@ export default function App() {
       if (saved) {
         const parsed = JSON.parse(saved);
         if (parsed && typeof parsed === 'object') {
-          // Fusión segura: Mantiene la estructura de defaultComps pero inserta los datos guardados
-          // Esto previene crasheos si hay nuevas ligas o campos actualizados en nuevas versiones
           const merged = { ...defaultComps };
-          Object.keys(parsed).forEach(key => {
-            if (merged[key]) {
-              merged[key] = { ...merged[key], ...parsed[key] };
-            }
-          });
+          Object.keys(parsed).forEach(key => { if (merged[key]) merged[key] = { ...merged[key], ...parsed[key] }; });
           return merged;
         }
       }
-    } catch (e) {
-      console.error("Error cargando los datos de competición desde localStorage. Restaurando...", e);
-    }
+    } catch (e) {}
     return defaultComps;
   });
 
-  useEffect(() => {
-    try {
-      window.localStorage.setItem(`${APP_ID}_comps`, JSON.stringify(comps));
-    } catch (e) {
-      console.warn("No se pudo guardar el progreso en localStorage", e);
-    }
-  }, [comps]);
+  useEffect(() => { try { window.localStorage.setItem(`${APP_ID}_comps`, JSON.stringify(comps)); } catch(e){} }, [comps]);
 
   const activeComp = comps[activeCompId];
   const updateActiveComp = (newData) => setComps(prev => ({ ...prev, [activeCompId]: { ...prev[activeCompId], ...newData } }));
 
-  const archiveCompetition = (compId, compData = null) => {
-    const comp = compData || comps[compId];
+  // Helper para asegurar persistencia manual
+  const manualSave = () => {
+    try { window.localStorage.setItem(`${APP_ID}_comps`, JSON.stringify(comps)); alert('Progreso guardado manualmente.'); } catch(e) {}
+  };
+
+  const archiveCompetition = (compId, div, customWinner = null) => {
+    const comp = comps[compId];
     if (!comp) return;
+    const isDiv2 = div === 2;
+    const t = isDiv2 ? comp.teams2 : comp.teams;
 
-    if (archive.length > 0) {
-      const compEntries = archive.filter(e => e.compId === compId);
-      if (compEntries.length > 0) {
-        const last = compEntries[0];
-        if (last.name === comp.name && last.winner?.id === (comp.type === 'league' ? [...comp.teams].sort((a, b) => b.pts - a.pts || (b.gf - b.ga) - (a.gf - a.ga))[0]?.id : null)) return; 
+    let winner = customWinner;
+    if (!winner) {
+      if (comp.type === 'league') {
+        winner = [...t].sort((a, b) => b.pts - a.pts || (b.gf - b.ga) - (a.gf - a.ga))[0];
+      } else {
+        const final = comp.bracket?.Final?.[0] || comp.bracket?.Final;
+        if (final && final.sh !== null) {
+          if (final.sh > final.sa) winner = t.find(x => x.id === final.hId);
+          else if (final.sa > final.sh) winner = t.find(x => x.id === final.aId);
+          else winner = t.find(x => x.id === (final.penH > final.penA ? final.hId : final.aId));
+        }
       }
     }
 
-    let winner;
-    if (comp.type === 'league') {
-      winner = [...comp.teams].sort((a, b) => b.pts - a.pts || (b.gf - b.ga) - (a.gf - a.ga))[0];
-    } else {
-      const final = comp.bracket?.Final?.[0] || comp.bracket?.Final;
-      if (final && final.sh !== null) {
-        if (final.sh > final.sa) winner = comp.teams.find(t => t.id === final.hId);
-        else if (final.sa > final.sh) winner = comp.teams.find(t => t.id === final.aId);
-        else winner = comp.teams.find(t => t.id === (final.penH > final.penA ? final.hId : final.aId));
-      }
-    }
-
-    const entry = { id: Date.now(), compId, name: comp.name, date: new Date().toLocaleDateString(), winner, teams: comp.teams, history: comp.history, bracket: comp.bracket, groups: comp.groups, type: comp.type };
-    setArchive(prev => {
-      const newArchive = [entry, ...prev];
-      return newArchive.slice(0, 5); 
-    });
+    const entry = { 
+      id: Date.now(), compId, name: comp.name, date: new Date().toLocaleDateString(), div, winner, 
+      teams: t, history: isDiv2 ? comp.history2 : comp.history, bracket: comp.bracket, groups: comp.groups, type: comp.type 
+    };
+    setArchive(prev => [entry, ...prev].slice(0, 5));
   };
 
   const [matchState, setMatchState] = useState(null);
@@ -1109,23 +1218,23 @@ export default function App() {
 
   useEffect(() => () => rollIntervalRef.current && clearInterval(rollIntervalRef.current), []);
 
-  const startMatch = (homeId, awayId) => {
-    const home = activeComp.teams.find(t => t.id === homeId);
-    const away = activeComp.teams.find(t => t.id === awayId);
+  const startMatch = (homeId, awayId, isDiv2Context) => {
+    const sourceTeams = isDiv2Context ? activeComp.teams2 : activeComp.teams;
+    const home = sourceTeams.find(t => t.id === homeId);
+    const away = sourceTeams.find(t => t.id === awayId);
     if (!home || !away) return;
 
     const isVuelta = activeCompId === 'C1' && activeComp.matchday % 2 !== 0 && activeComp.phase !== 'Final' && activeComp.phase !== 'groups';
     let aggregate = null;
     if (isVuelta && activeComp.bracket) {
-      const phaseData = activeComp.bracket[activeComp.phase];
-      const matchArray = Array.isArray(phaseData) ? phaseData : (phaseData ? [phaseData] : []);
+      const matchArray = Array.isArray(activeComp.bracket[activeComp.phase]) ? activeComp.bracket[activeComp.phase] : [activeComp.bracket[activeComp.phase]];
       const match = matchArray.find(m => m && m.hId === awayId && m.aId === homeId);
       if (match) aggregate = { sh: match.sa, sa: match.sh };
     }
 
     setMatchState({
-      home, away, scoreH: 0, scoreA: 0, oppH: home.opp, oppA: away.opp, turn: 'H', phase: 'att',
-      logs: ['⚽ ¡Comienza el encuentro!', aggregate ? `📊 Global de la ida: ${aggregate.sh} - ${aggregate.sa}` : 'Los equipos saltan al terreno de juego.'],
+      home, away, scoreH: 0, scoreA: 0, oppH: home.opp, oppA: away.opp, turn: 'H', phase: 'att', isDiv2Context,
+      logs: ['⚽ ¡Comienza el encuentro!', aggregate ? `📊 Global: ${aggregate.sh} - ${aggregate.sa}` : 'Al terreno de juego.'],
       lastDie: 1, finished: false, isKnockout: activeComp.type === 'knockout' || (activeComp.type === 'cup' && activeComp.phase !== 'groups'), penalties: null, aggregate
     });
     setCompView('playing');
@@ -1140,44 +1249,33 @@ export default function App() {
     setTimeout(() => {
       if (rollIntervalRef.current) { clearInterval(rollIntervalRef.current); rollIntervalRef.current = null; }
       const die = Math.floor(Math.random() * 6) + 1;
-
       setMatchState(prev => {
         if (!prev) return prev;
-        
         if (prev.phase === 'penalties') {
           const isHome = prev.penalties.turn === 'H';
           const attacker = isHome ? prev.home : prev.away;
           const defender = isHome ? prev.away : prev.home;
           let { scoreH, scoreA, shotsH, shotsA, phase: penPhase = 'att' } = prev.penalties;
-          let historyH = [...(prev.penalties.historyH || [])];
-          let historyA = [...(prev.penalties.historyA || [])];
-          let newLogs = [...prev.logs];
-          let nextTurn = prev.penalties.turn;
+          let historyH = [...(prev.penalties.historyH || [])]; let historyA = [...(prev.penalties.historyA || [])];
+          let newLogs = [...prev.logs]; let nextTurn = prev.penalties.turn;
 
           if (penPhase === 'att') {
-            if (die <= attacker.att) {
-              newLogs.unshift('🎯 ' + attacker.name + ' saca un ' + die + '. ¡Va a portería!');
-              penPhase = 'gk';
-            } else {
-              newLogs.unshift('❌ ' + attacker.name + ' sacó un ' + die + '. El penalti se va fuera.');
-              if (isHome) { historyH = [...historyH, false]; shotsH++; }
-              else { historyA = [...historyA, false]; shotsA++; }
-              nextTurn = isHome ? 'A' : 'H';
-              penPhase = 'att';
+            if (die <= attacker.att) { newLogs.unshift('🎯 ' + attacker.name + ' saca un ' + die + '. ¡A portería!'); penPhase = 'gk'; } 
+            else {
+              newLogs.unshift('❌ ' + attacker.name + ' falló el penalti (' + die + ').');
+              if (isHome) { historyH = [...historyH, false]; shotsH++; } else { historyA = [...historyA, false]; shotsA++; }
+              nextTurn = isHome ? 'A' : 'H'; penPhase = 'att';
             }
           } else {
             if (die > defender.def) {
-              newLogs.unshift('⚽ ¡GOL de penalti! ' + attacker.name + ' marcó con un ' + die + '.');
-              if (isHome) { historyH = [...historyH, true]; scoreH++; }
-              else { historyA = [...historyA, true]; scoreA++; }
+              newLogs.unshift('⚽ ¡GOL de penalti! ' + attacker.name + ' marcó.');
+              if (isHome) { historyH = [...historyH, true]; scoreH++; } else { historyA = [...historyA, true]; scoreA++; }
             } else {
-              newLogs.unshift('🧤 ¡PARADÓN! El portero sacó un ' + die + ' y detuvo el penalti.');
-              if (isHome) historyH = [...historyH, false];
-              else historyA = [...historyA, false];
+              newLogs.unshift('🧤 ¡PARADÓN! El portero detuvo el penalti.');
+              if (isHome) historyH = [...historyH, false]; else historyA = [...historyA, false];
             }
             if (isHome) shotsH++; else shotsA++;
-            nextTurn = isHome ? 'A' : 'H';
-            penPhase = 'att';
+            nextTurn = isHome ? 'A' : 'H'; penPhase = 'att';
           }
 
           let finished = false;
@@ -1185,26 +1283,23 @@ export default function App() {
             if (shotsH >= 5 && shotsA >= 5) { if (scoreH !== scoreA && shotsH === shotsA) finished = true; }
             else if (scoreH > scoreA + (5 - shotsA) || scoreA > scoreH + (5 - shotsH)) finished = true;
           }
-
           if (finished) {
-            newLogs.unshift('🏆 ¡Final de la tanda! Ganador: ' + (scoreH > scoreA ? prev.home.name : prev.away.name));
+            newLogs.unshift('🏆 Ganador tanda: ' + (scoreH > scoreA ? prev.home.name : prev.away.name));
             return { ...prev, lastDie: die, logs: newLogs, finished: true, penalties: { scoreH, scoreA, shotsH, shotsA, finished: true, historyH, historyA } };
           }
           return { ...prev, lastDie: die, logs: newLogs, penalties: { scoreH, scoreA, shotsH, shotsA, turn: nextTurn, phase: penPhase, historyH, historyA } };
         }
 
         const isHome = prev.turn === 'H';
-        const attacker = isHome ? prev.home : prev.away;
-        const defender = isHome ? prev.away : prev.home;
-        let newLogs = [...prev.logs];
-        let { scoreH, scoreA, phase: newPhase } = prev;
+        const attacker = isHome ? prev.home : prev.away; const defender = isHome ? prev.away : prev.home;
+        let newLogs = [...prev.logs]; let { scoreH, scoreA, phase: newPhase } = prev;
 
         if (newPhase === 'att') {
-          if (die <= attacker.att) { newLogs.unshift('🎯 ' + attacker.name + ' sacó un ' + die + '. ¡Va a portería!'); newPhase = 'gk'; } 
-          else { newLogs.unshift('❌ ' + attacker.name + ' sacó un ' + die + '. El disparo se va fuera.'); return advanceTurn({ ...prev, lastDie: die, logs: newLogs, phase: 'att' }); }
+          if (die <= attacker.att) { newLogs.unshift('🎯 ' + attacker.name + ' saca ' + die + '. ¡Va a portería!'); newPhase = 'gk'; } 
+          else { newLogs.unshift('❌ ' + attacker.name + ' falla (Dado: ' + die + ').'); return advanceTurn({ ...prev, lastDie: die, logs: newLogs, phase: 'att' }); }
         } else {
-          if (die > defender.def) { newLogs.unshift('⚽ ¡GOOOOOOL de ' + attacker.name + '! El dado marcó ' + die + '.'); isHome ? scoreH++ : scoreA++; } 
-          else { newLogs.unshift('🧤 ¡PARADÓN del portero! Sacó un ' + die + ' y evitó el gol.'); }
+          if (die > defender.def) { newLogs.unshift('⚽ ¡GOL de ' + attacker.name + '! (Dado: ' + die + ')'); isHome ? scoreH++ : scoreA++; } 
+          else { newLogs.unshift('🧤 ¡PARADÓN! Evitó el gol (Dado: ' + die + ').'); }
           return advanceTurn({ ...prev, lastDie: die, logs: newLogs, scoreH, scoreA, phase: 'att' });
         }
         return { ...prev, lastDie: die, logs: newLogs, phase: newPhase };
@@ -1224,231 +1319,284 @@ export default function App() {
       const isChampions = activeCompId === 'C1';
       const isIda = isChampions && activeComp.matchday % 2 === 0 && activeComp.phase !== 'Final' && activeComp.phase !== 'groups';
       const isVuelta = isChampions && activeComp.matchday % 2 !== 0 && activeComp.phase !== 'Final' && activeComp.phase !== 'groups';
-
       let needsPenalties = state.isKnockout && state.scoreH === state.scoreA && !isIda && !isVuelta;
       if (isVuelta && state.aggregate) if (state.aggregate.sh + state.scoreH === state.aggregate.sa + state.scoreA) needsPenalties = true;
 
-      if (needsPenalties) return { ...state, oppH: 0, oppA: 0, phase: 'penalties', penalties: { scoreH: 0, scoreA: 0, turn: 'H', shotsH: 0, shotsA: 0, phase: 'att', finished: false, historyH: [], historyA: [] }, logs: ['⚖️ ¡Empate global! Nos vamos a la tanda de penaltis.', ...state.logs] };
-      return { ...state, oppH: 0, oppA: 0, finished: true, logs: ['🏁 Final del partido.', ...state.logs] };
+      if (needsPenalties) return { ...state, oppH: 0, oppA: 0, phase: 'penalties', penalties: { scoreH: 0, scoreA: 0, turn: 'H', shotsH: 0, shotsA: 0, phase: 'att', finished: false, historyH: [], historyA: [] }, logs: ['⚖️ Empate. ¡Penaltis!', ...state.logs] };
+      return { ...state, oppH: 0, oppA: 0, finished: true, logs: ['🏁 Final.', ...state.logs] };
     }
     return { ...state, oppH: nextOppH, oppA: nextOppA, turn: nextTurn, phase: 'att' };
   };
 
   const processMatchday = () => {
     if (activeComp.type === 'league') {
-      const schedule = generateLeagueSchedule(activeComp.teams);
-      const currentRound = Array.isArray(schedule) ? schedule[activeComp.matchday] : [];
-      const results = Array.isArray(currentRound) ? currentRound.map(m => {
-        if (m.homeId === activeComp.userTeamId || m.awayId === activeComp.userTeamId) return { hId: m.homeId, aId: m.awayId, sh: matchState.scoreH, sa: matchState.scoreA, penH: undefined, penA: undefined };
-        const h = activeComp.teams.find(t => t.id === m.homeId);
-        const a = activeComp.teams.find(t => t.id === m.awayId);
-        let sh = 0, sa = 0;
-        for(let i=0; i<(h?.opp || 0); i++) if(Math.floor(Math.random()*6)+1 <= (h?.att || 0) && Math.floor(Math.random()*6)+1 > (a?.def || 0)) sh++;
-        for(let i=0; i<(a?.opp || 0); i++) if(Math.floor(Math.random()*6)+1 <= (a?.att || 0) && Math.floor(Math.random()*6)+1 > (h?.def || 0)) sa++;
-        return { hId: m.homeId, aId: m.awayId, sh, sa, penH: undefined, penA: undefined };
-      }) : [];
+      const isDiv2Context = matchState.isDiv2Context;
+      const tArray = isDiv2Context ? activeComp.teams2 : activeComp.teams;
+      const tMatchday = isDiv2Context ? activeComp.matchday2 : activeComp.matchday;
+      const tHistory = isDiv2Context ? activeComp.history2 : activeComp.history;
 
-      const updatedTeams = Array.isArray(activeComp.teams) ? activeComp.teams.map(t => {
+      const schedule = generateLeagueSchedule(tArray);
+      const currentRound = Array.isArray(schedule) ? schedule[tMatchday] : [];
+
+      const results = currentRound.map(m => {
+        if (m.homeId === matchState.home.id || m.awayId === matchState.home.id || m.homeId === matchState.away.id || m.awayId === matchState.away.id) {
+          if(m.homeId === matchState.home.id) return { hId: m.homeId, aId: m.awayId, sh: matchState.scoreH, sa: matchState.scoreA };
+          if(m.homeId === matchState.away.id) return { hId: m.homeId, aId: m.awayId, sh: matchState.scoreA, sa: matchState.scoreH };
+        }
+        const h = tArray.find(t => t.id === m.homeId); const a = tArray.find(t => t.id === m.awayId);
+        let sh = 0, sa = 0;
+        for(let i=0; i<(h?.opp||0); i++) if(Math.floor(Math.random()*6)+1 <= (h?.att||0) && Math.floor(Math.random()*6)+1 > (a?.def||0)) sh++;
+        for(let i=0; i<(a?.opp||0); i++) if(Math.floor(Math.random()*6)+1 <= (a?.att||0) && Math.floor(Math.random()*6)+1 > (h?.def||0)) sa++;
+        return { hId: m.homeId, aId: m.awayId, sh, sa };
+      });
+
+      const updatedTeams = tArray.map(t => {
         const res = results.find(r => r.hId === t.id || r.aId === t.id);
         if (!res) return t;
         const isHome = res.hId === t.id;
-        const gf = isHome ? res.sh : res.sa;
-        const ga = isHome ? res.sa : res.sh;
+        const gf = isHome ? res.sh : res.sa; const ga = isHome ? res.sa : res.sh;
         const w = gf > ga ? 1 : 0; const d = gf === ga ? 1 : 0; const l = gf < ga ? 1 : 0;
         return { ...t, p: t.p + 1, w: t.w + w, d: t.d + d, l: t.l + l, gf: t.gf + gf, ga: t.ga + ga, pts: t.pts + (w * 3 + d) };
-      }) : [];
+      });
 
-      const isFinished = activeComp.matchday === schedule.length - 1;
-      const updatedComp = { teams: updatedTeams, history: [{ day: activeComp.matchday + 1, results }, ...activeComp.history], matchday: isFinished ? activeComp.matchday : activeComp.matchday + 1, showWinner: isFinished };
-      updateActiveComp(updatedComp);
-      if (isFinished) archiveCompetition(activeCompId, { ...activeComp, ...updatedComp });
+      const isFinished = tMatchday === schedule.length - 1;
+      const nextMatchday = isFinished ? tMatchday : tMatchday + 1;
+      const newHistory = [{ day: tMatchday + 1, results }, ...tHistory];
 
-    } else if (activeComp.type === 'cup' || activeComp.type === 'knockout') {
-      const results = [{ hId: matchState.home.id, aId: matchState.away.id, sh: matchState.scoreH, sa: matchState.scoreA, penH: matchState.penalties?.scoreH, penA: matchState.penalties?.scoreA }];
-
-      if (activeComp.phase === 'groups') {
-        const isWorldCup = activeCompId === 'C2';
-        const maxMatchdays = isWorldCup ? 3 : 6;
-
-        activeComp.groups.forEach(group => {
-          const groupTeams = activeComp.teams.filter(t => group.teamIds.includes(t.id));
-          const currentRound = generateLeagueSchedule(groupTeams, !isWorldCup)[activeComp.matchday % maxMatchdays];
-          if (currentRound) {
-            currentRound.forEach(m => {
-              if (m.homeId !== activeComp.userTeamId && m.awayId !== activeComp.userTeamId) {
-                const h = activeComp.teams.find(t => t.id === m.homeId); const a = activeComp.teams.find(t => t.id === m.awayId);
-                let sh = 0, sa = 0;
-                for(let i=0; i<h.opp; i++) if(Math.floor(Math.random()*6)+1 <= h.att && Math.floor(Math.random()*6)+1 > a.def) sh++;
-                for(let i=0; i<a.opp; i++) if(Math.floor(Math.random()*6)+1 <= a.att && Math.floor(Math.random()*6)+1 > h.def) sa++;
-                results.push({ hId: m.homeId, aId: m.awayId, sh, sa, penH: undefined, penA: undefined });
-              }
-            });
-          }
-        });
-
-        const updatedTeams = activeComp.teams.map(t => {
-          const res = results.find(r => r.hId === t.id || r.aId === t.id);
-          if (!res) return t;
-          const isHome = res.hId === t.id;
-          const gf = isHome ? res.sh : res.sa; const ga = isHome ? res.sa : res.sh;
-          const w = gf > ga ? 1 : 0; const d = gf === ga ? 1 : 0; const l = gf < ga ? 1 : 0;
-          return { ...t, p: t.p + 1, w: t.w + w, d: t.d + d, l: t.l + l, gf: t.gf + gf, ga: t.ga + ga, pts: t.pts + (w * 3 + d) };
-        });
-
-        const nextMatchday = activeComp.matchday + 1;
-        const isEndOfGroups = nextMatchday >= maxMatchdays;
-        let newBracket = null, isUserDisqualified = false;
-
-        if (isEndOfGroups) {
-          newBracket = generateKnockoutBrackets({ ...activeComp, teams: updatedTeams });
-          const allTeamsInBracket = [...(newBracket.Octavos || []), ...(newBracket.Cuartos || []), ...(newBracket.Semis || []), ...(newBracket.Final || [])].flatMap(m => [m.hId, m.aId]).filter(id => id !== null);
-          if (!allTeamsInBracket.includes(activeComp.userTeamId)) isUserDisqualified = true;
-        }
-        updateActiveComp({ teams: updatedTeams, history: [{ day: 'Jornada ' + nextMatchday, results }, ...activeComp.history], matchday: nextMatchday, phase: isEndOfGroups ? (newBracket.Octavos ? 'Octavos' : 'Cuartos') : 'groups', bracket: newBracket, disqualified: isUserDisqualified });
-
+      if (isDiv2Context) {
+        updateActiveComp({ teams2: updatedTeams, history2: newHistory, matchday2: nextMatchday, showWinner2: isFinished });
       } else {
-        const isChampions = activeCompId === 'C1';
-        const phase = activeComp.phase;
-        const isVuelta = isChampions && activeComp.matchday % 2 !== 0 && phase !== 'Final';
-        const newBracket = { ...activeComp.bracket };
-        const currentMatches = newBracket[phase];
-        const allResults = [];
-        const matchesToProcess = Array.isArray(currentMatches) ? currentMatches : [currentMatches];
-
-        matchesToProcess.forEach(m => {
-          let sh, sa, penH, penA;
-          if (m.hId === matchState.home.id && m.aId === matchState.away.id) {
-            sh = matchState.scoreH; sa = matchState.scoreA; penH = matchState.penalties?.scoreH; penA = matchState.penalties?.scoreA;
-          } else if (isVuelta && m.hId === matchState.away.id && m.aId === matchState.home.id) {
-            sh = matchState.scoreA; sa = matchState.scoreH; penH = matchState.penalties?.scoreA; penA = matchState.penalties?.scoreH; 
-          } else {
-            const h = activeComp.teams.find(t => t.id === (isVuelta ? m.aId : m.hId));
-            const a = activeComp.teams.find(t => t.id === (isVuelta ? m.hId : m.aId));
-            let simH = 0, simA = 0;
-            for(let i=0; i<h.opp; i++) if(Math.floor(Math.random()*6)+1 <= h.att && Math.floor(Math.random()*6)+1 > a.def) simH++;
-            for(let i=0; i<a.opp; i++) if(Math.floor(Math.random()*6)+1 <= a.att && Math.floor(Math.random()*6)+1 > h.def) simA++;
-
-            if (isVuelta) { sh = simA; sa = simH; } else { sh = simH; sa = simA; }
-
-            const isDraw = (isChampions && isVuelta && phase !== 'Final') ? (m.sh + sh === m.sa + sa) : (sh === sa);
-            if (isDraw && (!isChampions || isVuelta || phase === 'Final')) {
-              let simPenH = 0; let simPenA = 0;
-              let shotsH = 0; let shotsA = 0;
-              const h_orig = activeComp.teams.find(t => t.id === m.hId);
-              const a_orig = activeComp.teams.find(t => t.id === m.aId);
-              const simPen = (att, def) => (Math.floor(Math.random() * 6) + 1 <= att && Math.floor(Math.random() * 6) + 1 > def);
-
-              for (let i = 0; i < 5; i++) {
-                if (simPen(h_orig.att, a_orig.def)) simPenH++;
-                shotsH++;
-                if (simPenH > simPenA + (5 - shotsA) || simPenA > simPenH + (5 - shotsH)) break;
-                if (simPen(a_orig.att, h_orig.def)) simPenA++;
-                shotsA++;
-                if (simPenH > simPenA + (5 - shotsA) || simPenA > simPenH + (5 - shotsH)) break;
-              }
-              while (simPenH === simPenA) { if (simPen(h_orig.att, a_orig.def)) simPenH++; if (simPen(a_orig.att, h_orig.def)) simPenA++; }
-              penH = simPenH; penA = simPenA;
-            }
-          }
-          if (isVuelta) { m.sh2 = sh; m.sa2 = sa; } else { m.sh = sh; m.sa = sa; }
-          if (penH !== undefined) { m.penH = penH; m.penA = penA; }
-          allResults.push(isVuelta ? { hId: m.aId, aId: m.hId, sh: sa, sa: sh, penH: penA, penA: penH } : { hId: m.hId, aId: m.aId, sh, sa, penH, penA });
-        });
-
-        let nextPhase = phase, showWinner = false, isUserDisqualified = activeComp.disqualified || false;
-
-        if (!isChampions || isVuelta || phase === 'Final') {
-          const winners = matchesToProcess.map(m => {
-            const totH = isChampions && phase !== 'Final' ? m.sh + m.sh2 : m.sh;
-            const totA = isChampions && phase !== 'Final' ? m.sa + m.sa2 : m.sa;
-            if (totH > totA) return m.hId; if (totA > totH) return m.aId;
-            return m.penH > m.penA ? m.hId : m.aId;
-          });
-          if (!winners.includes(activeComp.userTeamId)) isUserDisqualified = true;
-
-          if (phase === 'Octavos') { nextPhase = 'Cuartos'; newBracket.Cuartos = Array(4).fill(0).map((_, i) => ({ id: 'C'+(i+1), hId: winners[i*2], aId: winners[i*2+1], sh: null, sa: null, penH: null, penA: null, sh2: null, sa2: null })); } 
-          else if (phase === 'Cuartos') { nextPhase = 'Semis'; newBracket.Semis = Array(2).fill(0).map((_, i) => ({ id: 'S'+(i+1), hId: winners[i*2], aId: winners[i*2+1], sh: null, sa: null, penH: null, penA: null, sh2: null, sa2: null })); } 
-          else if (phase === 'Semis') { nextPhase = 'Final'; newBracket.Final = [{ id: 'F1', hId: winners[0], aId: winners[1], sh: null, sa: null, penH: null, penA: null, sh2: null, sa2: null }]; } 
-          else { nextPhase = 'Terminado'; showWinner = true; }
-        }
-
-        const updatedComp = { history: [{ day: phase + (isChampions ? (isVuelta ? ' (Vuelta)' : ' (Ida)') : ''), results: allResults }, ...activeComp.history], matchday: activeComp.matchday + 1, phase: nextPhase, bracket: newBracket, showWinner, disqualified: isUserDisqualified };
-        updateActiveComp(updatedComp);
-        if (showWinner) archiveCompetition(activeCompId, { ...activeComp, ...updatedComp });
+        updateActiveComp({ teams: updatedTeams, history: newHistory, matchday: nextMatchday, showWinner: isFinished });
       }
+
+    } else {
+       // Copas y Mundiales mantienen la lógica original sin divisiones múltiples
+       // ... Lógica reducida de torneo (C1/C2) ...
+       const results = [{ hId: matchState.home.id, aId: matchState.away.id, sh: matchState.scoreH, sa: matchState.scoreA, penH: matchState.penalties?.scoreH, penA: matchState.penalties?.scoreA }];
+       if (activeComp.phase === 'groups') {
+          const isWorldCup = activeCompId === 'C2';
+          const maxMatchdays = isWorldCup ? 3 : 6;
+          activeComp.groups.forEach(group => {
+             const groupTeams = activeComp.teams.filter(t => group.teamIds.includes(t.id));
+             const currentRound = generateLeagueSchedule(groupTeams, !isWorldCup)[activeComp.matchday % maxMatchdays];
+             if (currentRound) {
+                currentRound.forEach(m => {
+                   if (m.homeId !== activeComp.userTeamId && m.awayId !== activeComp.userTeamId) {
+                      const h = activeComp.teams.find(t => t.id === m.homeId); const a = activeComp.teams.find(t => t.id === m.awayId);
+                      let sh = 0, sa = 0;
+                      for(let i=0; i<h.opp; i++) if(Math.floor(Math.random()*6)+1 <= h.att && Math.floor(Math.random()*6)+1 > a.def) sh++;
+                      for(let i=0; i<a.opp; i++) if(Math.floor(Math.random()*6)+1 <= a.att && Math.floor(Math.random()*6)+1 > h.def) sa++;
+                      results.push({ hId: m.homeId, aId: m.awayId, sh, sa });
+                   }
+                });
+             }
+          });
+          const updatedTeams = activeComp.teams.map(t => {
+             const res = results.find(r => r.hId === t.id || r.aId === t.id);
+             if (!res) return t;
+             const isHome = res.hId === t.id;
+             const gf = isHome ? res.sh : res.sa; const ga = isHome ? res.sa : res.sh;
+             const w = gf > ga ? 1 : 0; const d = gf === ga ? 1 : 0; const l = gf < ga ? 1 : 0;
+             return { ...t, p: t.p + 1, w: t.w + w, d: t.d + d, l: t.l + l, gf: t.gf + gf, ga: t.ga + ga, pts: t.pts + (w * 3 + d) };
+          });
+          const nextMatchday = activeComp.matchday + 1;
+          const isEndOfGroups = nextMatchday >= maxMatchdays;
+          let newBracket = null;
+          if (isEndOfGroups) newBracket = generateKnockoutBrackets({ ...activeComp, teams: updatedTeams });
+          updateActiveComp({ teams: updatedTeams, history: [{ day: 'Jornada ' + nextMatchday, results }, ...activeComp.history], matchday: nextMatchday, phase: isEndOfGroups ? (newBracket.Octavos ? 'Octavos' : 'Cuartos') : 'groups', bracket: newBracket });
+       } else {
+          // Eliminatorias
+          const isChampions = activeCompId === 'C1';
+          const phase = activeComp.phase;
+          const isVuelta = isChampions && activeComp.matchday % 2 !== 0 && phase !== 'Final';
+          const newBracket = { ...activeComp.bracket };
+          const matchesToProcess = Array.isArray(newBracket[phase]) ? newBracket[phase] : [newBracket[phase]];
+          const allResults = [];
+
+          matchesToProcess.forEach(m => {
+             let sh, sa, penH, penA;
+             if (m.hId === matchState.home.id && m.aId === matchState.away.id) { sh = matchState.scoreH; sa = matchState.scoreA; penH = matchState.penalties?.scoreH; penA = matchState.penalties?.scoreA; } 
+             else if (isVuelta && m.hId === matchState.away.id && m.aId === matchState.home.id) { sh = matchState.scoreA; sa = matchState.scoreH; penH = matchState.penalties?.scoreA; penA = matchState.penalties?.scoreH; } 
+             else {
+                const h = activeComp.teams.find(t => t.id === (isVuelta ? m.aId : m.hId)); const a = activeComp.teams.find(t => t.id === (isVuelta ? m.hId : m.aId));
+                let simH = 0, simA = 0;
+                for(let i=0; i<h.opp; i++) if(Math.floor(Math.random()*6)+1 <= h.att && Math.floor(Math.random()*6)+1 > a.def) simH++;
+                for(let i=0; i<a.opp; i++) if(Math.floor(Math.random()*6)+1 <= a.att && Math.floor(Math.random()*6)+1 > h.def) simA++;
+                if (isVuelta) { sh = simA; sa = simH; } else { sh = simH; sa = simA; }
+                const isDraw = (isChampions && isVuelta && phase !== 'Final') ? (m.sh + sh === m.sa + sa) : (sh === sa);
+                if (isDraw && (!isChampions || isVuelta || phase === 'Final')) {
+                   let spH=0, spA=0, shH=0, shA=0;
+                   const sim = (att, def) => (Math.floor(Math.random()*6)+1 <= att && Math.floor(Math.random()*6)+1 > def);
+                   for(let i=0; i<5; i++){
+                      if(sim(h.att, a.def)) spH++; shH++;
+                      if(spH > spA + (5-shA) || spA > spH + (5-shH)) break;
+                      if(sim(a.att, h.def)) spA++; shA++;
+                      if(spH > spA + (5-shA) || spA > spH + (5-shH)) break;
+                   }
+                   while(spH===spA){ if(sim(h.att, a.def)) spH++; if(sim(a.att, h.def)) spA++; }
+                   penH = spH; penA = spA;
+                }
+             }
+             if (isVuelta) { m.sh2 = sh; m.sa2 = sa; } else { m.sh = sh; m.sa = sa; }
+             if (penH !== undefined) { m.penH = penH; m.penA = penA; }
+             allResults.push(isVuelta ? { hId: m.aId, aId: m.hId, sh: sa, sa: sh, penH: penA, penA: penH } : { hId: m.hId, aId: m.aId, sh, sa, penH, penA });
+          });
+
+          let nextPhase = phase, showWinner = false;
+          if (!isChampions || isVuelta || phase === 'Final') {
+             const winners = matchesToProcess.map(m => {
+                const tH = isChampions && phase!=='Final' ? m.sh+m.sh2 : m.sh; const tA = isChampions && phase!=='Final' ? m.sa+m.sa2 : m.sa;
+                if(tH>tA) return m.hId; if(tA>tH) return m.aId; return m.penH>m.penA ? m.hId : m.aId;
+             });
+             if (phase === 'Octavos') { nextPhase = 'Cuartos'; newBracket.Cuartos = Array(4).fill(0).map((_, i) => ({ id: 'C'+(i+1), hId: winners[i*2], aId: winners[i*2+1], sh: null, sa: null, penH: null, penA: null, sh2: null, sa2: null })); } 
+             else if (phase === 'Cuartos') { nextPhase = 'Semis'; newBracket.Semis = Array(2).fill(0).map((_, i) => ({ id: 'S'+(i+1), hId: winners[i*2], aId: winners[i*2+1], sh: null, sa: null, penH: null, penA: null, sh2: null, sa2: null })); } 
+             else if (phase === 'Semis') { nextPhase = 'Final'; newBracket.Final = [{ id: 'F1', hId: winners[0], aId: winners[1], sh: null, sa: null, penH: null, penA: null, sh2: null, sa2: null }]; } 
+             else { nextPhase = 'Terminado'; showWinner = true; }
+          }
+          const updatedComp = { history: [{ day: phase + (isChampions ? (isVuelta ? ' (Vuelta)' : ' (Ida)') : ''), results: allResults }, ...activeComp.history], matchday: activeComp.matchday + 1, phase: nextPhase, bracket: newBracket, showWinner };
+          updateActiveComp(updatedComp);
+          if (showWinner) archiveCompetition(activeCompId, 1);
+       }
     }
     setCompView('main');
   };
 
-  // FIX DE RESETEO: Resetea solo estadísticas, conserva equipos editados.
-  const resetCompetition = (compId) => {
-    setComps(prev => {
-      const comp = prev[compId]; 
-      if (!comp) return prev;
-      
-      // Conservar equipos pero resetear sus estadísticas.
-      let newTeams = Array.isArray(comp.teams) ? comp.teams.map(t => ({ ...t, p: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, pts: 0 })) : [];
-      
-      // Fallback: Si no había equipos cargados, carga el preset por defecto
-      if (newTeams.length === 0 && comp.type === 'league') {
-        const pres = compId === 'L1' ? 'ES' : compId === 'L2' ? 'IT' : compId === 'L3' ? 'EN' : compId === 'L4' ? 'DE' : compId === 'L5' ? 'NL' : compId === 'L6' ? 'FR' : 'MI';
-        if (PRESETS[pres]) newTeams = PRESETS[pres].map((t, i) => ({ ...t, id: i + 1, p: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, pts: 0 }));
-      }
-      
-      return { ...prev, [compId]: { ...comp, teams: newTeams, matchday: 0, history: [], phase: comp.type === 'league' ? 'league' : 'groups', showWinner: false, disqualified: false, bracket: null } };
+  const handlePromotionAndNewSeason = () => {
+    if (activeComp.type !== 'league') return;
+
+    // Archivamos a los campeones
+    archiveCompetition(activeCompId, 1);
+    archiveCompetition(activeCompId, 2);
+
+    const sorted1 = [...activeComp.teams].sort((a, b) => b.pts - a.pts || (b.gf - b.ga) - (a.gf - a.ga));
+    const sorted2 = [...activeComp.teams2].sort((a, b) => b.pts - a.pts || (b.gf - b.ga) - (a.gf - a.ga));
+
+    const bottom3 = sorted1.slice(-3); // Descienden (18, 19, 20)
+    const top3 = sorted2.slice(0, 3); // Ascienden (1, 2, 3)
+
+    // Guardar stats originales de los que descienden
+    const origStats = bottom3.map(t => ({ att: t.att, opp: t.opp, def: t.def }));
+
+    // Aplicar stats fijos a los que descienden (boost en segunda)
+    const boostedRelegated = [
+      { ...bottom3[0], att: 5, opp: 5, def: 3 }, // 18º
+      { ...bottom3[1], att: 4, opp: 4, def: 4 }, // 19º
+      { ...bottom3[2], att: 3, opp: 4, def: 3 }  // 20º
+    ];
+
+    // Aplicar stats originales a los que ascienden
+    const adjustedPromoted = [
+      { ...top3[0], att: origStats[0].att, opp: origStats[0].opp, def: origStats[0].def },
+      { ...top3[1], att: origStats[1].att, opp: origStats[1].opp, def: origStats[1].def },
+      { ...top3[2], att: origStats[2].att, opp: origStats[2].opp, def: origStats[2].def }
+    ];
+
+    const resetStats = (t) => ({ ...t, p: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, pts: 0 });
+
+    const remaining1 = sorted1.slice(0, -3).map(resetStats);
+    const remaining2 = sorted2.slice(3).map(resetStats);
+
+    const nextTeams1 = [...remaining1, ...adjustedPromoted.map(resetStats)];
+    const nextTeams2 = [...remaining2, ...boostedRelegated.map(resetStats)];
+
+    updateActiveComp({
+      teams: nextTeams1,
+      teams2: nextTeams2,
+      matchday: 0,
+      matchday2: 0,
+      history: [],
+      history2: [],
+      showWinner: false,
+      showWinner2: false
+    });
+
+    setShowPromoModal(false);
+  };
+
+  const handleTotalReset = (compId) => {
+    const defaultData = getDefaultComps()[compId];
+    updateActiveComp({
+      teams: defaultData.teams,
+      teams2: defaultData.teams2,
+      matchday: 0, matchday2: 0, history: [], history2: [],
+      showWinner: false, showWinner2: false, phase: defaultData.phase, bracket: null
     });
     setCompView('main');
   };
 
   const CompetitionView = () => {
     if (!activeComp) return null;
-    const hasStarted = activeComp.matchday > 0 || activeComp.history?.length > 0;
+    const hasStarted = activeComp.type === 'league' 
+      ? (activeComp.matchday > 0 || activeComp.matchday2 > 0 || activeComp.history?.length > 0)
+      : (activeComp.matchday > 0 || activeComp.history?.length > 0);
 
-    if (!activeComp.teams || activeComp.teams.length === 0) {
+    const isLeague = activeComp.type === 'league';
+    const isDiv2 = viewDiv === 2 && isLeague;
+
+    // Selectores dinámicos basados en la división actual
+    const currentTeams = isDiv2 ? activeComp.teams2 : activeComp.teams;
+    const currentMatchday = isDiv2 ? activeComp.matchday2 : activeComp.matchday;
+    const currentHistory = isDiv2 ? activeComp.history2 : activeComp.history;
+    const currentShowWinner = isDiv2 ? activeComp.showWinner2 : activeComp.showWinner;
+
+    if (!currentTeams || currentTeams.length === 0) {
       return (
         <div className='flex-grow flex flex-col items-center justify-center text-center p-8'>
           <div className='w-24 h-24 bg-slate-900/30 backdrop-blur-md rounded-3xl flex items-center justify-center mb-8 border border-white/10 shadow-2xl'><Trophy size={48} className='text-slate-400' /></div>
           <h2 className='text-3xl font-black italic uppercase mb-2 text-white drop-shadow-md'>{activeComp?.name}</h2>
-          <p className='text-[10px] font-bold text-slate-300 uppercase tracking-widest mb-10 drop-shadow-md'>Esta competición aún no ha sido configurada.</p>
+          <p className='text-[10px] font-bold text-slate-300 uppercase tracking-widest mb-10 drop-shadow-md'>Faltan equipos en {isDiv2 ? '2ª' : '1ª'} División.</p>
           <div className='space-y-4 w-full max-w-xs'>
-            <button onClick={() => updateActiveComp(getAutoFillData(activeCompId))} className='w-full bg-blue-600/80 backdrop-blur-md hover:bg-blue-500 text-white py-4 rounded-2xl text-[11px] font-black uppercase italic tracking-widest shadow-xl transition-all active:scale-95 flex justify-center items-center gap-2'>
-              <Wand2 size={16}/> Auto-Rellenar
-            </button>
-            <button onClick={() => updateActiveComp(getShuffleData(activeCompId))} className='w-full bg-emerald-600/80 backdrop-blur-md hover:bg-emerald-500 text-white py-4 rounded-2xl text-[11px] font-black uppercase italic tracking-widest shadow-xl transition-all active:scale-95 flex justify-center items-center gap-2'>
-              <Shuffle size={16}/> Sorteo Dinámico
-            </button>
+            {!isLeague && (
+              <>
+                <button onClick={() => {
+                   const compsState = JSON.parse(window.localStorage.getItem(`${APP_ID}_comps`));
+                   updateActiveComp(getAutoFillData(activeCompId, compsState));
+                }} className='w-full bg-blue-600/80 backdrop-blur-md hover:bg-blue-500 text-white py-4 rounded-2xl text-[11px] font-black uppercase italic tracking-widest shadow-xl transition-all active:scale-95 flex justify-center items-center gap-2'>
+                  <Wand2 size={16}/> Auto-Rellenar
+                </button>
+                <button onClick={() => {
+                   const compsState = JSON.parse(window.localStorage.getItem(`${APP_ID}_comps`));
+                   updateActiveComp(getShuffleData(activeCompId, compsState));
+                }} className='w-full bg-emerald-600/80 backdrop-blur-md hover:bg-emerald-500 text-white py-4 rounded-2xl text-[11px] font-black uppercase italic tracking-widest shadow-xl transition-all active:scale-95 flex justify-center items-center gap-2'>
+                  <Shuffle size={16}/> Sorteo Dinámico
+                </button>
+              </>
+            )}
             <button onClick={() => setView('hub')} className='w-full bg-slate-900/40 backdrop-blur-md border border-white/10 text-slate-200 py-4 rounded-2xl text-[11px] font-black uppercase italic tracking-widest transition-all active:scale-95'>Volver al Inicio</button>
           </div>
         </div>
       );
     }
 
-    const sortedTeams = [...activeComp.teams].sort((a, b) => b.pts - a.pts || (b.gf - b.ga) - (a.gf - a.ga));
-    const userTeam = activeComp.teams.find(t => t.id === activeComp.userTeamId) || activeComp.teams[0];
+    const sortedTeams = [...currentTeams].sort((a, b) => b.pts - a.pts || (b.gf - b.ga) - (a.gf - a.ga));
+
+    // Obtenemos todos los equipos para la vista de selección
+    const allTeamsContext = isLeague ? [...activeComp.teams, ...(activeComp.teams2 || [])] : activeComp.teams;
+    const userTeam = allTeamsContext.find(t => t.id === activeComp.userTeamId) || activeComp.teams[0];
 
     const winner = useMemo(() => {
-      if (!activeComp.teams || activeComp.teams.length === 0) return null;
-      if (activeComp.type === 'league') return [...activeComp.teams].sort((a, b) => b.pts - a.pts || (b.gf - b.ga) - (a.gf - a.ga))[0];
+      if (!currentTeams || currentTeams.length === 0) return null;
+      if (isLeague) return sortedTeams[0];
       const final = activeComp.bracket?.Final?.[0] || activeComp.bracket?.Final;
       if (final && final.sh !== null) {
         if (final.sh > final.sa) return activeComp.teams.find(t => t.id === final.hId);
         if (final.sa > final.sh) return activeComp.teams.find(t => t.id === final.aId);
         return activeComp.teams.find(t => t.id === (final.penH > final.penA ? final.hId : final.aId));
       }
-      return activeComp.teams[0];
-    }, [activeComp]);
+      return currentTeams[0];
+    }, [activeComp, currentTeams, isLeague, sortedTeams]);
 
     useEffect(() => {
-      if (activeComp && activeComp.phase !== 'groups' && !activeComp.bracket) {
+      if (!isLeague && activeComp.phase !== 'groups' && !activeComp.bracket) {
         const newBracket = generateKnockoutBrackets(activeComp);
         if (newBracket) updateActiveComp({ bracket: newBracket });
       }
-    }, [activeComp?.phase, activeComp?.bracket]);
+    }, [activeComp?.phase, activeComp?.bracket, isLeague]);
 
     const getGroupMatch = () => {
-      if (!activeComp.teams || activeComp.teams.length === 0) return null;
-      if (activeComp.type === 'league') return (generateLeagueSchedule(activeComp.teams)[activeComp.matchday] || []).find(m => m.homeId === userTeam.id || m.awayId === userTeam.id);
-      
+      if (!currentTeams || currentTeams.length === 0) return null;
+      if (isLeague) return (generateLeagueSchedule(currentTeams)[currentMatchday] || []).find(m => m.homeId === userTeam.id || m.awayId === userTeam.id);
+
       if (activeComp.phase === 'groups' && activeComp.groups) {
         const isWC = activeCompId === 'C2';
         const group = activeComp.groups.find(g => g.teamIds.includes(userTeam.id));
@@ -1475,35 +1623,72 @@ export default function App() {
       const temp = homeId; homeId = awayId; awayId = temp;
     }
 
-    const homeTeam = activeComp.teams.find(t => t.id === homeId);
-    const awayTeam = activeComp.teams.find(t => t.id === awayId);
-    
-    const getRemainingTeams = () => {
-      if (activeComp.phase === 'groups' || !activeComp.bracket || !activeComp.bracket[activeComp.phase]) return activeComp.teams;
-      const matchArray = Array.isArray(activeComp.bracket[activeComp.phase]) ? activeComp.bracket[activeComp.phase] : [activeComp.bracket[activeComp.phase]];
-      const teamIds = matchArray.flatMap(m => [m?.hId, m?.aId]).filter(id => id !== null);
-      return activeComp.teams.filter(t => teamIds.includes(t.id));
-    };
+    const homeTeam = currentTeams.find(t => t.id === homeId);
+    const awayTeam = currentTeams.find(t => t.id === awayId);
 
-    const remainingTeams = getRemainingTeams();
+    // Sistema de validación de ascensos (solo Ligas)
+    const isMax1 = isLeague && activeComp.teams && activeComp.matchday >= generateLeagueSchedule(activeComp.teams).length - 1;
+    const isMax2 = isLeague && activeComp.teams2 && activeComp.matchday2 >= generateLeagueSchedule(activeComp.teams2).length - 1;
+    const readyForPromotion = isLeague && isMax1 && isMax2 && !activeComp.showWinner && !activeComp.showWinner2;
 
     if (compView === 'config') return (
       <ConfigPanel 
         initialComp={activeComp} 
         compId={activeCompId} 
-        hasStarted={hasStarted}
-        onSave={(draftData) => {
-          updateActiveComp(draftData);
-          setCompView('main');
-        }}
+        onSave={(draftData) => { updateActiveComp(draftData); setCompView('main'); }}
         onCancel={() => setCompView('main')}
+        onTotalReset={handleTotalReset}
       />
     );
 
     if (compView === 'main') return (
       <div className='flex-grow px-4 pb-20 relative'>
+
+        {/* MODAL ASCENSOS/DESCENSOS */}
+        {showPromoModal && (
+          <div className='fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-950/95 backdrop-blur-md'>
+             <div className='bg-slate-900 rounded-[2.5rem] p-6 border border-white/20 w-full max-w-sm shadow-2xl relative overflow-hidden'>
+                <div className='absolute inset-0 bg-gradient-to-b from-blue-500/10 to-emerald-500/10 pointer-events-none'></div>
+                <h2 className='text-2xl font-black uppercase italic text-center mb-6 text-white drop-shadow-md relative z-10'>Resumen Temporada</h2>
+
+                <div className='space-y-6 relative z-10'>
+                  {/* ASCENSOS */}
+                  <div className='bg-emerald-900/30 border border-emerald-500/30 p-4 rounded-3xl'>
+                    <h3 className='text-xs font-black uppercase text-emerald-400 mb-3 flex items-center gap-2'><ArrowUpCircle size={16}/> Ascienden a 1ª</h3>
+                    <div className='space-y-2'>
+                      {[...activeComp.teams2].sort((a,b)=>b.pts-a.pts || (b.gf-b.ga)-(a.gf-a.ga)).slice(0,3).map((t, i) => (
+                        <div key={t.id} className='flex items-center gap-3 bg-black/40 p-2 rounded-xl border border-white/5'>
+                          <span className='text-[10px] font-black text-emerald-300 w-3'>{i+1}</span>
+                          <Shield color1={t.color1} color2={t.color2} initial={t.name} size='xs'/>
+                          <span className='text-[10px] font-bold uppercase truncate'>{t.name}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  {/* DESCENSOS */}
+                  <div className='bg-red-900/30 border border-red-500/30 p-4 rounded-3xl'>
+                    <h3 className='text-xs font-black uppercase text-red-400 mb-3 flex items-center gap-2'><ArrowDownCircle size={16}/> Descienden a 2ª</h3>
+                    <div className='space-y-2'>
+                      {[...activeComp.teams].sort((a,b)=>b.pts-a.pts || (b.gf-b.ga)-(a.gf-a.ga)).slice(-3).map((t, i) => (
+                        <div key={t.id} className='flex items-center gap-3 bg-black/40 p-2 rounded-xl border border-white/5'>
+                          <span className='text-[10px] font-black text-red-300 w-3'>↓</span>
+                          <Shield color1={t.color1} color2={t.color2} initial={t.name} size='xs'/>
+                          <span className='text-[10px] font-bold uppercase truncate'>{t.name}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <button onClick={handlePromotionAndNewSeason} className='w-full mt-6 bg-blue-600 py-4 rounded-2xl font-black uppercase italic text-white active:scale-95 shadow-lg shadow-blue-500/20 transition-all relative z-10'>
+                  Aplicar y Empezar Nueva Temp.
+                </button>
+             </div>
+          </div>
+        )}
+
         <AnimatePresence>
-          {activeComp.showWinner && compView === 'main' && (
+          {currentShowWinner && compView === 'main' && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className='fixed inset-0 z-[60] flex items-center justify-center p-6 bg-black/80 backdrop-blur-md'>
               <Confetti />
               <motion.div initial={{ scale: 0.8, y: 50 }} animate={{ scale: 1, y: 0 }} className='bg-slate-900/90 backdrop-blur-xl w-full max-w-sm rounded-[3.5rem] border border-yellow-500/30 p-8 shadow-2xl shadow-yellow-500/10 text-center relative overflow-hidden'>
@@ -1513,61 +1698,34 @@ export default function App() {
                 <div className='my-8 flex flex-col items-center'>
                   <Shield color1={winner?.color1} color2={winner?.color2} initial={winner?.name} size='lg' isFlag={winner?.isFlag} />
                   <h3 className='text-xl font-black uppercase italic mt-4 text-white'>{winner?.name}</h3>
-                  <p className='text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1'>Ha conquistado la {activeComp.name}</p>
-                </div>
-                
-                <button onClick={() => resetCompetition(activeCompId)} className='w-full bg-yellow-500 text-slate-950 py-4 rounded-2xl text-[10px] font-black uppercase italic tracking-widest shadow-xl active:scale-95 transition-all mb-4'>Nueva Temporada</button>
-                
-                <div className='flex gap-2 w-full'>
-                  <button onClick={() => setCompView('stats')} className='flex-1 bg-slate-800/80 border border-white/10 py-3 rounded-2xl flex flex-col items-center hover:bg-slate-700 active:scale-95 transition-all text-emerald-400'>
-                    <BarChart3 size={16} className="mb-1"/>
-                    <span className="text-[8px] font-black uppercase italic">Stats</span>
-                  </button>
-                  <button onClick={() => setCompView('results')} className='flex-1 bg-slate-800/80 border border-white/10 py-3 rounded-2xl flex flex-col items-center hover:bg-slate-700 active:scale-95 transition-all text-yellow-400'>
-                    <History size={16} className="mb-1"/>
-                    <span className="text-[8px] font-black uppercase italic">Result.</span>
-                  </button>
-                  {activeComp.type !== 'league' && (
-                    <button onClick={() => setCompView('bracket')} className='flex-1 bg-slate-800/80 border border-white/10 py-3 rounded-2xl flex flex-col items-center hover:bg-slate-700 active:scale-95 transition-all text-purple-400'>
-                      <Swords size={16} className="mb-1"/>
-                      <span className="text-[8px] font-black uppercase italic">Llaves</span>
-                    </button>
-                  )}
+                  <p className='text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1'>Ganador {isDiv2 ? '2ª División' : (isLeague ? '1ª División' : activeComp.name)}</p>
                 </div>
 
+                <button onClick={() => {
+                   if (isDiv2) updateActiveComp({ showWinner2: false }); else updateActiveComp({ showWinner: false });
+                }} className='w-full bg-yellow-500 text-slate-950 py-4 rounded-2xl text-[10px] font-black uppercase italic tracking-widest shadow-xl active:scale-95 transition-all mb-4'>Continuar</button>
               </motion.div>
             </motion.div>
           )}
         </AnimatePresence>
 
-        <AnimatePresence>
-          {activeComp.disqualified && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className='fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/80 backdrop-blur-md'>
-              <motion.div initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} className='bg-slate-900/90 backdrop-blur-xl w-full max-w-sm rounded-[3rem] border border-red-500/30 p-8 shadow-2xl shadow-red-500/10'>
-                <div className='w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center text-red-500 mx-auto mb-6'><ShieldIcon size={40} /></div>
-                <h2 className='text-2xl font-black italic uppercase text-center mb-2'>¡Descalificado!</h2>
-                <p className='text-[10px] text-slate-400 font-bold uppercase text-center mb-8 tracking-widest'>Tu equipo ha sido eliminado de la competición. Selecciona un nuevo equipo para seguir jugando.</p>
-                <div className='max-h-60 overflow-y-auto pr-2 space-y-2 mb-8 custom-scrollbar'>
-                  {remainingTeams.map(t => (
-                    <button key={t.id} onClick={() => updateActiveComp({ userTeamId: t.id, disqualified: false })} className='w-full flex items-center gap-4 p-3 bg-white/5 hover:bg-white/10 rounded-2xl border border-white/5 transition-all active:scale-95 group'>
-                      <Shield color1={t.color1} color2={t.color2} initial={t.name} size='sm' isFlag={t.isFlag} />
-                      <span className='text-xs font-black uppercase italic flex-grow text-left group-hover:text-blue-400'>{t.name}</span>
-                      <ArrowRight size={14} className='text-slate-500 group-hover:text-blue-400' />
-                    </button>
-                  ))}
-                </div>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        <header className='flex items-center gap-3 mb-6'>
-          <button onClick={() => setView('hub')} className='p-2 bg-slate-900/30 backdrop-blur-md rounded-xl text-slate-200 border border-white/10 active:scale-95 transition-all'><ChevronLeft /></button>
-          <div className='flex-grow'>
-            <h2 className='text-xl font-black italic uppercase truncate drop-shadow-md'>{activeComp?.name}</h2>
-            {activeComp.type !== 'league' && <span className='text-[8px] font-black text-blue-300 uppercase tracking-widest drop-shadow-md'>Fase: {activeComp.phase}</span>}
+        <header className='flex items-center justify-between mb-4'>
+          <div className='flex items-center gap-3'>
+            <button onClick={() => setView('hub')} className='p-2 bg-slate-900/30 backdrop-blur-md rounded-xl text-slate-200 border border-white/10 active:scale-95 transition-all'><ChevronLeft /></button>
+            <div>
+              <h2 className='text-xl font-black italic uppercase truncate drop-shadow-md'>{activeComp?.name}</h2>
+              {activeComp.type !== 'league' && <span className='text-[8px] font-black text-blue-300 uppercase tracking-widest drop-shadow-md'>Fase: {activeComp.phase}</span>}
+            </div>
           </div>
+          <button onClick={manualSave} className='p-2 bg-blue-600/30 text-blue-300 rounded-xl border border-blue-500/40 active:scale-95'><Save size={18}/></button>
         </header>
+
+        {isLeague && (
+          <div className='flex mb-6 bg-slate-900/40 p-1 rounded-2xl border border-white/10 backdrop-blur-md'>
+            <button onClick={() => setViewDiv(1)} className={`flex-1 py-2.5 text-[10px] font-black uppercase italic rounded-[10px] transition-all ${!isDiv2 ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:text-white'}`}>1ª División</button>
+            <button onClick={() => setViewDiv(2)} className={`flex-1 py-2.5 text-[10px] font-black uppercase italic rounded-[10px] transition-all ${isDiv2 ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-400 hover:text-white'}`}>2ª División</button>
+          </div>
+        )}
 
         <div className='grid grid-cols-4 gap-2 mb-6 bg-slate-900/30 p-3 rounded-[2rem] border border-white/10 backdrop-blur-md shadow-lg'>
            <MenuButton icon={<BarChart3 size={18} className='text-emerald-400'/>} label="Stats" onClick={() => setCompView('stats')} />
@@ -1578,11 +1736,20 @@ export default function App() {
            ) : (
              <MenuButton icon={<Users size={18} className='text-indigo-400'/>} label="Equipo" onClick={() => setCompView('teamSelect')} />
            )}
-           
+
            <MenuButton icon={<Settings size={16} className='text-slate-300'/>} label="Ajustes" onClick={() => setCompView('config')} isWide />
-           <MenuButton icon={<RotateCcw size={16}/>} label="Reset" onClick={() => resetCompetition(activeCompId)} isDanger isWide />
-           {activeComp.type !== 'league' && <MenuButton icon={<Users size={16} className='text-indigo-400'/>} label="Mi Equipo" onClick={() => setCompView('teamSelect')} isWide />}
+           {activeComp.type !== 'league' ? (
+             <MenuButton icon={<RotateCcw size={16}/>} label="Reset" onClick={() => handleTotalReset(activeCompId)} isDanger isWide />
+           ) : (
+             <MenuButton icon={<Users size={16} className='text-indigo-400'/>} label="Mi Equipo" onClick={() => setCompView('teamSelect')} isWide />
+           )}
         </div>
+
+        {readyForPromotion && (
+          <button onClick={() => setShowPromoModal(true)} className='w-full mb-6 bg-gradient-to-r from-blue-600 to-emerald-600 py-4 rounded-[2rem] border border-white/20 shadow-[0_0_20px_rgba(52,211,153,0.3)] animate-pulse active:scale-95 transition-all text-white font-black uppercase italic flex items-center justify-center gap-3'>
+            <ArrowUpCircle size={20} /> Procesar Ascensos y Descensos <ArrowDownCircle size={20}/>
+          </button>
+        )}
 
         {activeComp.type !== 'league' && activeComp.phase === 'groups' && Array.isArray(activeComp.groups) && (
           <div className='grid grid-cols-1 gap-6 mb-8'>
@@ -1604,13 +1771,13 @@ export default function App() {
           </div>
         )}
 
-        {activeComp.type === 'league' && (
+        {isLeague && (
           <section className='bg-slate-900/30 backdrop-blur-md rounded-[2rem] p-4 border border-white/10 mb-6 shadow-lg'>
-            <h3 className='text-[10px] font-black uppercase text-slate-200 mb-3 flex items-center gap-2 drop-shadow-md'><BarChart3 size={12} /> Top Clasificación</h3>
+            <h3 className='text-[10px] font-black uppercase text-slate-200 mb-3 flex items-center gap-2 drop-shadow-md'><BarChart3 size={12} /> Top Clasificación {isDiv2 ? '2ª' : '1ª'} Div.</h3>
             <div className='space-y-1.5'>
               {sortedTeams.slice(0, 6).map((t, i) => (
-                <div key={t.id} className={'flex items-center gap-3 p-2 rounded-xl ' + (t.id === activeComp.userTeamId ? 'bg-blue-600/40 border border-blue-400/50 shadow-inner' : 'bg-black/30')}>
-                  <span className='text-[10px] font-black text-slate-300 italic w-4'>{i+1}</span>
+                <div key={t.id} className={'flex items-center gap-3 p-2 rounded-xl ' + (t.id === activeComp.userTeamId ? 'bg-blue-600/40 border border-blue-400/50 shadow-inner' : (isDiv2 && i < 3 ? 'bg-emerald-900/30 border border-emerald-500/20' : 'bg-black/30'))}>
+                  <span className={'text-[10px] font-black italic w-4 ' + (isDiv2 && i < 3 ? 'text-emerald-400' : 'text-slate-300')}>{i+1}</span>
                   <Shield color1={t?.color1} color2={t?.color2} initial={t?.name} size='sm' isFlag={t?.isFlag} />
                   <span className='text-[11px] font-bold uppercase truncate flex-grow italic text-white drop-shadow-sm'>{t?.name}</span>
                   <span className='text-[10px] font-black bg-slate-800/60 px-2 py-0.5 rounded-md text-emerald-400 border border-white/10'>{t.pts} PTS</span>
@@ -1620,7 +1787,7 @@ export default function App() {
           </section>
         )}
 
-        {!activeComp.showWinner && currentMatch && (
+        {!currentShowWinner && currentMatch && !readyForPromotion && (
           <section className='bg-gradient-to-br from-blue-700/80 to-indigo-900/80 backdrop-blur-md rounded-[2.5rem] p-6 shadow-2xl relative overflow-hidden border border-white/20'>
             <div className='flex justify-between items-center mb-6'>
               <div className='text-center w-24'>
@@ -1638,10 +1805,26 @@ export default function App() {
                 {awayTeam?.id === userTeam?.id && <span className='text-[7px] font-black bg-white/30 px-1.5 py-0.5 rounded uppercase backdrop-blur-sm'>Tu Equipo</span>}
               </div>
             </div>
-            <button onClick={() => startMatch(homeId, awayId)} className='w-full bg-white/95 text-blue-900 py-4 rounded-2xl text-xs font-black uppercase italic tracking-widest shadow-xl active:scale-95 transition-all flex flex-col items-center justify-center'>
-              <span>{activeComp.phase === 'Final' ? 'Gran Final' : ('Jugar ' + (activeComp.type === 'league' || activeComp.phase === 'groups' ? 'Jornada ' + (activeComp.matchday + 1) : activeComp.phase + (activeCompId === 'C1' ? (activeComp.matchday % 2 === 0 ? ' (Ida)' : ' (Vuelta)') : '')))}</span>
-              <span className='text-[7px] opacity-60 mt-0.5 tracking-normal'>{homeTeam?.opp} vs {awayTeam?.opp} TIROS DISPONIBLES</span>
-            </button>
+
+            {/* Control para deshabilitar si la otra liga no ha terminado */}
+            {(() => {
+              const schedule = generateLeagueSchedule(currentTeams);
+              const isDone = currentMatchday >= schedule.length - 1;
+              if (isLeague && isDone) {
+                 return (
+                   <button disabled className='w-full bg-slate-800 text-slate-400 py-4 rounded-2xl text-[10px] font-black uppercase italic tracking-widest shadow-inner border border-white/10'>
+                     Esperando a {isDiv2 ? '1ª' : '2ª'} División...
+                   </button>
+                 );
+              }
+              return (
+                <button onClick={() => startMatch(homeId, awayId, isDiv2)} className='w-full bg-white/95 text-blue-900 py-4 rounded-2xl text-xs font-black uppercase italic tracking-widest shadow-xl active:scale-95 transition-all flex flex-col items-center justify-center'>
+                  <span>{activeComp.phase === 'Final' ? 'Gran Final' : ('Jugar ' + (isLeague || activeComp.phase === 'groups' ? 'Jornada ' + (currentMatchday + 1) : activeComp.phase + (activeCompId === 'C1' ? (activeComp.matchday % 2 === 0 ? ' (Ida)' : ' (Vuelta)') : '')))}</span>
+                  <span className='text-[7px] opacity-60 mt-0.5 tracking-normal'>{homeTeam?.opp} vs {awayTeam?.opp} TIROS DISPONIBLES</span>
+                </button>
+              );
+            })()}
+
           </section>
         )}
       </div>
@@ -1651,10 +1834,10 @@ export default function App() {
       <div className='flex-grow px-4 pb-20'>
         <div className='flex items-center gap-3 mb-6'>
           <button onClick={() => setCompView('main')} className='p-2 bg-slate-900/30 backdrop-blur-md rounded-xl active:scale-95 transition-all border border-white/10'><ChevronLeft /></button>
-          <h2 className='text-xl font-black italic uppercase drop-shadow-md'>Estadísticas</h2>
+          <h2 className='text-xl font-black italic uppercase drop-shadow-md'>Estadísticas {isDiv2 && '(2ª Div)'}</h2>
         </div>
 
-        {activeComp.type === 'league' ? (
+        {isLeague ? (
           <div className='bg-slate-900/30 backdrop-blur-md rounded-[2rem] border border-white/10 overflow-x-auto custom-scrollbar relative shadow-xl'>
             <table className='w-full text-left border-collapse min-w-[550px]'>
               <thead className='bg-[#0f172a] sticky top-0 z-50 shadow-md'>
@@ -1666,19 +1849,26 @@ export default function App() {
                 </tr>
               </thead>
               <tbody className='divide-y divide-white/5'>
-                {Array.isArray(sortedTeams) && sortedTeams.map((t, i) => (
-                  <tr key={t.id} className={t.id === activeComp.userTeamId ? 'bg-blue-600/30' : ''}>
-                    <td className='p-3 text-[10px] font-black italic text-slate-300 sticky z-40 bg-[#0f172a]' style={{ left: 0 }}>{i+1}</td>
-                    <td className='p-3 flex items-center gap-2 sticky z-40 bg-[#0f172a]' style={{ left: '40px', minWidth: '130px' }}><Shield color1={t?.color1} color2={t?.color2} initial={t?.name} size='xs' isFlag={t?.isFlag} /><span className='text-[10px] font-bold uppercase truncate italic max-w-[80px]'>{t?.name}</span></td>
-                    <td className='p-3 text-center text-[10px] font-bold sticky z-40 bg-[#0f172a] border-r border-white/10' style={{ left: '170px' }}>{t.p}</td>
-                    <td className='p-3 text-center text-[10px] font-bold'>{t.w}</td><td className='p-3 text-center text-[10px] font-bold'>{t.d}</td><td className='p-3 text-center text-[10px] font-bold'>{t.l}</td><td className='p-3 text-center text-[10px] font-bold'>{t.gf}</td><td className='p-3 text-center text-[10px] font-bold'>{t.ga}</td><td className='p-3 text-center text-[10px] font-bold'>{t.gf - t.ga}</td><td className='p-3 text-center text-[10px] font-black text-emerald-400'>{t.pts}</td>
-                  </tr>
-                ))}
+                {Array.isArray(sortedTeams) && sortedTeams.map((t, i) => {
+                  const isUser = t.id === activeComp.userTeamId;
+                  const isPromo = isDiv2 && i < 3;
+                  const isRelegation = !isDiv2 && i >= sortedTeams.length - 3;
+                  const rowBg = isUser ? 'bg-blue-600/30' : (isPromo ? 'bg-emerald-900/20' : (isRelegation ? 'bg-red-900/20' : ''));
+                  return (
+                    <tr key={t.id} className={rowBg}>
+                      <td className={'p-3 text-[10px] font-black italic sticky z-40 bg-[#0f172a] ' + (isPromo ? 'text-emerald-400' : isRelegation ? 'text-red-400' : 'text-slate-300')} style={{ left: 0 }}>{i+1}</td>
+                      <td className='p-3 flex items-center gap-2 sticky z-40 bg-[#0f172a]' style={{ left: '40px', minWidth: '130px' }}><Shield color1={t?.color1} color2={t?.color2} initial={t?.name} size='xs' isFlag={t?.isFlag} /><span className='text-[10px] font-bold uppercase truncate italic max-w-[80px]'>{t?.name}</span></td>
+                      <td className='p-3 text-center text-[10px] font-bold sticky z-40 bg-[#0f172a] border-r border-white/10' style={{ left: '170px' }}>{t.p}</td>
+                      <td className='p-3 text-center text-[10px] font-bold'>{t.w}</td><td className='p-3 text-center text-[10px] font-bold'>{t.d}</td><td className='p-3 text-center text-[10px] font-bold'>{t.l}</td><td className='p-3 text-center text-[10px] font-bold'>{t.gf}</td><td className='p-3 text-center text-[10px] font-bold'>{t.ga}</td><td className='p-3 text-center text-[10px] font-bold'>{t.gf - t.ga}</td><td className='p-3 text-center text-[10px] font-black text-emerald-400'>{t.pts}</td>
+                    </tr>
+                  )
+                })}
               </tbody>
             </table>
           </div>
         ) : (
           <div className='space-y-8'>
+            {/* Lógica original de Copas y Eliminatorias */}
             {(activeComp.groups || []).map((group, gi) => (
               <div key={gi} className='bg-slate-900/30 backdrop-blur-md rounded-[2rem] border border-white/10 overflow-x-auto custom-scrollbar relative shadow-xl'>
                 <div className='bg-[#0f172a] p-3 border-b border-white/10 sticky left-0 z-50'><h3 className='text-[10px] font-black uppercase text-blue-400 flex items-center gap-2'><ShieldIcon size={12} /> {group.name}</h3></div>
@@ -1713,17 +1903,17 @@ export default function App() {
       <div className='flex-grow px-4 pb-20'>
         <div className='flex items-center gap-3 mb-6'>
           <button onClick={() => setCompView('main')} className='p-2 bg-slate-900/30 backdrop-blur-md rounded-xl active:scale-95 transition-all border border-white/10'><ChevronLeft /></button>
-          <h2 className='text-xl font-black italic uppercase drop-shadow-md'>Resultados</h2>
+          <h2 className='text-xl font-black italic uppercase drop-shadow-md'>Resultados {isDiv2 && '(2ª)'}</h2>
         </div>
         <div className='space-y-4'>
-          {(!Array.isArray(activeComp.history) || activeComp.history.length === 0) && <div className='text-center py-20 text-slate-300 bg-slate-900/30 backdrop-blur-md rounded-[2rem] border border-white/5 italic font-bold uppercase text-[10px] shadow-lg'>No hay partidos jugados aún.</div>}
-          {Array.isArray(activeComp.history) && activeComp.history.map((h, i) => (
+          {(!Array.isArray(currentHistory) || currentHistory.length === 0) && <div className='text-center py-20 text-slate-300 bg-slate-900/30 backdrop-blur-md rounded-[2rem] border border-white/5 italic font-bold uppercase text-[10px] shadow-lg'>No hay partidos jugados aún.</div>}
+          {Array.isArray(currentHistory) && currentHistory.map((h, i) => (
             <div key={i} className='bg-slate-900/30 backdrop-blur-md rounded-3xl p-4 border border-white/10 shadow-lg'>
-              <h3 className='text-[9px] font-black uppercase text-blue-300 mb-3 drop-shadow-md'>{h.day}</h3>
+              <h3 className='text-[9px] font-black uppercase text-blue-300 mb-3 drop-shadow-md'>Jornada/Día: {h.day}</h3>
               <div className='space-y-2'>
                 {Array.isArray(h.results) && h.results.map((r, ri) => {
-                  const home = Array.isArray(activeComp.teams) ? activeComp.teams.find(t => t.id === r.hId) : null;
-                  const away = Array.isArray(activeComp.teams) ? activeComp.teams.find(t => t.id === r.aId) : null;
+                  const home = Array.isArray(currentTeams) ? currentTeams.find(t => t.id === r.hId) : null;
+                  const away = Array.isArray(currentTeams) ? currentTeams.find(t => t.id === r.aId) : null;
                   return (
                     <div key={ri} className='flex items-center justify-between bg-black/30 p-3 rounded-2xl border border-white/5'>
                       <div className='flex items-center gap-2 w-24'><Shield color1={home?.color1} color2={home?.color2} initial={home?.name} size='xs' isFlag={home?.isFlag} /><span className='text-[9px] font-bold uppercase truncate italic'>{home?.name}</span></div>
@@ -1746,23 +1936,23 @@ export default function App() {
       <div className='flex-grow px-4 pb-20'>
         <div className='flex items-center gap-3 mb-6'>
           <button onClick={() => setCompView('main')} className='p-2 bg-slate-900/30 backdrop-blur-md rounded-xl active:scale-95 transition-all border border-white/10'><ChevronLeft /></button>
-          <h2 className='text-xl font-black italic uppercase drop-shadow-md'>Calendario</h2>
+          <h2 className='text-xl font-black italic uppercase drop-shadow-md'>Calendario {isDiv2 && '(2ª)'}</h2>
         </div>
         <div className='space-y-4'>
-          {activeComp.type === 'league' ? (
+          {isLeague ? (
             (() => {
-              const rounds = generateLeagueSchedule(activeComp.teams).map((round, ri) => ({ round, ri }));
-              return [...rounds.filter(r => r.ri === activeComp.matchday), ...rounds.filter(r => r.ri > activeComp.matchday), ...rounds.filter(r => r.ri < activeComp.matchday).reverse()];
+              const rounds = generateLeagueSchedule(currentTeams).map((round, ri) => ({ round, ri }));
+              return [...rounds.filter(r => r.ri === currentMatchday), ...rounds.filter(r => r.ri > currentMatchday), ...rounds.filter(r => r.ri < currentMatchday).reverse()];
             })().map(({ round, ri }) => (
-              <div key={ri} className={'bg-slate-900/30 backdrop-blur-md rounded-3xl p-4 border border-white/10 shadow-lg ' + (ri === activeComp.matchday ? 'ring-2 ring-blue-500/50' : 'opacity-80')}>
+              <div key={ri} className={'bg-slate-900/30 backdrop-blur-md rounded-3xl p-4 border border-white/10 shadow-lg ' + (ri === currentMatchday ? 'ring-2 ring-blue-500/50' : 'opacity-80')}>
                 <div className='flex justify-between items-center mb-3'>
-                  <h3 className='text-[9px] font-black uppercase text-slate-300'>Jornada {ri + 1} {ri === activeComp.matchday && '(Actual)'}</h3>
-                  <span className={'text-[7px] font-black uppercase px-2 py-0.5 rounded-full ' + (ri < activeComp.matchday ? 'bg-emerald-500/30 text-emerald-300' : ri === activeComp.matchday ? 'bg-blue-500/40 text-blue-200' : 'bg-slate-800/80 text-slate-300')}>{ri < activeComp.matchday ? 'Finalizado' : ri === activeComp.matchday ? 'En Curso' : 'Próximo'}</span>
+                  <h3 className='text-[9px] font-black uppercase text-slate-300'>Jornada {ri + 1} {ri === currentMatchday && '(Actual)'}</h3>
+                  <span className={'text-[7px] font-black uppercase px-2 py-0.5 rounded-full ' + (ri < currentMatchday ? 'bg-emerald-500/30 text-emerald-300' : ri === currentMatchday ? 'bg-blue-500/40 text-blue-200' : 'bg-slate-800/80 text-slate-300')}>{ri < currentMatchday ? 'Finalizado' : ri === currentMatchday ? 'En Curso' : 'Próximo'}</span>
                 </div>
                 <div className='space-y-2'>
                   {round.map((m, mi) => {
-                    const home = activeComp.teams.find(t => t.id === m.homeId); const away = activeComp.teams.find(t => t.id === m.awayId);
-                    const result = activeComp.history.find(h => h.day === 'Jornada ' + (ri + 1))?.results.find(r => (r.hId === m.homeId && r.aId === m.awayId) || (r.hId === m.awayId && r.aId === m.homeId));
+                    const home = currentTeams.find(t => t.id === m.homeId); const away = currentTeams.find(t => t.id === m.awayId);
+                    const result = currentHistory.find(h => h.day === (ri + 1))?.results.find(r => (r.hId === m.homeId && r.aId === m.awayId) || (r.hId === m.awayId && r.aId === m.homeId));
                     return (
                       <div key={mi} className='flex items-center justify-between bg-black/30 p-2 rounded-xl border border-white/5'>
                         <div className='flex items-center gap-2 w-24'><Shield color1={home?.color1} color2={home?.color2} initial={home?.name} size='xs' isFlag={home?.isFlag} /><span className='text-[9px] font-bold uppercase truncate italic'>{home?.name}</span></div>
@@ -1775,6 +1965,7 @@ export default function App() {
               </div>
             ))
           ) : (
+            // Lógica intacta para torneos
             <div className='space-y-8'>
               {(activeComp.groups || []).length > 0 && (
                 <div className='space-y-6'>
@@ -1837,6 +2028,14 @@ export default function App() {
                   <h2 className='text-xs font-black uppercase text-slate-200 border-b border-white/20 pb-2 drop-shadow-md'>Eliminatorias</h2>
                   {(() => {
                     const po = ['Octavos', 'Cuartos', 'Semis', 'Final'];
+                    const curIdx = po.indexOf(activeComp.phase);
+                    if (curIdx === -1) return po; 
+                    return [...po.slice(curIdx, curIdx + 1), ...po.slice(curIdx + 1), ...po.slice(0, curIdx).reverse()];
+                  })().map(phase => {
+                    const matches = activeComp.bracket[phase];
+                    if (!matches || (Array.isArray(matches) && matches.length === 0)) return null;
+                    const matchArray = Array.isArray(matches) ? matches : [matches];
+                    const phases = ['Octavos', 'Cuartos', 'Semis', 'Final'];
                     const curIdx = po.indexOf(activeComp.phase);
                     if (curIdx === -1) return po; 
                     return [...po.slice(curIdx, curIdx + 1), ...po.slice(curIdx + 1), ...po.slice(0, curIdx).reverse()];
@@ -1986,7 +2185,7 @@ export default function App() {
               <p className='text-[10px] font-black uppercase italic mt-2 truncate text-white drop-shadow-md w-full'>{matchState.home?.name}</p>
               <p className='text-[8px] font-bold text-slate-300 mt-1 bg-black/40 backdrop-blur-sm inline-block px-2 rounded'>{matchState.home.att + '/' + matchState.home.opp + '/' + matchState.home.def}</p>
             </div>
-            
+
             <div className='px-4 flex flex-col items-center shrink-0 w-32'>
               <div className='text-5xl font-black italic tracking-tighter flex gap-3 tabular-nums drop-shadow-[0_0_15px_rgba(0,0,0,0.8)] text-white'><span>{matchState.scoreH}</span><span className='text-slate-400'>-</span><span>{matchState.scoreA}</span></div>
               {!matchState.finished && matchState.phase !== 'penalties' && <div className='text-[8px] font-black text-white/70 uppercase italic mt-1 bg-black/40 px-2 py-0.5 rounded backdrop-blur-sm'>{matchState.oppH} vs {matchState.oppA} TIROS RESTANTES</div>}
@@ -2001,7 +2200,7 @@ export default function App() {
                 </div>
               )}
             </div>
-            
+
             <div className='flex-1 flex flex-col items-center text-center'>
               {matchState.phase === 'penalties' && <PenaltyDots history={matchState.penalties?.historyA} />}
               <Shield color1={matchState.away?.color1} color2={matchState.away?.color2} initial={matchState.away?.name} size='lg' isFlag={matchState.away?.isFlag} />
@@ -2081,4 +2280,3 @@ export default function App() {
     </div>
   );
 }
-
