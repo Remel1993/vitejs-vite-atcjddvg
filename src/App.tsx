@@ -296,7 +296,7 @@ const PRESETS_2 = {
   ],
   FR: [
     { name: 'Clermont Foot', att: 4, opp: 4, def: 4, color1: '#e30613', color2: '#0033a0', league: 'FR' },
-    { name: 'Bordeaux', att: 5, opp: 5, def: 3, color1: '#f5a12d', color2: '#000000', league: 'FR' },
+    { name: 'Bordeaux', att: 5, opp: 5, def: 3, color1: '#0033a0', color2: '#ffffff', league: 'FR' },
     { name: 'Valencienne', att: 4, opp: 4, def: 4, color1: '#8b0000', color2: '#ffffff', league: 'FR' },
     { name: 'Paris FC', att: 4, opp: 5, def: 4, color1: '#0033a0', color2: '#ffffff', league: 'FR' },
     { name: 'Rodez AF', att: 3, opp: 4, def: 3, color1: '#e30613', color2: '#ffcc00', league: 'FR' },
