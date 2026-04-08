@@ -1135,9 +1135,8 @@ function DiceFootballApp() {
   const [activeCompId, setActiveCompId] = useState(null);
   const [compView, setCompView] = useState('main');
   const [viewDiv, setViewDiv] = useState(1); 
-  const [showPromoModal, setShowPromoModal] = useState(false);
   const [showSaveModal, setShowSaveModal] = useState(false);
-  const [championModalTab, setChampionModalTab] = useState<'champion' | 'stats' | 'results'>('champion');
+  const [championModalTab, setChampionModalTab] = useState<'champion' | 'stats' | 'results' | 'promotions'>('champion');
   const [championModalDiv, setChampionModalDiv] = useState(1);
 
   useEffect(() => {
@@ -1577,7 +1576,6 @@ function DiceFootballApp() {
       showWinner2: false
     });
 
-    setShowPromoModal(false);
   };
 
   const handleTotalReset = (compId) => {
@@ -1693,8 +1691,8 @@ function DiceFootballApp() {
     const awayTeam = currentTeams.find(t => t.id === awayId);
 
     // Sistema de validación de ascensos (solo Ligas)
-    const isMax1 = isLeague && activeComp.teams && activeComp.matchday >= generateLeagueSchedule(activeComp.teams).length - 1;
-    const isMax2 = isLeague && activeComp.teams2 && activeComp.matchday2 >= generateLeagueSchedule(activeComp.teams2).length - 1;
+    const isMax1 = isLeague && activeComp.teams && activeComp.matchday >= generateLeagueSchedule(activeComp.teams).length;
+    const isMax2 = isLeague && activeComp.teams2 && activeComp.matchday2 >= generateLeagueSchedule(activeComp.teams2).length;
     const readyForPromotion = isLeague && isMax1 && isMax2 && !activeComp.showWinner && !activeComp.showWinner2;
 
     if (compView === 'config') return (
@@ -1728,51 +1726,8 @@ function DiceFootballApp() {
           )}
         </AnimatePresence>
 
-        {/* MODAL ASCENSOS/DESCENSOS */}
-        {showPromoModal && (
-          <div className='fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-950/95 backdrop-blur-md'>
-             <div className='bg-slate-900 rounded-[2.5rem] p-6 border border-white/20 w-full max-w-sm shadow-2xl relative overflow-hidden'>
-                <div className='absolute inset-0 bg-gradient-to-b from-blue-500/10 to-emerald-500/10 pointer-events-none'></div>
-                <h2 className='text-2xl font-black uppercase italic text-center mb-6 text-white drop-shadow-md relative z-10'>Resumen Temporada</h2>
-
-                <div className='space-y-6 relative z-10'>
-                  {/* ASCENSOS */}
-                  <div className='bg-emerald-900/30 border border-emerald-500/30 p-4 rounded-3xl'>
-                    <h3 className='text-xs font-black uppercase text-emerald-400 mb-3 flex items-center gap-2'><ArrowUpCircle size={16}/> Ascienden a 1ª</h3>
-                    <div className='space-y-2'>
-                      {[...activeComp.teams2].sort((a,b)=>b.pts-a.pts || (b.gf-b.ga)-(a.gf-a.ga)).slice(0,3).map((t, i) => (
-                        <div key={t.id} className='flex items-center gap-3 bg-black/40 p-2 rounded-xl border border-white/5'>
-                          <span className='text-[10px] font-black text-emerald-300 w-3'>{i+1}</span>
-                          <Shield color1={t.color1} color2={t.color2} initial={t.name} size='xs'/>
-                          <span className='text-[10px] font-bold uppercase truncate'>{t.name}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  {/* DESCENSOS */}
-                  <div className='bg-red-900/30 border border-red-500/30 p-4 rounded-3xl'>
-                    <h3 className='text-xs font-black uppercase text-red-400 mb-3 flex items-center gap-2'><ArrowDownCircle size={16}/> Descienden a 2ª</h3>
-                    <div className='space-y-2'>
-                      {[...activeComp.teams].sort((a,b)=>b.pts-a.pts || (b.gf-b.ga)-(a.gf-a.ga)).slice(-3).map((t, i) => (
-                        <div key={t.id} className='flex items-center gap-3 bg-black/40 p-2 rounded-xl border border-white/5'>
-                          <span className='text-[10px] font-black text-red-300 w-3'>↓</span>
-                          <Shield color1={t.color1} color2={t.color2} initial={t.name} size='xs'/>
-                          <span className='text-[10px] font-bold uppercase truncate'>{t.name}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                <button onClick={handlePromotionAndNewSeason} className='w-full mt-6 bg-blue-600 py-4 rounded-2xl font-black uppercase italic text-white active:scale-95 shadow-lg shadow-blue-500/20 transition-all relative z-10'>
-                  Aplicar y Empezar Nueva Temp.
-                </button>
-             </div>
-          </div>
-        )}
-
         <AnimatePresence>
-          {currentShowWinner && compView === 'main' && (() => {
+          {(currentShowWinner || readyForPromotion) && compView === 'main' && (() => {
             const sorted1 = activeComp.teams ? [...activeComp.teams].sort((a, b) => b.pts - a.pts || (b.gf - b.ga) - (a.gf - a.ga)) : [];
             const sorted2 = activeComp.teams2 ? [...activeComp.teams2].sort((a, b) => b.pts - a.pts || (b.gf - b.ga) - (a.gf - a.ga)) : [];
             const champion1 = sorted1[0];
@@ -1799,13 +1754,14 @@ function DiceFootballApp() {
               {/* Sin confetti */}
               <motion.div initial={{ scale: 0.8, y: 50 }} animate={{ scale: 1, y: 0 }} className='bg-slate-900/95 backdrop-blur-xl w-full max-w-sm rounded-[2.5rem] border border-yellow-500/30 shadow-2xl shadow-yellow-500/10 relative overflow-hidden max-h-[90vh] flex flex-col'>
                 <div className='absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-yellow-500 to-transparent' />
-                
+
                 {/* Tabs */}
                 <div className='flex bg-slate-950/80 border-b border-white/10 shrink-0'>
                   {[
                     { key: 'champion', label: '🏆 Campeón' },
                     { key: 'stats', label: '📊 Stats' },
-                    { key: 'results', label: '📋 Result.' }
+                    { key: 'results', label: '📋 Result.' },
+                    ...(isLeague ? [{ key: 'promotions', label: '↕️ Asc/Desc' }] : [])
                   ].map(tab => (
                     <button key={tab.key} onClick={() => setChampionModalTab(tab.key as any)} className={`flex-1 py-3 text-[9px] font-black uppercase italic tracking-wider transition-all ${championModalTab === tab.key ? 'text-yellow-400 border-b-2 border-yellow-500 bg-yellow-500/10' : 'text-slate-400 hover:text-white'}`}>{tab.label}</button>
                   ))}
@@ -1832,43 +1788,6 @@ function DiceFootballApp() {
                         {winner && <p className='text-[9px] font-bold text-emerald-400 mt-2 bg-emerald-900/30 px-3 py-1 rounded-full'>{winner.pts} PTS | {winner.w}G {winner.d}E {winner.l}P | GF:{winner.gf} GC:{winner.ga}</p>}
                       </div>
 
-                      {/* Ascensos y Descensos inline */}
-                      {isLeague && (
-                        <div className='space-y-4 mt-4 text-left'>
-                          {/* Ascienden */}
-                          <div className='bg-emerald-900/20 border border-emerald-500/20 p-3 rounded-2xl'>
-                            <h4 className='text-[9px] font-black uppercase text-emerald-400 mb-2 flex items-center gap-1.5'><ArrowUpCircle size={13}/> Ascienden a 1ª</h4>
-                            <div className='space-y-1.5'>
-                              {promoted.map((t, i) => (
-                                <div key={t.id} className='flex items-center gap-2 bg-black/30 p-2 rounded-xl border border-white/5'>
-                                  <span className='text-[9px] font-black text-emerald-300 w-3'>{i+1}</span>
-                                  <Shield color1={t.color1} color2={t.color2} initial={t.name} size='xs'/>
-                                  <span className='text-[9px] font-bold uppercase truncate flex-grow'>{t.name}</span>
-                                  <span className='text-[7px] font-bold text-slate-400'>{t.att}/{t.opp}/{t.def}</span>
-                                  <span className='text-[7px] text-emerald-400'>→</span>
-                                  <span className='text-[7px] font-black text-emerald-300'>{newPromotedStats[i]?.att}/{newPromotedStats[i]?.opp}/{newPromotedStats[i]?.def}</span>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                          {/* Descienden */}
-                          <div className='bg-red-900/20 border border-red-500/20 p-3 rounded-2xl'>
-                            <h4 className='text-[9px] font-black uppercase text-red-400 mb-2 flex items-center gap-1.5'><ArrowDownCircle size={13}/> Descienden a 2ª</h4>
-                            <div className='space-y-1.5'>
-                              {relegated.map((t, i) => (
-                                <div key={t.id} className='flex items-center gap-2 bg-black/30 p-2 rounded-xl border border-white/5'>
-                                  <span className='text-[9px] font-black text-red-300 w-3'>↓</span>
-                                  <Shield color1={t.color1} color2={t.color2} initial={t.name} size='xs'/>
-                                  <span className='text-[9px] font-bold uppercase truncate flex-grow'>{t.name}</span>
-                                  <span className='text-[7px] font-bold text-slate-400'>{t.att}/{t.opp}/{t.def}</span>
-                                  <span className='text-[7px] text-red-400'>→</span>
-                                  <span className='text-[7px] font-black text-red-300'>{newRelegatedStats[i]?.att}/{newRelegatedStats[i]?.opp}/{newRelegatedStats[i]?.def}</span>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        </div>
-                      )}
                     </div>
                   )}
 
@@ -1953,14 +1872,61 @@ function DiceFootballApp() {
                       </div>
                     </div>
                   )}
+
+                  {championModalTab === 'promotions' && isLeague && (
+                    <div className='space-y-4 text-left'>
+                      <div className='bg-emerald-900/20 border border-emerald-500/20 p-3 rounded-2xl'>
+                        <h4 className='text-[9px] font-black uppercase text-emerald-400 mb-2 flex items-center gap-1.5'><ArrowUpCircle size={13}/> Ascienden a 1ª</h4>
+                        <div className='space-y-1.5'>
+                          {promoted.map((t, i) => (
+                            <div key={t.id} className='flex items-center gap-2 bg-black/30 p-2 rounded-xl border border-white/5'>
+                              <span className='text-[9px] font-black text-emerald-300 w-3'>{i+1}</span>
+                              <Shield color1={t.color1} color2={t.color2} initial={t.name} size='xs'/>
+                              <span className='text-[9px] font-bold uppercase truncate flex-grow'>{t.name}</span>
+                              <span className='text-[7px] font-bold text-slate-400'>{t.att}/{t.opp}/{t.def}</span>
+                              <span className='text-[7px] text-emerald-400'>→</span>
+                              <span className='text-[7px] font-black text-emerald-300'>{newPromotedStats[i]?.att}/{newPromotedStats[i]?.opp}/{newPromotedStats[i]?.def}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      <div className='bg-red-900/20 border border-red-500/20 p-3 rounded-2xl'>
+                        <h4 className='text-[9px] font-black uppercase text-red-400 mb-2 flex items-center gap-1.5'><ArrowDownCircle size={13}/> Descienden a 2ª</h4>
+                        <div className='space-y-1.5'>
+                          {relegated.map((t, i) => (
+                            <div key={t.id} className='flex items-center gap-2 bg-black/30 p-2 rounded-xl border border-white/5'>
+                              <span className='text-[9px] font-black text-red-300 w-3'>↓</span>
+                              <Shield color1={t.color1} color2={t.color2} initial={t.name} size='xs'/>
+                              <span className='text-[9px] font-bold uppercase truncate flex-grow'>{t.name}</span>
+                              <span className='text-[7px] font-bold text-slate-400'>{t.att}/{t.opp}/{t.def}</span>
+                              <span className='text-[7px] text-red-400'>→</span>
+                              <span className='text-[7px] font-black text-red-300'>{newRelegatedStats[i]?.att}/{newRelegatedStats[i]?.opp}/{newRelegatedStats[i]?.def}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div className='p-4 border-t border-white/10 shrink-0'>
-                  <button onClick={() => {
-                     setChampionModalTab('champion');
-                     setChampionModalDiv(1);
-                     if (isDiv2) updateActiveComp({ showWinner2: false }); else updateActiveComp({ showWinner: false });
-                  }} className='w-full bg-yellow-500 text-slate-950 py-3.5 rounded-2xl text-[10px] font-black uppercase italic tracking-widest shadow-xl active:scale-95 transition-all'>Continuar</button>
+                  {isLeague && readyForPromotion && championModalTab !== 'promotions' ? (
+                    <button onClick={() => {
+                      setChampionModalTab('promotions');
+                    }} className='w-full bg-yellow-500 text-slate-950 py-3.5 rounded-2xl text-[10px] font-black uppercase italic tracking-widest shadow-xl active:scale-95 transition-all'>Ascendidos y Descendidos</button>
+                  ) : isLeague && readyForPromotion && championModalTab === 'promotions' ? (
+                    <button onClick={() => {
+                      setChampionModalTab('champion');
+                      setChampionModalDiv(1);
+                      handlePromotionAndNewSeason();
+                    }} className='w-full bg-yellow-500 text-slate-950 py-3.5 rounded-2xl text-[10px] font-black uppercase italic tracking-widest shadow-xl active:scale-95 transition-all'>Aplicar y Empezar Nueva Temp.</button>
+                  ) : (
+                    <button onClick={() => {
+                       setChampionModalTab('champion');
+                       setChampionModalDiv(1);
+                       if (isDiv2) updateActiveComp({ showWinner2: false }); else updateActiveComp({ showWinner: false });
+                    }} className='w-full bg-yellow-500 text-slate-950 py-3.5 rounded-2xl text-[10px] font-black uppercase italic tracking-widest shadow-xl active:scale-95 transition-all'>Continuar</button>
+                  )}
                 </div>
               </motion.div>
             </motion.div>
@@ -2004,12 +1970,6 @@ function DiceFootballApp() {
            )}
         </div>
 
-        {readyForPromotion && (
-          <button onClick={() => setShowPromoModal(true)} className='w-full mb-6 bg-gradient-to-r from-blue-600 to-emerald-600 py-4 rounded-[2rem] border border-white/20 shadow-[0_0_20px_rgba(52,211,153,0.3)] animate-pulse active:scale-95 transition-all text-white font-black uppercase italic flex items-center justify-center gap-3'>
-            <ArrowUpCircle size={20} /> Procesar Ascensos y Descensos <ArrowDownCircle size={20}/>
-          </button>
-        )}
-
         {activeComp.type !== 'league' && activeComp.phase === 'groups' && Array.isArray(activeComp.groups) && (
           <div className='grid grid-cols-1 gap-6 mb-8'>
             {activeComp.groups.map((group, gi) => (
@@ -2046,7 +2006,7 @@ function DiceFootballApp() {
           </section>
         )}
 
-        {!currentShowWinner && currentMatch && !readyForPromotion && (
+        {!currentShowWinner && (currentMatch || (isLeague && currentMatchday >= generateLeagueSchedule(currentTeams).length)) && (
           <section className='bg-gradient-to-br from-blue-700/80 to-indigo-900/80 backdrop-blur-md rounded-[2.5rem] p-6 shadow-2xl relative overflow-hidden border border-white/20'>
             <div className='flex justify-between items-center mb-6'>
               <div className='text-center w-24'>
@@ -2079,7 +2039,7 @@ function DiceFootballApp() {
                 <button onClick={() => startMatch(homeId, awayId, isDiv2)} className='w-full bg-white/95 text-blue-900 py-4 rounded-2xl text-xs font-black uppercase italic tracking-widest shadow-xl active:scale-95 transition-all flex flex-col items-center justify-center'>
                   <span>{activeComp.phase === 'Final' ? 'Gran Final' : ('Jugar ' + (isLeague || activeComp.phase === 'groups' ? 'Jornada ' + (currentMatchday + 1) : activeComp.phase + (activeCompId === 'C1' ? (activeComp.matchday % 2 === 0 ? ' (Ida)' : ' (Vuelta)') : '')))}</span>
                   <span className='text-[7px] opacity-60 mt-0.5 tracking-normal'>{homeTeam?.opp} vs {awayTeam?.opp} TIROS DISPONIBLES</span>
-                  {isLeague && <span className='text-[7px] text-emerald-600 font-bold mt-0.5'>⚡ Ambas divisiones juegan simultáneamente</span>}
+                  
                 </button>
               );
             })()}
