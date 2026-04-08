@@ -142,7 +142,7 @@ const PRESETS = {
     { name: 'Le Havre', att: 2, opp: 3, def: 3, color1: '#00529f', color2: '#87ceeb', league: 'FR' },
     { name: 'AJ Auxerre', att: 2, opp: 3, def: 2, color1: '#ffffff', color2: '#00529f', league: 'FR' },
     { name: 'Angers SCO', att: 2, opp: 3, def: 2, color1: '#000000', color2: '#ffffff', league: 'FR' },
-    { name: 'Saint-Étienne', att: 2, opp: 3, def: 3, color1: '#006532', color2: '#ffffff', league: 'FR' },
+    { name: 'Saint-Étienne', att: 2, opp: 2, def: 3, color1: '#006532', color2: '#ffffff', league: 'FR' },
     ],
   MI: [ 
     { name: 'FC Porto', att: 4, opp: 4, def: 4, color1: '#003399', color2: '#ffffff', league: 'MI' },
