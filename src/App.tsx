@@ -8,7 +8,8 @@ import {
   Trophy, Settings, Calendar, History, Swords, ChevronLeft, Save, 
   Users, BarChart3, Play, RotateCcw, Check, Dice1, Dice2, Dice3, 
   Dice4, Dice5, Dice6, Globe, Shield as ShieldIcon, Info, ArrowRight, Dices,
-  Wand2, Shuffle, ArrowUpCircle, ArrowDownCircle, AlertTriangle
+  Wand2, Shuffle, ArrowUpCircle, ArrowDownCircle, AlertTriangle,
+  Newspaper, TrendingUp, AlertCircle, Flame, Star, X, Megaphone, Eye
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -142,7 +143,7 @@ const PRESETS = {
     { name: 'Le Havre', att: 2, opp: 3, def: 3, color1: '#00529f', color2: '#87ceeb', league: 'FR' },
     { name: 'AJ Auxerre', att: 2, opp: 3, def: 2, color1: '#ffffff', color2: '#00529f', league: 'FR' },
     { name: 'Angers SCO', att: 2, opp: 3, def: 2, color1: '#000000', color2: '#ffffff', league: 'FR' },
-    { name: 'Saint-Étienne', att: 2, opp: 2, def: 3, color1: '#006532', color2: '#ffffff', league: 'FR' },
+    { name: 'Saint-Étienne', att: 2, opp: 3, def: 3, color1: '#006532', color2: '#ffffff', league: 'FR' },
     ],
   MI: [ 
     { name: 'FC Porto', att: 4, opp: 4, def: 4, color1: '#003399', color2: '#ffffff', league: 'MI' },
@@ -726,6 +727,357 @@ const MenuButton = ({ icon, label, onClick, disabled = false, isDanger = false, 
   </button>
 );
 
+// ==========================================
+// GENERADOR DE NOTICIAS DINÁMICAS
+// ==========================================
+const pick = (arr: any[]) => arr[Math.floor(Math.random() * arr.length)];
+
+const generateNews = (teams: any[], teams2: any[], matchday: number, compType: string, compName: string, history?: any[], schedule?: any[][]) => {
+  if (!teams || teams.length === 0) return [];
+  
+  const sorted = [...teams].sort((a, b) => b.pts - a.pts || (b.gf - b.ga) - (a.gf - a.ga));
+  const sorted2 = teams2 && teams2.length > 0 ? [...teams2].sort((a, b) => b.pts - a.pts || (b.gf - b.ga) - (a.gf - a.ga)) : [];
+  const news: any[] = [];
+  const totalTeams = sorted.length;
+  const usedIds = new Set<number>();
+  const totalRounds = compType === 'league' ? (totalTeams - 1) * 2 : matchday + 5;
+  const progress = matchday / totalRounds;
+  const phase = progress < 0.25 ? 'early' : progress < 0.55 ? 'mid' : progress < 0.8 ? 'late' : 'final';
+  const jLeft = totalRounds - matchday;
+
+  const addNews = (item: any) => {
+    if (item.team) usedIds.add(item.team.id);
+    news.push(item);
+  };
+
+  // Helper: calcular rachas desde historial
+  const getStreak = (teamId: number) => {
+    if (!history || history.length === 0) return { type: 'none', count: 0, results: '' };
+    let streak = '';
+    let streakType = '';
+    let streakCount = 0;
+    for (const day of history) {
+      const res = day.results?.find((r: any) => r.homeId === teamId || r.awayId === teamId);
+      if (!res) continue;
+      const isHome = res.homeId === teamId;
+      const gf = isHome ? res.homeGoals : res.awayGoals;
+      const ga = isHome ? res.awayGoals : res.homeGoals;
+      const result = gf > ga ? 'W' : gf === ga ? 'D' : 'L';
+      streak += result;
+      if (streak.length <= 1) { streakType = result; streakCount = 1; }
+      else if (result === streakType) streakCount++;
+      else break;
+    }
+    return { type: streakType, count: streakCount, results: streak.slice(0, 5) };
+  };
+
+  // === LIDERATO ===
+  if (sorted[0] && sorted[0].pts > 0) {
+    const L = sorted[0];
+    const gap = sorted[1] ? L.pts - sorted[1].pts : 0;
+    const dg = (L.gf || 0) - (L.ga || 0);
+    const streak = getStreak(L.id);
+    const streakText = streak.count >= 3 && streak.type === 'W' ? ` Racha de ${streak.count} victorias consecutivas que los hace intocables.` : '';
+    const opts = phase === 'early' ? [
+      { title: `🏆 ${L.name} arranca mandando`, desc: `${L.pts} pts tras ${matchday} jornadas. Arranque sólido con ${L.w || 0} triunfos.${streakText} Esto recién empieza, pero marcan el ritmo.` },
+      { title: `📊 Buen inicio del ${L.name}`, desc: `Líderes tras la jornada ${matchday}. ${L.w || 0} victorias y +${dg} en gol diferencia.${streakText}` },
+      { title: `⭐ ${L.name} toma la delantera`, desc: `${L.pts} puntos. Es pronto, pero el mensaje es claro: vienen con todo.${streakText}` },
+      { title: `👑 ${L.name} se planta en la cima`, desc: `${L.w || 0}V ${L.d || 0}E ${L.l || 0}D. La temporada empieza y ellos ya mandan.${streakText}` },
+    ] : phase === 'mid' ? [
+      { title: `🏆 ${L.name} domina en el ecuador`, desc: `${L.pts} pts a mitad de temporada. ${gap > 3 ? `Ventaja de ${gap} sobre el segundo, colchón cómodo.` : 'Ventaja corta, pero el liderato es suyo.'}${streakText}` },
+      { title: `📈 ${L.name} consolida a medio campeonato`, desc: `${L.w || 0} victorias en ${matchday} fechas. La regularidad es su arma.${streakText}` },
+      { title: `💪 ${L.name} no afloja al llegar al ecuador`, desc: `+${dg} en diferencia de goles. Base sólida para la segunda vuelta.${streakText}` },
+    ] : phase === 'late' ? [
+      { title: `🏆 ${L.name} se aferra en la recta final`, desc: `${jLeft} jornadas y ${L.pts} pts. ${gap > 3 ? `${gap} de ventaja, dependen de sí mismos.` : 'Ventaja mínima, un tropiezo cambia todo.'}${streakText}` },
+      { title: `🔥 ${L.name} resiste cuando más importa`, desc: `Cada punto vale doble a estas alturas. ${L.pts} unidades y la inercia de su lado.${streakText}` },
+    ] : [
+      { title: `🏆 ${L.name} acaricia el título`, desc: `${L.pts} pts a ${jLeft} fechas. ${gap > 0 ? `${gap} de ventaja. Lo tienen en la mano.` : 'Empatados en puntos. Final de película.'}${streakText}` },
+      { title: `👑 ${L.name} a un paso de la gloria`, desc: `${L.w || 0} victorias que pueden valer un campeonato. ${jLeft} partidos para la eternidad.${streakText}` },
+    ];
+    addNews({ ...pick(opts), team: L, type: 'leader' });
+  }
+
+  // === CRISIS / ÚLTIMO ===
+  const lastTeam = sorted[sorted.length - 1];
+  if (lastTeam && matchday > 2 && !usedIds.has(lastTeam.id)) {
+    const lastStreak = getStreak(lastTeam.id);
+    const loseStreak = lastStreak.count >= 3 && lastStreak.type === 'L' ? ` Llevan ${lastStreak.count} derrotas seguidas... la moral por los suelos.` : '';
+    const opts = phase === 'early' ? [
+      { title: `😰 Mal arranque del ${lastTeam.name}`, desc: `Últimos con ${lastTeam.pts} pts tras ${matchday} jornadas. Queda liga, pero preocupa.${loseStreak}` },
+      { title: `📉 ${lastTeam.name} empieza sufriendo`, desc: `${lastTeam.l || 0} derrotas en el arranque. El técnico ya siente la presión.${loseStreak}` },
+    ] : phase === 'mid' ? [
+      { title: `🚨 ${lastTeam.name} en el fondo al ecuador`, desc: `${lastTeam.pts} pts a mitad de temporada. La segunda vuelta tiene que ser otra historia.${loseStreak}` },
+      { title: `💔 ${lastTeam.name} no levanta cabeza`, desc: `${lastTeam.w || 0} victorias en media temporada. La reacción no llega.${loseStreak}` },
+    ] : phase === 'late' ? [
+      { title: `⚠️ ${lastTeam.name}: el tiempo se agota`, desc: `Últimos con ${lastTeam.pts} pts y ${jLeft} jornadas. Desesperante.${loseStreak}` },
+      { title: `🆘 Cuenta regresiva para ${lastTeam.name}`, desc: `${lastTeam.l || 0} derrotas pesan. ${jLeft} partidos para el milagro.${loseStreak}` },
+    ] : [
+      { title: `😱 ${lastTeam.name}: últimos en la definición`, desc: `${lastTeam.pts} pts a ${jLeft} fechas. Prácticamente sentenciados.${loseStreak}` },
+      { title: `🪦 Final amargo para ${lastTeam.name}`, desc: `${lastTeam.w || 0}V ${lastTeam.d || 0}E ${lastTeam.l || 0}D. Números duros cuando todo se define.${loseStreak}` },
+    ];
+    addNews({ ...pick(opts), team: lastTeam, type: 'crisis' });
+  }
+
+  // === RACHA EN LLAMAS (3+ victorias seguidas) ===
+  if (matchday >= 3) {
+    const hotTeams = sorted.filter(t => !usedIds.has(t.id) && getStreak(t.id).type === 'W' && getStreak(t.id).count >= 3);
+    if (hotTeams.length > 0) {
+      const hot = pick(hotTeams);
+      const s = getStreak(hot.id);
+      const formStr = s.results.split('').map(r => r === 'W' ? '✅' : r === 'D' ? '🟡' : '🔴').join('');
+      addNews({ title: `🔥 ${hot.name} EN RACHA: ${s.count} victorias al hilo`, desc: `Forma: ${formStr}. El momentum está de su lado. Cuando un equipo entra en esta dinámica, los rivales tiemblan. ${phase === 'late' || phase === 'final' ? 'Y justo en el momento más importante de la temporada.' : 'Si mantienen este nivel, van a ser protagonistas.'}`, team: hot, type: 'momentum' });
+    }
+  }
+
+  // === MOMENTUM NEGATIVO (3+ derrotas seguidas, no repetir con crisis) ===
+  if (matchday >= 3) {
+    const coldTeams = sorted.filter(t => !usedIds.has(t.id) && getStreak(t.id).type === 'L' && getStreak(t.id).count >= 3);
+    if (coldTeams.length > 0) {
+      const cold = pick(coldTeams);
+      const s = getStreak(cold.id);
+      const formStr = s.results.split('').map(r => r === 'W' ? '✅' : r === 'D' ? '🟡' : '🔴').join('');
+      addNews({ title: `📉 ${cold.name} en caída libre: ${s.count} derrotas consecutivas`, desc: `Forma: ${formStr}. La confianza se evapora partido a partido. ${cold.pts > sorted[sorted.length - 1].pts + 3 ? 'Aún tienen colchón en la tabla, pero si no reaccionan...' : 'Y la tabla no perdona. Necesitan un golpe de timón urgente.'}`, team: cold, type: 'crisis' });
+    }
+  }
+
+  // === FACTOR DADO / SUERTE ===
+  if (matchday >= 2) {
+    // Equipos con att bajo pero muchos goles (suerte en los dados)
+    const luckyTeams = sorted.filter(t => !usedIds.has(t.id) && (t.att || 3) <= 3 && (t.gf || 0) > matchday * 1.3);
+    const unluckyTeams = sorted.filter(t => !usedIds.has(t.id) && (t.att || 3) >= 4 && matchday > 0 && (t.gf || 0) < matchday * 0.7);
+    
+    if (luckyTeams.length > 0) {
+      const lucky = pick(luckyTeams);
+      const gpm = ((lucky.gf || 0) / matchday).toFixed(1);
+      addNews({ ...pick([
+        { title: `🎲 ¡Los dados sonríen al ${lucky.name}!`, desc: `ATT ${lucky.att || 3} pero ${lucky.gf} goles (${gpm}/partido). El azar les está dando la mano. En el fútbol de dados, a veces la suerte es la mejor táctica.` },
+        { title: `🍀 ${lucky.name}: el factor suerte existe`, desc: `Con un ataque modesto (ATT ${lucky.att || 3}) llevan ${lucky.gf} goles. Los dados han rodado a su favor y lo están aprovechando. ¿Cuánto durará la racha?` },
+        { title: `✨ La fortuna del dado sonríe al ${lucky.name}`, desc: `${lucky.gf} goles con ATT ${lucky.att || 3}. En este juego, el dado manda, y últimamente el dado quiere a este equipo.` },
+      ]), team: lucky, type: 'luck' });
+    } else if (unluckyTeams.length > 0) {
+      const unlucky = pick(unluckyTeams);
+      const gpm = ((unlucky.gf || 0) / matchday).toFixed(1);
+      addNews({ ...pick([
+        { title: `🎲 Los dados le dan la espalda al ${unlucky.name}`, desc: `ATT ${unlucky.att || 3} pero solo ${unlucky.gf} goles (${gpm}/partido). Tienen el potencial, pero el dado no coopera. La mala suerte también es parte del juego.` },
+        { title: `😤 ${unlucky.name} pide que cambien los dados`, desc: `Con ATT ${unlucky.att || 3} esperaban más, pero solo llevan ${unlucky.gf} goles. El azar no entiende de estadísticas.` },
+        { title: `🔮 El dado castiga al ${unlucky.name}`, desc: `Solo ${gpm} goles/partido con un ataque de nivel ${unlucky.att || 3}. A veces, la suerte simplemente no está de tu lado.` },
+      ]), team: unlucky, type: 'luck' });
+    }
+  }
+
+  // === PREVIA DE PARTIDO INTERESANTE (próxima jornada) ===
+  if (schedule && schedule[matchday]) {
+    const nextRound = schedule[matchday];
+    // Buscar el partido más atractivo: 1º vs 2º, o equipos con rachas opuestas
+    let bestMatch: any = null;
+    let bestScore = 0;
+    for (const m of nextRound) {
+      const h = sorted.find(t => t.id === m.homeId);
+      const a = sorted.find(t => t.id === m.awayId);
+      if (!h || !a) continue;
+      const hRank = sorted.indexOf(h);
+      const aRank = sorted.indexOf(a);
+      // Más atractivo si ambos están arriba, o si la diferencia de posiciones es grande (sorpresa)
+      let score = 0;
+      if (hRank < 4 && aRank < 4) score += 10; // duelo directo arriba
+      if (hRank < 2 || aRank < 2) score += 5; // involucra al líder
+      const hStreak = getStreak(h.id);
+      const aStreak = getStreak(a.id);
+      if (hStreak.type === 'W' && hStreak.count >= 2) score += 3;
+      if (aStreak.type === 'W' && aStreak.count >= 2) score += 3;
+      if (hStreak.type === 'W' && aStreak.type === 'L') score += 4; // contraste
+      if (aStreak.type === 'W' && hStreak.type === 'L') score += 4;
+      if (Math.abs(hRank - aRank) <= 2 && hRank < totalTeams / 2) score += 2;
+      if (score > bestScore) { bestScore = score; bestMatch = { h, a, hStreak, aStreak }; }
+    }
+    if (bestMatch && bestScore >= 3 && !usedIds.has(bestMatch.h.id) && !usedIds.has(bestMatch.a.id)) {
+      const { h, a, hStreak, aStreak } = bestMatch;
+      const hPos = sorted.indexOf(h) + 1;
+      const aPos = sorted.indexOf(a) + 1;
+      const hForm = hStreak.results.slice(0, 4).split('').map(r => r === 'W' ? '✅' : r === 'D' ? '🟡' : '🔴').join('');
+      const aForm = aStreak.results.slice(0, 4).split('').map(r => r === 'W' ? '✅' : r === 'D' ? '🟡' : '🔴').join('');
+      const formText = (hForm || aForm) ? ` Forma: ${h.name} ${hForm || '—'} vs ${aForm || '—'} ${a.name}.` : '';
+      
+      if (hPos <= 3 && aPos <= 3) {
+        addNews({ ...pick([
+          { title: `🔜 PREVIA: ${h.name} vs ${a.name} — Duelo en la cima`, desc: `${hPos}º contra ${aPos}º. Un partido que puede definir la parte alta de la tabla.${formText} Jornada ${matchday + 1}, no se lo pierdan.` },
+          { title: `⚡ Partidazo a la vista: ${h.name} recibe al ${a.name}`, desc: `Dos de los mejores frente a frente. ${h.pts} pts vs ${a.pts} pts.${formText} Esto promete.` },
+        ]), team: h, type: 'preview' });
+      } else {
+        addNews({ ...pick([
+          { title: `🔜 PREVIA J${matchday + 1}: ${h.name} vs ${a.name}`, desc: `${hPos}º vs ${aPos}º. ${hStreak.count >= 2 && hStreak.type === 'W' ? `${h.name} llega en racha.` : aStreak.count >= 2 && aStreak.type === 'W' ? `${a.name} llega en racha.` : 'Ambos necesitan los tres puntos.'}${formText}` },
+          { title: `📋 Ojo a la jornada ${matchday + 1}: ${h.name} - ${a.name}`, desc: `Cruce interesante en la próxima fecha.${formText} ${Math.abs(h.pts - a.pts) <= 3 ? 'Separados por poco en la tabla, cada punto cuenta.' : ''}` },
+        ]), team: h, type: 'preview' });
+      }
+    }
+  }
+
+  // === ZONA DE DESCENSO ===
+  if (compType === 'league' && totalTeams >= 18 && matchday > 1) {
+    const relegTeam = pick(sorted.slice(-3).filter(t => !usedIds.has(t.id)));
+    if (relegTeam) {
+      const rStreak = getStreak(relegTeam.id);
+      const formStr = rStreak.results.slice(0, 5).split('').map(r => r === 'W' ? '✅' : r === 'D' ? '🟡' : '🔴').join('');
+      const opts = phase === 'early' ? [
+        { title: `⬇️ ${relegTeam.name} en zona roja`, desc: `${relegTeam.pts} pts. Forma: ${formStr || '—'}. Es temprano, pero nadie quiere acostumbrarse al fondo.` },
+      ] : phase === 'mid' ? [
+        { title: `⬇️ ${relegTeam.name}: media liga en descenso`, desc: `${relegTeam.pts} pts al ecuador. Forma: ${formStr || '—'}. La segunda vuelta tiene que ser otra cosa.` },
+      ] : phase === 'late' ? [
+        { title: `⬇️ Alarma para ${relegTeam.name}`, desc: `${jLeft} jornadas y en zona de bajada. Forma: ${formStr || '—'}. El margen se reduce cada semana.` },
+        { title: `⏳ ${relegTeam.name}: cada partido es una final`, desc: `En puestos de descenso en la recta final. ${relegTeam.w || 0} victorias no alcanzan. Forma: ${formStr || '—'}.` },
+      ] : [
+        { title: `🆘 ${relegTeam.name}: el descenso acecha`, desc: `A ${jLeft} jornadas, con ${relegTeam.pts} pts... Forma: ${formStr || '—'}. Las matemáticas son crueles.` },
+      ];
+      addNews({ ...pick(opts), team: relegTeam, type: 'relegation' });
+    }
+  }
+
+  // === ASCENSO ===
+  if (sorted2.length > 0 && matchday > 1) {
+    const promoTeam = pick(sorted2.slice(0, Math.min(3, sorted2.length)).filter(t => !usedIds.has(t.id)));
+    if (promoTeam) {
+      const opts = phase === 'early' ? [
+        { title: `⬆️ ${promoTeam.name} empieza bien en 2ª`, desc: `${promoTeam.pts} pts en las primeras jornadas. Si mantienen el nivel, el ascenso es real.` },
+      ] : phase === 'mid' ? [
+        { title: `⬆️ ${promoTeam.name} fuerte al ecuador en segunda`, desc: `${promoTeam.pts} pts a medio campeonato. La afición empieza a soñar con Primera.` },
+      ] : phase === 'late' ? [
+        { title: `🚀 ${promoTeam.name} aprieta por el ascenso`, desc: `${jLeft} jornadas y con ${promoTeam.pts} pts en zona de promoción. El sueño de Primera se siente cerca.` },
+      ] : [
+        { title: `🌟 ${promoTeam.name} a un paso de Primera`, desc: `Últimas fechas y en puestos de ascenso. ${promoTeam.pts} pts. La ciudad entera contiene la respiración.` },
+      ];
+      addNews({ ...pick(opts), team: promoTeam, type: 'promotion' });
+    }
+  }
+
+  // === ATAQUE LETAL (ATT >= 5) ===
+  const offensiveBeasts = teams.filter(t => t.att >= 5 && !usedIds.has(t.id));
+  if (offensiveBeasts.length > 0) {
+    const beast = pick(offensiveBeasts);
+    const gpm = matchday > 0 ? ((beast.gf || 0) / matchday).toFixed(1) : '0';
+    addNews({ ...pick([
+      { title: `⚔️ Poder ofensivo del ${beast.name}: nivel máximo`, desc: `ATT 5 y ${beast.gf || 0} goles (${gpm}/partido). ${phase === 'final' ? 'A estas alturas, su artillería es letal.' : 'Generan peligro constante.'}` },
+      { title: `💥 ${beast.name}: la delantera más temida`, desc: `${beast.gf || 0} goles en ${matchday} jornadas. Cuando el dado acompaña a un ATT de 5, el resultado es demoledor.` },
+    ]), team: beast, type: 'stats' });
+  }
+
+  // === MURO DEFENSIVO (DEF >= 5) ===
+  const walls = teams.filter(t => t.def >= 5 && !usedIds.has(t.id));
+  if (walls.length > 0) {
+    const wall = pick(walls);
+    const gapm = matchday > 0 ? ((wall.ga || 0) / matchday).toFixed(1) : '0';
+    addNews({ ...pick([
+      { title: `🛡️ ${wall.name}: muro defensivo`, desc: `Solo ${wall.ga || 0} goles en contra (${gapm}/partido). DEF 5 que se nota. ${phase === 'late' || phase === 'final' ? 'En la recta final, esa solidez vale oro.' : ''}` },
+      { title: `🧱 ${wall.name} no regala nada atrás`, desc: `${wall.ga || 0} goles recibidos. Los rivales se estrellan contra su línea de fondo.` },
+    ]), team: wall, type: 'defense' });
+  }
+
+  // === MÁXIMO GOLEADOR ===
+  const topScorer = [...teams].sort((a, b) => (b.gf || 0) - (a.gf || 0))[0];
+  if (topScorer && (topScorer.gf || 0) > 3 && !usedIds.has(topScorer.id)) {
+    addNews({ ...pick([
+      { title: `⚽ ${topScorer.name} lidera con ${topScorer.gf} goles`, desc: `${phase === 'early' ? 'En apenas unas jornadas, ya son los máximos anotadores.' : phase === 'final' ? 'En la definición, cada gol de más puede valer un título.' : `Jornada ${matchday} y nadie ha metido más.`}` },
+      { title: `🥅 ${topScorer.name} hace vibrar las redes`, desc: `${topScorer.gf} tantos. ${phase === 'late' ? 'Argumentos de sobra para pelear arriba.' : 'Vocación ofensiva.'}` },
+    ]), team: topScorer, type: 'scorer' });
+  }
+
+  // === RIVALIDAD (2º vs 1º) ===
+  if (sorted[1] && sorted[0] && sorted[0].pts - sorted[1].pts <= 3 && matchday > 2 && !usedIds.has(sorted[1].id)) {
+    const ch = sorted[1];
+    const diff = sorted[0].pts - ch.pts;
+    const chStreak = getStreak(ch.id);
+    const leaderStreak = getStreak(sorted[0].id);
+    const momentumText = chStreak.type === 'W' && chStreak.count >= 2 ? ` Y el ${ch.name} viene en racha de ${chStreak.count} victorias...` : leaderStreak.type === 'L' ? ` Y el líder viene de perder...` : '';
+    const opts = phase === 'early' ? [
+      { title: `🔥 ${ch.name} pisa los talones al líder`, desc: `${diff === 0 ? 'Empatados en puntos.' : `Solo ${diff} punto(s).`} Liga apretada desde el arranque.${momentumText}` },
+    ] : phase === 'mid' ? [
+      { title: `⚡ ${ch.name} no se despega del ${sorted[0].name}`, desc: `${diff} punto(s) al ecuador. La segunda vuelta será guerra por el título.${momentumText}` },
+      { title: `🥊 Duelo en la cima: ${ch.name} vs ${sorted[0].name}`, desc: `${ch.pts} vs ${sorted[0].pts} pts. La pelea se define en los detalles.${momentumText}` },
+    ] : phase === 'late' ? [
+      { title: `🌡️ La liga hierve: ${ch.name} acecha`, desc: `${jLeft} jornadas, ${diff} punto(s). Cada tropiezo cambia todo.${momentumText}` },
+    ] : [
+      { title: `🔥 ${ch.name} a ${diff} punto(s) del título`, desc: `${jLeft} jornadas. Diferencia mínima. Cualquier resultado da un vuelco.${momentumText}` },
+    ];
+    addNews({ ...pick(opts), team: ch, type: 'rivalry' });
+  }
+
+  // === TORNEO / COPA ===
+  if (compType !== 'league' && matchday > 0) {
+    const rTeam = pick(sorted);
+    addNews({ ...pick([
+      { title: `🏟️ Jornada ${matchday} de la ${compName}`, desc: `${matchday <= 3 ? 'El torneo está en fase inicial pero ya hay historia.' : 'A medida que avanza, cada partido pesa más. Los favoritos muestran sus cartas.'}` },
+      { title: `🌍 La ${compName} avanza`, desc: `${matchday <= 3 ? 'Primeras rondas con cruces interesantes.' : 'Fase avanzada. Los que quedan son los mejores.'}` },
+    ]), team: rTeam, type: 'generic' });
+  }
+
+  // === EQUIPO SORPRESA ===
+  if (matchday > 3 && sorted.length > 6) {
+    const midTable = sorted.slice(Math.floor(totalTeams * 0.3), Math.floor(totalTeams * 0.6)).filter(t => !usedIds.has(t.id) && (t.w || 0) >= 2);
+    if (midTable.length > 0) {
+      const surprise = pick(midTable);
+      const sStreak = getStreak(surprise.id);
+      const formStr = sStreak.results.slice(0, 4).split('').map(r => r === 'W' ? '✅' : r === 'D' ? '🟡' : '🔴').join('');
+      addNews({ ...pick([
+        { title: `👀 ${surprise.name}: la revelación`, desc: `${surprise.w || 0} victorias en ${matchday} jornadas. Forma: ${formStr || '—'}. ${phase === 'late' ? 'Ya no son sorpresa: son realidad.' : 'Trabajan en silencio pero hacen ruido.'}` },
+        { title: `🐴 Ojo con ${surprise.name}`, desc: `${surprise.pts} pts. Forma reciente: ${formStr || '—'}. ${phase === 'final' ? 'A estas alturas, su presencia no es casualidad.' : 'Un proyecto que empieza a dar frutos.'}` },
+      ]), team: surprise, type: 'surprise' });
+    }
+  }
+
+  // === INVICTO ===
+  if (matchday > 3) {
+    const unbeaten = sorted.filter(t => (t.l || 0) === 0 && (t.p || 0) > 2 && !usedIds.has(t.id));
+    if (unbeaten.length > 0) {
+      const ub = pick(unbeaten);
+      addNews({ ...pick([
+        { title: `🛡️ ${ub.name} sigue invicto tras ${matchday} jornadas`, desc: `${ub.w || 0}V ${ub.d || 0}E sin derrotas. ${phase === 'final' ? '¿Terminarán invictos? Sería histórico.' : 'Racha que impone respeto.'}` },
+        { title: `✨ ${matchday} fechas y ${ub.name} no cae`, desc: `${ub.pts} pts sin conocer la derrota. Los dados no los han traicionado ni una sola vez.` },
+      ]), team: ub, type: 'leader' });
+    }
+  }
+
+  // === PEOR DEFENSA ===
+  if (matchday > 2) {
+    const worstDef = [...teams].filter(t => !usedIds.has(t.id)).sort((a, b) => (b.ga || 0) - (a.ga || 0))[0];
+    if (worstDef && (worstDef.ga || 0) > 5) {
+      const gapm = ((worstDef.ga || 0) / matchday).toFixed(1);
+      addNews({ ...pick([
+        { title: `🚪 ${worstDef.name} sufre atrás: ${worstDef.ga} goles en contra`, desc: `${gapm} goles/partido. ${phase === 'late' ? 'En la recta final, esos goles cuestan caro.' : 'El arco sigue abierto.'}` },
+        { title: `📉 Crisis defensiva en ${worstDef.name}`, desc: `${worstDef.ga} goles encajados. ${worstDef.def <= 2 ? 'Con DEF de ' + worstDef.def + ', el dado les condena atrás.' : 'El cuerpo técnico busca soluciones.'}` },
+      ]), team: worstDef, type: 'crisis' });
+    }
+  }
+
+  // === DATO RANDOM DE DADOS ===
+  if (matchday >= 3 && Math.random() > 0.5) {
+    const totalGoals = teams.reduce((sum, t) => sum + (t.gf || 0), 0);
+    const avgGoals = (totalGoals / (matchday * (totalTeams / 2))).toFixed(1);
+    const highScoringGames = history?.reduce((count, day) => {
+      return count + (day.results?.filter((r: any) => (r.homeGoals + r.awayGoals) >= 5).length || 0);
+    }, 0) || 0;
+    addNews({ ...pick([
+      { title: `🎲 Estadísticas del dado: ${avgGoals} goles/partido`, desc: `${totalGoals} goles en ${matchday} jornadas. ${parseFloat(avgGoals) > 2.5 ? 'Los dados han sido generosos esta temporada. Espectáculo asegurado.' : parseFloat(avgGoals) < 1.5 ? 'Temporada de dados conservadores. Pocos goles pero mucha intensidad.' : 'Promedio equilibrado. El dado reparte con justicia.'}` },
+      { title: `📊 El dado ha hablado: ${highScoringGames} goleadas en ${matchday} jornadas`, desc: `${highScoringGames > 3 ? 'Partidos de 5+ goles que no se olvidan fácil.' : 'Pocos escándalos en el marcador.'} El promedio general es de ${avgGoals} goles por partido.` },
+    ]), type: 'luck' });
+  }
+
+  return news.sort(() => Math.random() - 0.5).slice(0, 7);
+};
+
+const NewsIcon = ({ type }: { type: string }) => {
+  switch (type) {
+    case 'leader': return <Trophy size={18} className='text-yellow-400' />;
+    case 'crisis': case 'relegation': return <AlertCircle size={18} className='text-red-400' />;
+    case 'promotion': case 'rivalry': return <TrendingUp size={18} className='text-emerald-400' />;
+    case 'stats': case 'scorer': case 'defense': return <Flame size={18} className='text-orange-400' />;
+    case 'momentum': return <TrendingUp size={18} className='text-yellow-400' />;
+    case 'luck': return <Dice6 size={18} className='text-purple-400' />;
+    case 'preview': return <Eye size={18} className='text-cyan-400' />;
+    case 'generic': case 'surprise': return <Star size={18} className='text-blue-400' />;
+    default: return <Newspaper size={18} className='text-slate-300' />;
+  }
+};
+
+
 const PenaltyDots = ({ history }) => {
   const totalLen = history ? history.length : 0;
   const startIdx = totalLen % 5 === 0 && totalLen > 0 ? totalLen - 5 : totalLen - (totalLen % 5);
@@ -1172,6 +1524,7 @@ function DiceFootballApp() {
   const [championModalDiv, setChampionModalDiv] = useState(1);
   const [eliminatedModal, setEliminatedModal] = useState<{ compId: string; phase: string } | null>(null);
   const [resetConfirmModal, setResetConfirmModal] = useState(false);
+  const [showNewsModal, setShowNewsModal] = useState(false);
 
   useEffect(() => {
     if (view !== 'hub' || compView !== 'main') window.history.pushState(null, '', window.location.href);
@@ -1890,6 +2243,88 @@ function DiceFootballApp() {
           )}
         </AnimatePresence>
 
+        {/* NEWS MODAL */}
+        <AnimatePresence>
+          {showNewsModal && (() => {
+            const currentMd = isDiv2 ? (activeComp.matchday2 || 0) : (activeComp.matchday || 0);
+            const currentTms = isDiv2 ? (activeComp.teams2 || []) : (activeComp.teams || []);
+            const currentHist = isDiv2 ? (activeComp.history2 || []) : (activeComp.history || []);
+            const currentSched = currentTms.length > 0 ? generateLeagueSchedule(currentTms) : [];
+            const newsItems = generateNews(
+              currentTms,
+              activeComp.teams2 || [],
+              currentMd,
+              activeComp.type,
+              activeComp.name,
+              currentHist,
+              currentSched
+            );
+            return (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className='fixed inset-0 z-[70] flex items-end sm:items-center justify-center bg-black/90 backdrop-blur-md' onClick={() => setShowNewsModal(false)}>
+                <motion.div initial={{ y: 100, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 100, opacity: 0 }} transition={{ type: 'spring', damping: 25, stiffness: 300 }} onClick={e => e.stopPropagation()} className='bg-slate-900/95 backdrop-blur-xl w-full max-w-md rounded-t-[2.5rem] sm:rounded-[2.5rem] border border-amber-500/20 shadow-2xl relative overflow-hidden max-h-[85vh]'>
+                  <div className='absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-amber-500 to-transparent' />
+                  <div className='p-6'>
+                    <div className='flex items-center justify-between mb-5'>
+                      <div className='flex items-center gap-3'>
+                        <div className='w-10 h-10 bg-amber-500/20 rounded-2xl flex items-center justify-center shadow-[0_0_20px_rgba(245,158,11,0.2)]'>
+                          <Megaphone size={20} className='text-amber-400' />
+                        </div>
+                        <div>
+                          <h2 className='text-lg font-black italic uppercase text-white drop-shadow-md'>Noticias</h2>
+                          <p className='text-[8px] font-bold text-slate-400 uppercase tracking-widest'>Jornada {isDiv2 ? (activeComp.matchday2 || 0) : (activeComp.matchday || 0)} · {activeComp.name}</p>
+                        </div>
+                      </div>
+                      <button onClick={() => setShowNewsModal(false)} className='p-2 bg-slate-800/80 rounded-xl border border-white/10 active:scale-95 transition-all'>
+                        <X size={16} className='text-slate-400' />
+                      </button>
+                    </div>
+                    
+                    <div className='space-y-3 overflow-y-auto max-h-[60vh] pr-1 custom-scrollbar'>
+                      {newsItems.length === 0 ? (
+                        <div className='text-center py-10'>
+                          <Newspaper size={32} className='text-slate-600 mx-auto mb-3' />
+                          <p className='text-[10px] font-bold text-slate-500 uppercase italic'>No hay noticias aún. ¡Juega algunas jornadas!</p>
+                        </div>
+                      ) : (
+                        newsItems.map((news, i) => (
+                          <motion.div
+                            key={i}
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: i * 0.1 }}
+                            className='bg-black/40 backdrop-blur-md rounded-2xl p-4 border transition-all hover:border-opacity-60'
+                            style={{ borderColor: news.team?.color1 || '#ffffff', borderWidth: '1px', borderLeftWidth: '3px' }}
+                          >
+                            <div className='flex items-start gap-3'>
+                              <div className='mt-0.5 shrink-0'>
+                                <NewsIcon type={news.type} />
+                              </div>
+                              <div className='flex-grow min-w-0'>
+                                <h3 className='text-[11px] font-black italic text-white leading-snug mb-1 drop-shadow-sm'>{news.title}</h3>
+                                <p className='text-[9px] font-bold text-slate-400 leading-relaxed'>{news.desc}</p>
+                                {news.team && (
+                                  <div className='flex items-center gap-2 mt-2'>
+                                    <div className='w-3 h-3 rounded-full' style={{ background: `linear-gradient(135deg, ${news.team.color1}, ${news.team.color2})` }} />
+                                    <span className='text-[8px] font-black text-slate-500 uppercase tracking-wider'>{news.team.name}</span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </motion.div>
+                        ))
+                      )}
+                    </div>
+
+                    <button onClick={() => setShowNewsModal(false)} className='w-full mt-4 bg-slate-800/80 border border-white/10 text-slate-200 py-3 rounded-2xl text-[10px] font-black uppercase italic tracking-widest active:scale-95 transition-all'>
+                      Cerrar
+                    </button>
+                  </div>
+                </motion.div>
+              </motion.div>
+            );
+          })()}
+        </AnimatePresence>
+
         <AnimatePresence>
           {(currentShowWinner || readyForPromotion) && compView === 'main' && (() => {
             const sorted1 = activeComp.teams ? [...activeComp.teams].sort((a, b) => b.pts - a.pts || (b.gf - b.ga) - (a.gf - a.ga)) : [];
@@ -1978,49 +2413,45 @@ function DiceFootballApp() {
                     {isLeague ? (
                       <>
                         <h3 className='text-xs font-black uppercase text-slate-200 mb-3 text-center'>Clasificación</h3>
-                        <div className='bg-slate-900/30 rounded-2xl border border-white/10 overflow-hidden'>
+                        <div className='bg-slate-900/30 rounded-2xl border border-white/10 overflow-hidden overflow-x-auto custom-scrollbar' style={{ maxHeight: '50vh' }}>
                           <table className='w-full text-left border-collapse'>
-                            <thead className='bg-[#0f172a] sticky top-0 z-10'>
-                              <tr className='text-[8px] font-black uppercase italic text-slate-400'>
-                                <th className='p-2 sticky left-0 z-20 bg-[#0f172a]' style={{ minWidth: '28px' }}>Pos</th>
-                                <th className='p-2 sticky left-[28px] z-20 bg-[#0f172a]' style={{ minWidth: '110px' }}>Equipo</th>
-                                <th className='p-2 text-center sticky left-[138px] z-20 bg-[#0f172a] border-r border-white/10'>PJ</th>
-                                <th className='p-2 text-center'>G</th><th className='p-2 text-center'>E</th><th className='p-2 text-center'>P</th>
-                                <th className='p-2 text-center'>GF</th><th className='p-2 text-center'>GC</th><th className='p-2 text-center'>DG</th>
-                                <th className='p-2 text-center text-emerald-400'>Pts</th>
+                            <thead className='bg-[#0f172a] sticky top-0 z-20'>
+                              <tr className='text-[7px] font-black uppercase italic text-slate-400'>
+                                <th className='px-1 py-1.5 sticky left-0 z-30 bg-[#0f172a] w-6'>#</th>
+                                <th className='px-1 py-1.5 sticky left-[24px] z-30 bg-[#0f172a] min-w-[80px]'>Equipo</th>
+                                <th className='px-1 py-1.5 text-center sticky left-[104px] z-30 bg-[#0f172a] border-r border-white/10 w-6'>PJ</th>
+                                <th className='px-1 py-1.5 text-center w-5'>G</th><th className='px-1 py-1.5 text-center w-5'>E</th><th className='px-1 py-1.5 text-center w-5'>P</th>
+                                <th className='px-1 py-1.5 text-center w-6'>GF</th><th className='px-1 py-1.5 text-center w-6'>GC</th><th className='px-1 py-1.5 text-center w-6'>DG</th>
+                                <th className='px-1 py-1.5 text-center text-emerald-400 w-6'>Pts</th>
                               </tr>
                             </thead>
-                          </table>
-                          <div className='overflow-x-auto custom-scrollbar' style={{ maxHeight: '50vh' }}>
-                            <table className='w-full text-left border-collapse min-w-[480px]'>
-                              <tbody className='divide-y divide-white/5'>
+                            <tbody className='divide-y divide-white/5'>
                                 {displayTeams.map((t, i) => {
                                   const isPromo = championModalDiv === 2 && i < 3;
                                   const isReleg = championModalDiv === 1 && i >= displayTeams.length - 3;
                                   const rowBg = i === 0 ? 'bg-yellow-500/15' : isPromo ? 'bg-emerald-900/20' : isReleg ? 'bg-red-900/20' : '';
                                   return (
                                     <tr key={t.id} className={rowBg}>
-                                      <td className={'p-2 text-[10px] font-black italic sticky left-0 z-10 bg-[#0f172a] ' + (i === 0 ? 'text-yellow-400' : isPromo ? 'text-emerald-400' : isReleg ? 'text-red-400' : 'text-slate-300')} style={{ minWidth: '28px' }}>{i+1}</td>
-                                      <td className='p-2 sticky left-[28px] z-10 bg-[#0f172a]' style={{ minWidth: '110px' }}>
-                                        <div className='flex items-center gap-1.5'>
+                                      <td className={'px-1 py-1.5 text-[9px] font-black italic sticky left-0 z-10 bg-[#0f172a] ' + (i === 0 ? 'text-yellow-400' : isPromo ? 'text-emerald-400' : isReleg ? 'text-red-400' : 'text-slate-300')}>{i+1}</td>
+                                      <td className='px-1 py-1.5 sticky left-[24px] z-10 bg-[#0f172a] min-w-[80px]'>
+                                        <div className='flex items-center gap-1'>
                                           <Shield color1={t.color1} color2={t.color2} initial={t.name} size='xs' isFlag={t.isFlag}/>
-                                          <span className='text-[9px] font-bold uppercase truncate italic max-w-[80px]'>{t.name}</span>
+                                          <span className='text-[8px] font-bold uppercase truncate italic max-w-[60px]'>{t.name}</span>
                                         </div>
                                       </td>
-                                      <td className='p-2 text-center text-[10px] font-bold sticky left-[138px] z-10 bg-[#0f172a] border-r border-white/10'>{t.p}</td>
-                                      <td className='p-2 text-center text-[10px] font-bold'>{t.w}</td>
-                                      <td className='p-2 text-center text-[10px] font-bold'>{t.d}</td>
-                                      <td className='p-2 text-center text-[10px] font-bold'>{t.l}</td>
-                                      <td className='p-2 text-center text-[10px] font-bold'>{t.gf}</td>
-                                      <td className='p-2 text-center text-[10px] font-bold'>{t.ga}</td>
-                                      <td className='p-2 text-center text-[10px] font-bold'>{t.gf - t.ga}</td>
-                                      <td className='p-2 text-center text-[10px] font-black text-emerald-400'>{t.pts}</td>
+                                      <td className='px-1 py-1.5 text-center text-[9px] font-bold sticky left-[104px] z-10 bg-[#0f172a] border-r border-white/10'>{t.p}</td>
+                                      <td className='px-1 py-1.5 text-center text-[9px] font-bold'>{t.w}</td>
+                                      <td className='px-1 py-1.5 text-center text-[9px] font-bold'>{t.d}</td>
+                                      <td className='px-1 py-1.5 text-center text-[9px] font-bold'>{t.l}</td>
+                                      <td className='px-1 py-1.5 text-center text-[9px] font-bold'>{t.gf}</td>
+                                      <td className='px-1 py-1.5 text-center text-[9px] font-bold'>{t.ga}</td>
+                                      <td className='px-1 py-1.5 text-center text-[9px] font-bold'>{t.gf - t.ga}</td>
+                                      <td className='px-1 py-1.5 text-center text-[9px] font-black text-emerald-400'>{t.pts}</td>
                                     </tr>
                                   );
                                 })}
                               </tbody>
                             </table>
-                          </div>
                         </div>
                       </>
                     ) : (
@@ -2034,39 +2465,36 @@ function DiceFootballApp() {
                                 <div className='bg-[#0f172a] p-2 border-b border-white/10'>
                                   <h4 className='text-[10px] font-black uppercase text-blue-400 flex items-center gap-1.5'><ShieldIcon size={10} /> {group.name}</h4>
                                 </div>
-                                {/* Fixed header */}
-                                <table className='w-full text-left border-collapse'>
-                                  <thead className='bg-[#0f172a]'>
-                                    <tr className='text-[8px] font-black uppercase italic text-slate-400'>
-                                      <th className='p-1.5 sticky left-0 z-20 bg-[#0f172a]' style={{ minWidth: '24px' }}>Pos</th>
-                                      <th className='p-1.5 sticky left-[24px] z-20 bg-[#0f172a]' style={{ minWidth: '90px' }}>Equipo</th>
-                                      <th className='p-1.5 text-center sticky left-[114px] z-20 bg-[#0f172a] border-r border-white/10'>PJ</th>
-                                      <th className='p-1.5 text-center'>G</th><th className='p-1.5 text-center'>E</th><th className='p-1.5 text-center'>P</th>
-                                      <th className='p-1.5 text-center'>GF</th><th className='p-1.5 text-center'>GC</th><th className='p-1.5 text-center'>DG</th>
-                                      <th className='p-1.5 text-center text-emerald-400'>Pts</th>
-                                    </tr>
-                                  </thead>
-                                </table>
                                 <div className='overflow-x-auto custom-scrollbar'>
-                                  <table className='w-full text-left border-collapse min-w-[400px]'>
+                                  <table className='w-full text-left border-collapse'>
+                                    <thead className='bg-[#0f172a] sticky top-0 z-20'>
+                                      <tr className='text-[7px] font-black uppercase italic text-slate-400'>
+                                        <th className='px-1 py-1 sticky left-0 z-30 bg-[#0f172a] w-5'>#</th>
+                                        <th className='px-1 py-1 sticky left-[20px] z-30 bg-[#0f172a] min-w-[70px]'>Equipo</th>
+                                        <th className='px-1 py-1 text-center sticky left-[90px] z-30 bg-[#0f172a] border-r border-white/10 w-5'>PJ</th>
+                                        <th className='px-1 py-1 text-center w-5'>G</th><th className='px-1 py-1 text-center w-5'>E</th><th className='px-1 py-1 text-center w-5'>P</th>
+                                        <th className='px-1 py-1 text-center w-5'>GF</th><th className='px-1 py-1 text-center w-5'>GC</th><th className='px-1 py-1 text-center w-5'>DG</th>
+                                        <th className='px-1 py-1 text-center text-emerald-400 w-5'>Pts</th>
+                                      </tr>
+                                    </thead>
                                     <tbody className='divide-y divide-white/5'>
                                       {groupTeams.map((t, i) => (
                                         <tr key={t.id} className={i < 2 ? 'bg-emerald-900/15' : ''}>
-                                          <td className='p-1.5 text-[9px] font-black italic text-slate-300 sticky left-0 z-10 bg-[#0f172a]' style={{ minWidth: '24px' }}>{i+1}</td>
-                                          <td className='p-1.5 sticky left-[24px] z-10 bg-[#0f172a]' style={{ minWidth: '90px' }}>
+                                          <td className='px-1 py-1 text-[8px] font-black italic text-slate-300 sticky left-0 z-10 bg-[#0f172a]'>{i+1}</td>
+                                          <td className='px-1 py-1 sticky left-[20px] z-10 bg-[#0f172a] min-w-[70px]'>
                                             <div className='flex items-center gap-1'>
                                               <Shield color1={t.color1} color2={t.color2} initial={t.name} size='xs' isFlag={t.isFlag}/>
-                                              <span className='text-[8px] font-bold uppercase truncate italic max-w-[65px]'>{t.name}</span>
+                                              <span className='text-[8px] font-bold uppercase truncate italic max-w-[50px]'>{t.name}</span>
                                             </div>
                                           </td>
-                                          <td className='p-1.5 text-center text-[9px] font-bold sticky left-[114px] z-10 bg-[#0f172a] border-r border-white/10'>{t.p}</td>
-                                          <td className='p-1.5 text-center text-[9px] font-bold'>{t.w}</td>
-                                          <td className='p-1.5 text-center text-[9px] font-bold'>{t.d}</td>
-                                          <td className='p-1.5 text-center text-[9px] font-bold'>{t.l}</td>
-                                          <td className='p-1.5 text-center text-[9px] font-bold'>{t.gf}</td>
-                                          <td className='p-1.5 text-center text-[9px] font-bold'>{t.ga}</td>
-                                          <td className='p-1.5 text-center text-[9px] font-bold'>{t.gf - t.ga}</td>
-                                          <td className='p-1.5 text-center text-[9px] font-black text-emerald-400'>{t.pts}</td>
+                                          <td className='px-1 py-1 text-center text-[8px] font-bold sticky left-[90px] z-10 bg-[#0f172a] border-r border-white/10'>{t.p}</td>
+                                          <td className='px-1 py-1 text-center text-[8px] font-bold'>{t.w}</td>
+                                          <td className='px-1 py-1 text-center text-[8px] font-bold'>{t.d}</td>
+                                          <td className='px-1 py-1 text-center text-[8px] font-bold'>{t.l}</td>
+                                          <td className='px-1 py-1 text-center text-[8px] font-bold'>{t.gf}</td>
+                                          <td className='px-1 py-1 text-center text-[8px] font-bold'>{t.ga}</td>
+                                          <td className='px-1 py-1 text-center text-[8px] font-bold'>{t.gf - t.ga}</td>
+                                          <td className='px-1 py-1 text-center text-[8px] font-black text-emerald-400'>{t.pts}</td>
                                         </tr>
                                       ))}
                                     </tbody>
@@ -2085,9 +2513,9 @@ function DiceFootballApp() {
                 {championModalTab === 'results' && (
                   <div>
                     <h3 className='text-xs font-black uppercase text-slate-200 mb-3 text-center'>Resultados</h3>
-                    <div className='space-y-3'>
+                    <div className='space-y-3 max-h-[60vh] overflow-y-auto custom-scrollbar pr-1'>
                       {displayHistory.length === 0 && <p className='text-center text-[10px] text-slate-400 italic py-8'>No hay resultados.</p>}
-                      {displayHistory.slice(0, 5).map((h, i) => (
+                      {displayHistory.map((h, i) => (
                         <div key={i} className='bg-black/20 rounded-xl p-2.5 border border-white/5'>
                           <h4 className='text-[8px] font-black uppercase text-blue-300 mb-1.5'>Jornada {h.day}</h4>
                           <div className='space-y-1'>
@@ -2111,7 +2539,6 @@ function DiceFootballApp() {
                           </div>
                         </div>
                       ))}
-                      {displayHistory.length > 5 && <p className='text-center text-[8px] text-slate-400 italic'>... y {displayHistory.length - 5} jornadas más</p>}
                     </div>
                   </div>
                 )}
@@ -2282,7 +2709,7 @@ function DiceFootballApp() {
              <MenuButton icon={<Users size={18} className='text-indigo-400'/>} label="Equipo" onClick={() => setCompView('teamSelect')} />
            )}
 
-           <MenuButton icon={<Users size={16} className='text-indigo-400'/>} label="Mi Equipo" onClick={() => setCompView('teamSelect')} isWide />
+           <MenuButton icon={<Newspaper size={16} className='text-amber-400'/>} label="Noticias" onClick={() => setShowNewsModal(true)} isWide />
            <MenuButton icon={<Settings size={16} className='text-slate-300'/>} label="Ajustes" onClick={() => setCompView('config')} isWide />
         </div>
 
@@ -2448,7 +2875,7 @@ function DiceFootballApp() {
           {(!Array.isArray(currentHistory) || currentHistory.length === 0) && <div className='text-center py-20 text-slate-300 bg-slate-900/30 backdrop-blur-md rounded-[2rem] border border-white/5 italic font-bold uppercase text-[10px] shadow-lg'>No hay partidos jugados aún.</div>}
           {Array.isArray(currentHistory) && currentHistory.map((h, i) => (
             <div key={i} className='bg-slate-900/30 backdrop-blur-md rounded-3xl p-4 border border-white/10 shadow-lg'>
-              <h3 className='text-[9px] font-black uppercase text-blue-300 mb-3 drop-shadow-md'>Jornada/Día: {h.day}</h3>
+              <h3 className='text-[9px] font-black uppercase text-blue-300 mb-3 drop-shadow-md'>Jornada {h.day}</h3>
               <div className='space-y-2'>
                 {Array.isArray(h.results) && h.results.map((r, ri) => {
                   const home = Array.isArray(currentTeams) ? currentTeams.find(t => t.id === r.hId) : null;
@@ -2697,9 +3124,14 @@ function DiceFootballApp() {
       if (!matchState) return null;
       return (
         <div className='flex-grow flex flex-col px-4'>
-        <div className='flex justify-between items-center mb-6'>
+        <div className='flex justify-between items-center mb-4'>
           <button onClick={() => setCompView('main')} className='p-2 bg-slate-900/30 backdrop-blur-md border border-white/10 rounded-xl text-slate-200 active:scale-95 transition-all'><ChevronLeft /></button>
-          <div className='px-4 py-1 bg-red-600/80 backdrop-blur-md rounded-full text-[9px] font-black uppercase italic animate-pulse shadow-md'>En Vivo</div>
+          <div className='flex flex-col items-center gap-1'>
+            <div className='px-4 py-1 bg-red-600/80 backdrop-blur-md rounded-full text-[9px] font-black uppercase italic animate-pulse shadow-md'>En Vivo</div>
+            <span className='text-[8px] font-black uppercase italic text-slate-300 tracking-wider'>
+              {activeComp.phase === 'Final' ? '🏆 Gran Final' : isLeague || activeComp.phase === 'groups' ? `📅 Jornada ${currentMatchday + 1}` : `⚔️ ${activeComp.phase}${activeCompId === 'C1' ? (activeComp.matchday % 2 === 0 ? ' — Ida' : ' — Vuelta') : ''}`}
+            </span>
+          </div>
           <div className='w-10'></div>
         </div>
 
@@ -2819,4 +3251,3 @@ function DiceFootballApp() {
 }
 
 export default DiceFootballApp;
-
