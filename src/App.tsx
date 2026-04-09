@@ -734,7 +734,7 @@ const pick = (arr: any[]) => arr[Math.floor(Math.random() * arr.length)];
 
 const generateNews = (teams: any[], teams2: any[], matchday: number, compType: string, compName: string, history?: any[], schedule?: any[][]) => {
   if (!teams || teams.length === 0) return [];
-  
+
   const sorted = [...teams].sort((a, b) => b.pts - a.pts || (b.gf - b.ga) - (a.gf - a.ga));
   const sorted2 = teams2 && teams2.length > 0 ? [...teams2].sort((a, b) => b.pts - a.pts || (b.gf - b.ga) - (a.gf - a.ga)) : [];
   const news: any[] = [];
@@ -757,11 +757,11 @@ const generateNews = (teams: any[], teams2: any[], matchday: number, compType: s
     let streakType = '';
     let streakCount = 0;
     for (const day of history) {
-      const res = day.results?.find((r: any) => r.homeId === teamId || r.awayId === teamId);
+      const res = day.results?.find((r: any) => r.hId === teamId || r.aId === teamId);
       if (!res) continue;
-      const isHome = res.homeId === teamId;
-      const gf = isHome ? res.homeGoals : res.awayGoals;
-      const ga = isHome ? res.awayGoals : res.homeGoals;
+      const isHome = res.hId === teamId;
+      const gf = isHome ? res.sh : res.sa;
+      const ga = isHome ? res.sa : res.sh;
       const result = gf > ga ? 'W' : gf === ga ? 'D' : 'L';
       streak += result;
       if (streak.length <= 1) { streakType = result; streakCount = 1; }
@@ -845,7 +845,7 @@ const generateNews = (teams: any[], teams2: any[], matchday: number, compType: s
     // Equipos con att bajo pero muchos goles (suerte en los dados)
     const luckyTeams = sorted.filter(t => !usedIds.has(t.id) && (t.att || 3) <= 3 && (t.gf || 0) > matchday * 1.3);
     const unluckyTeams = sorted.filter(t => !usedIds.has(t.id) && (t.att || 3) >= 4 && matchday > 0 && (t.gf || 0) < matchday * 0.7);
-    
+
     if (luckyTeams.length > 0) {
       const lucky = pick(luckyTeams);
       const gpm = ((lucky.gf || 0) / matchday).toFixed(1);
@@ -897,7 +897,7 @@ const generateNews = (teams: any[], teams2: any[], matchday: number, compType: s
       const hForm = hStreak.results.slice(0, 4).split('').map(r => r === 'W' ? '✅' : r === 'D' ? '🟡' : '🔴').join('');
       const aForm = aStreak.results.slice(0, 4).split('').map(r => r === 'W' ? '✅' : r === 'D' ? '🟡' : '🔴').join('');
       const formText = (hForm || aForm) ? ` Forma: ${h.name} ${hForm || '—'} vs ${aForm || '—'} ${a.name}.` : '';
-      
+
       if (hPos <= 3 && aPos <= 3) {
         addNews({ ...pick([
           { title: `🔜 PREVIA: ${h.name} vs ${a.name} — Duelo en la cima`, desc: `${hPos}º contra ${aPos}º. Un partido que puede definir la parte alta de la tabla.${formText} Jornada ${matchday + 1}, no se lo pierdan.` },
@@ -1520,7 +1520,7 @@ function DiceFootballApp() {
   const [compView, setCompView] = useState('main');
   const [viewDiv, setViewDiv] = useState(1); 
   const [showSaveModal, setShowSaveModal] = useState(false);
-  const [championModalTab, setChampionModalTab] = useState<'champion' | 'stats' | 'results' | 'promotions' | 'bracket'>('champion');
+  const [championModalTab, setChampionModalTab] = useState<'stats' | 'results' | 'promotions' | 'bracket'>('stats');
   const [championModalDiv, setChampionModalDiv] = useState(1);
   const [eliminatedModal, setEliminatedModal] = useState<{ compId: string; phase: string } | null>(null);
   const [resetConfirmModal, setResetConfirmModal] = useState(false);
@@ -2278,7 +2278,7 @@ function DiceFootballApp() {
                         <X size={16} className='text-slate-400' />
                       </button>
                     </div>
-                    
+
                     <div className='space-y-3 overflow-y-auto max-h-[60vh] pr-1 custom-scrollbar'>
                       {newsItems.length === 0 ? (
                         <div className='text-center py-10'>
@@ -2398,7 +2398,7 @@ function DiceFootballApp() {
               </div>
 
               {/* Div switcher for leagues */}
-              {isLeague && championModalTab !== 'champion' && (
+              {isLeague && (
                 <div className='flex mx-4 mt-2 bg-slate-800/60 p-0.5 rounded-xl border border-white/10 shrink-0'>
                   <button onClick={() => setChampionModalDiv(1)} className={`flex-1 py-1.5 text-[9px] font-black uppercase italic rounded-lg transition-all ${championModalDiv === 1 ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400'}`}>1ª División</button>
                   <button onClick={() => setChampionModalDiv(2)} className={`flex-1 py-1.5 text-[9px] font-black uppercase italic rounded-lg transition-all ${championModalDiv === 2 ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-400'}`}>2ª División</button>
@@ -2413,7 +2413,7 @@ function DiceFootballApp() {
                     {isLeague ? (
                       <>
                         <h3 className='text-xs font-black uppercase text-slate-200 mb-3 text-center'>Clasificación</h3>
-                        <div className='bg-slate-900/30 rounded-2xl border border-white/10 overflow-hidden overflow-x-auto custom-scrollbar' style={{ maxHeight: '50vh' }}>
+                        <div className='bg-slate-900/30 rounded-2xl border border-white/10 overflow-x-auto overflow-y-auto custom-scrollbar' style={{ maxHeight: '50vh' }}>
                           <table className='w-full text-left border-collapse'>
                             <thead className='bg-[#0f172a] sticky top-0 z-20'>
                               <tr className='text-[7px] font-black uppercase italic text-slate-400'>
@@ -2645,7 +2645,7 @@ function DiceFootballApp() {
                   </button>
                 ) : isLeague && readyForPromotion && championModalTab === 'promotions' ? (
                   <button onClick={() => {
-                    setChampionModalTab('champion');
+                    setChampionModalTab('stats');
                     setChampionModalDiv(1);
                     handlePromotionAndNewSeason();
                   }} className='w-full bg-gradient-to-r from-yellow-500 to-amber-600 text-slate-950 py-4 rounded-2xl text-[11px] font-black uppercase italic tracking-widest shadow-xl active:scale-95 transition-all flex items-center justify-center gap-2'>
@@ -2654,12 +2654,12 @@ function DiceFootballApp() {
                 ) : !isLeague ? (
                   <div className='flex gap-2'>
                     <button onClick={() => {
-                       setChampionModalTab('champion');
+                       setChampionModalTab('stats');
                        setChampionModalDiv(1);
                        updateActiveComp({ showWinner: false });
                     }} className='flex-1 bg-slate-800/80 border border-white/10 text-slate-200 py-3.5 rounded-2xl text-[10px] font-black uppercase italic tracking-widest active:scale-95 transition-all'>Cerrar</button>
                     <button onClick={() => {
-                       setChampionModalTab('champion');
+                       setChampionModalTab('stats');
                        setChampionModalDiv(1);
                        handleTotalReset(activeCompId);
                        updateActiveComp({ showWinner: false });
@@ -2669,7 +2669,7 @@ function DiceFootballApp() {
                   </div>
                 ) : (
                   <button onClick={() => {
-                     setChampionModalTab('champion');
+                     setChampionModalTab('stats');
                      setChampionModalDiv(1);
                      if (isDiv2) updateActiveComp({ showWinner2: false }); else updateActiveComp({ showWinner: false });
                   }} className='w-full bg-gradient-to-r from-yellow-500 to-amber-600 text-slate-950 py-4 rounded-2xl text-[11px] font-black uppercase italic tracking-widest shadow-xl active:scale-95 transition-all'>Continuar</button>
