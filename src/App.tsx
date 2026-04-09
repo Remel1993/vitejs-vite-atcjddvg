@@ -204,6 +204,80 @@ const PRESETS = {
 };
 
 // ==========================================
+// DERBYS Y CLÁSICOS
+// ==========================================
+const DERBY_PAIRS: { teams: [string, string]; name: string; emoji: string; intensity: number }[] = [
+  // España
+  { teams: ['Real Madrid', 'FC Barcelona'], name: 'El Clásico', emoji: '🔥', intensity: 5 },
+  { teams: ['Real Madrid', 'Atlético Madrid'], name: 'Derby de Madrid', emoji: '⚔️', intensity: 5 },
+  { teams: ['FC Barcelona', 'Espanyol'], name: 'Derby Catalán', emoji: '🏟️', intensity: 4 },
+  { teams: ['Sevilla FC', 'Real Betis'], name: 'Gran Derbi de Sevilla', emoji: '💚❤️', intensity: 5 },
+  { teams: ['Real Sociedad', 'Athletic Club'], name: 'Derby Vasco', emoji: '🔴🔵', intensity: 5 },
+  { teams: ['Valencia CF', 'Villarreal CF'], name: 'Derby de la Comunitat', emoji: '🍊', intensity: 3 },
+  { teams: ['Celta Vigo', 'Dep. La Coruña'], name: 'Derby Gallego', emoji: '🌊', intensity: 4 },
+  { teams: ['Real Oviedo', 'Sporting Gijón'], name: 'Derby Asturiano', emoji: '⛰️', intensity: 5 },
+  // Italia
+  { teams: ['Inter Milan', 'AC Milan'], name: 'Derby della Madonnina', emoji: '🏛️', intensity: 5 },
+  { teams: ['AS Roma', 'Lazio'], name: 'Derby della Capitale', emoji: '🐺🦅', intensity: 5 },
+  { teams: ['Juventus', 'Inter Milan'], name: 'Derby d\'Italia', emoji: '🇮🇹', intensity: 5 },
+  { teams: ['Juventus', 'Torino'], name: 'Derby della Mole', emoji: '🏔️', intensity: 5 },
+  { teams: ['Genoa', 'Sampdoria'], name: 'Derby della Lanterna', emoji: '🏮', intensity: 4 },
+  { teams: ['Napoli', 'Juventus'], name: 'Il Grande Classico', emoji: '⚡', intensity: 4 },
+  // Inglaterra
+  { teams: ['Liverpool FC', 'Man United'], name: 'Northwest Derby', emoji: '🔴', intensity: 5 },
+  { teams: ['Manchester City', 'Man United'], name: 'Manchester Derby', emoji: '🏙️', intensity: 5 },
+  { teams: ['Arsenal FC', 'Tottenham'], name: 'North London Derby', emoji: '🏟️', intensity: 5 },
+  { teams: ['Liverpool FC', 'Everton'], name: 'Merseyside Derby', emoji: '🔵🔴', intensity: 5 },
+  { teams: ['Chelsea FC', 'Arsenal FC'], name: 'London Rivalry', emoji: '🇬🇧', intensity: 4 },
+  { teams: ['Chelsea FC', 'Tottenham'], name: 'London Derby', emoji: '💙🤍', intensity: 4 },
+  { teams: ['Newcastle', 'Sunderland'], name: 'Tyne-Wear Derby', emoji: '⚫⬜', intensity: 5 },
+  { teams: ['Leeds United', 'Man United'], name: 'Roses Rivalry', emoji: '🌹', intensity: 5 },
+  // Alemania
+  { teams: ['Bayern Munich', 'B. Dortmund'], name: 'Der Klassiker', emoji: '🇩🇪', intensity: 5 },
+  { teams: ['B. Dortmund', 'Schalke 04'], name: 'Revierderby', emoji: '⛏️', intensity: 5 },
+  { teams: ['Bayern Munich', 'B. Leverkusen'], name: 'TopSpiel', emoji: '🔝', intensity: 4 },
+  { teams: ['Werder Bremen', 'Hamburger SV'], name: 'Nordderby', emoji: '🌊', intensity: 4 },
+  // Francia
+  { teams: ['PSG', 'Marseille'], name: 'Le Classique', emoji: '🇫🇷', intensity: 5 },
+  { teams: ['Olympique Lyon', 'Saint-Étienne'], name: 'Derby Rhône-Alpes', emoji: '🦁', intensity: 5 },
+  { teams: ['Olympique Lyon', 'Marseille'], name: 'Olympique Clásico', emoji: '🏛️', intensity: 4 },
+  { teams: ['RC Lens', 'Lille OSC'], name: 'Derby du Nord', emoji: '🏗️', intensity: 4 },
+  // Holanda
+  { teams: ['Ajax', 'Feyenoord'], name: 'De Klassieker', emoji: '🇳🇱', intensity: 5 },
+  { teams: ['Ajax', 'PSV Eindhoven'], name: 'De Topper', emoji: '🏆', intensity: 5 },
+  { teams: ['Feyenoord', 'Sparta Rotterdam'], name: 'Stadsderby Rotterdam', emoji: '🏙️', intensity: 4 },
+  // Portugal / Miscelánea
+  { teams: ['Benfica', 'Sporting CP'], name: 'Derby de Lisboa', emoji: '🏟️', intensity: 5 },
+  { teams: ['FC Porto', 'Benfica'], name: 'O Clássico', emoji: '🇵🇹', intensity: 5 },
+  { teams: ['FC Porto', 'Sporting CP'], name: 'Clássico Lusitano', emoji: '🏛️', intensity: 4 },
+  { teams: ['Celtic FC', 'Rangers FC'], name: 'Old Firm', emoji: '🏴󠁧󠁢󠁳󠁣󠁴󠁿', intensity: 5 },
+  { teams: ['Galatasaray', 'Fenerbahçe'], name: 'Kıtalar Arası Derbi', emoji: '🇹🇷', intensity: 5 },
+  { teams: ['Olympiacos', 'Panathinaikos'], name: 'Derby de los Eternos', emoji: '🇬🇷', intensity: 5 },
+  // Mundiales
+  { teams: ['Argentina', 'Brazil'], name: 'Superclásico Sudamericano', emoji: '🌎', intensity: 5 },
+  { teams: ['Argentina', 'England'], name: 'La Mano de Dios', emoji: '✋', intensity: 5 },
+  { teams: ['Argentina', 'Germany'], name: 'Clásico Mundial', emoji: '🏆', intensity: 5 },
+  { teams: ['Brazil', 'Germany'], name: 'Rivalidad Histórica', emoji: '⚽', intensity: 4 },
+  { teams: ['France', 'Germany'], name: 'Le Classique Internacional', emoji: '🇪🇺', intensity: 4 },
+  { teams: ['Spain', 'Italy'], name: 'Mediterráneo', emoji: '🌊', intensity: 4 },
+  { teams: ['England', 'Germany'], name: 'Rivalidad Eterna', emoji: '🦁🦅', intensity: 5 },
+  { teams: ['France', 'Argentina'], name: 'Final del Mundo', emoji: '🏆', intensity: 5 },
+  { teams: ['Mexico', 'USA'], name: 'Clásico de CONCACAF', emoji: '🌮🗽', intensity: 5 },
+  { teams: ['Brazil', 'Argentina'], name: 'Superclásico de las Américas', emoji: '🔥', intensity: 5 },
+  { teams: ['Uruguay', 'Argentina'], name: 'Clásico del Río de la Plata', emoji: '🌊', intensity: 5 },
+  { teams: ['Chile', 'Argentina'], name: 'Clásico Trasandino', emoji: '🏔️', intensity: 4 },
+  { teams: ['Colombia', 'Argentina'], name: 'Clásico Suramericano', emoji: '☕', intensity: 3 },
+];
+
+// Helper para detectar derbys
+const findDerby = (teamName1: string, teamName2: string) => {
+  return DERBY_PAIRS.find(d =>
+    (d.teams[0] === teamName1 && d.teams[1] === teamName2) ||
+    (d.teams[0] === teamName2 && d.teams[1] === teamName1)
+  );
+};
+
+// ==========================================
 // NUEVO: PRESETS SEGUNDA DIVISIÓN
 // ==========================================
 const PRESETS_2 = {
@@ -756,19 +830,21 @@ const generateNews = (teams: any[], teams2: any[], matchday: number, compType: s
     let streak = '';
     let streakType = '';
     let streakCount = 0;
-    for (const day of history) {
+    // Iterar de más reciente a más antiguo para obtener la racha ACTUAL
+    for (let i = history.length - 1; i >= 0; i--) {
+      const day = history[i];
       const res = day.results?.find((r: any) => r.hId === teamId || r.aId === teamId);
       if (!res) continue;
       const isHome = res.hId === teamId;
       const gf = isHome ? res.sh : res.sa;
       const ga = isHome ? res.sa : res.sh;
       const result = gf > ga ? 'W' : gf === ga ? 'D' : 'L';
-      streak += result;
-      if (streak.length <= 1) { streakType = result; streakCount = 1; }
+      streak = result + streak; // prepend para mantener orden cronológico en el string
+      if (streakCount === 0) { streakType = result; streakCount = 1; }
       else if (result === streakType) streakCount++;
       else break;
     }
-    return { type: streakType, count: streakCount, results: streak.slice(0, 5) };
+    return { type: streakType, count: streakCount, results: streak.slice(-5) };
   };
 
   // === LIDERATO ===
@@ -865,31 +941,34 @@ const generateNews = (teams: any[], teams2: any[], matchday: number, compType: s
     }
   }
 
-  // === PREVIA DE PARTIDO INTERESANTE (próxima jornada) ===
+  // === PREVIA DE PARTIDO: DERBY / CLÁSICO / PARTIDO INTERESANTE ===
   if (schedule && schedule[matchday]) {
     const nextRound = schedule[matchday];
-    // Buscar el partido más atractivo: 1º vs 2º, o equipos con rachas opuestas
     let bestMatch: any = null;
     let bestScore = 0;
+    let bestDerby: any = null;
+
     for (const m of nextRound) {
       const h = sorted.find(t => t.id === m.homeId);
       const a = sorted.find(t => t.id === m.awayId);
       if (!h || !a) continue;
       const hRank = sorted.indexOf(h);
       const aRank = sorted.indexOf(a);
-      // Más atractivo si ambos están arriba, o si la diferencia de posiciones es grande (sorpresa)
+      const derby = findDerby(h.name, a.name);
       let score = 0;
-      if (hRank < 4 && aRank < 4) score += 10; // duelo directo arriba
-      if (hRank < 2 || aRank < 2) score += 5; // involucra al líder
+      if (derby) score += 15 + derby.intensity * 3; // derbys tienen máxima prioridad
+      if (hRank < 4 && aRank < 4) score += 10;
+      if (hRank < 2 || aRank < 2) score += 5;
       const hStreak = getStreak(h.id);
       const aStreak = getStreak(a.id);
       if (hStreak.type === 'W' && hStreak.count >= 2) score += 3;
       if (aStreak.type === 'W' && aStreak.count >= 2) score += 3;
-      if (hStreak.type === 'W' && aStreak.type === 'L') score += 4; // contraste
+      if (hStreak.type === 'W' && aStreak.type === 'L') score += 4;
       if (aStreak.type === 'W' && hStreak.type === 'L') score += 4;
       if (Math.abs(hRank - aRank) <= 2 && hRank < totalTeams / 2) score += 2;
-      if (score > bestScore) { bestScore = score; bestMatch = { h, a, hStreak, aStreak }; }
+      if (score > bestScore) { bestScore = score; bestMatch = { h, a, hStreak, aStreak }; bestDerby = derby; }
     }
+
     if (bestMatch && bestScore >= 3 && !usedIds.has(bestMatch.h.id) && !usedIds.has(bestMatch.a.id)) {
       const { h, a, hStreak, aStreak } = bestMatch;
       const hPos = sorted.indexOf(h) + 1;
@@ -898,16 +977,85 @@ const generateNews = (teams: any[], teams2: any[], matchday: number, compType: s
       const aForm = aStreak.results.slice(0, 4).split('').map(r => r === 'W' ? '✅' : r === 'D' ? '🟡' : '🔴').join('');
       const formText = (hForm || aForm) ? ` Forma: ${h.name} ${hForm || '—'} vs ${aForm || '—'} ${a.name}.` : '';
 
-      if (hPos <= 3 && aPos <= 3) {
+      if (bestDerby) {
+        // ¡ES UN DERBY O CLÁSICO!
+        const d = bestDerby;
+        const ptsDiff = Math.abs(h.pts - a.pts);
+        const bothTop = hPos <= 5 && aPos <= 5;
+        const titleRace = ptsDiff <= 6 && bothTop;
+        const cupContext = compType !== 'league';
+
+        const derbyOpts = [
+          { title: `${d.emoji} ¡${d.name}! ${h.name} vs ${a.name}`, desc: `¡SE VIENE EL PARTIDO MÁS ESPERADO! ${d.name} en la jornada ${matchday + 1}. ${titleRace ? `¡Y con pelea por el título! Solo ${ptsDiff} puntos separan a estos rivales en la tabla.` : `Cuando estos dos se enfrentan, la tabla no importa. Es puro orgullo, pura rivalidad.`}${formText} ¡No hay favoritos en un derby!` },
+          { title: `${d.emoji} ALERTA DERBY: ${d.name} — J${matchday + 1}`, desc: `${h.name} (${hPos}º) recibe al ${a.name} (${aPos}º). ${d.intensity >= 5 ? 'El partido más caliente del calendario. La rivalidad se siente en cada rincón.' : 'Un clásico que siempre da espectáculo.'} ${hStreak.count >= 3 && hStreak.type === 'W' ? `${h.name} llega con ${hStreak.count} victorias seguidas, ¿lo notarán los rivales?` : aStreak.count >= 3 && aStreak.type === 'W' ? `${a.name} viene en racha de ${aStreak.count} triunfos. Peligro.` : 'Todo puede pasar.'}${formText}` },
+          { title: `${d.emoji} ${d.name}: ¡LA CIUDAD TIEMBLA!`, desc: `¡${h.name} vs ${a.name}! Se paraliza todo. ${phase === 'final' ? '¡Y en la recta final de la temporada! Cada punto vale doble en un derby así.' : phase === 'late' ? 'En plena fase decisiva, un derby puede cambiar el rumbo de la temporada.' : 'La rivalidad no entiende de estadísticas ni de momentos.'} ${bothTop ? 'Ambos en la parte alta, duelo directo con implicaciones.' : 'No importa la tabla cuando suena el himno de este derby.'}${formText}` },
+        ];
+        if (cupContext) {
+          derbyOpts.push({ title: `${d.emoji} ¡${d.name} EN ELIMINATORIA!`, desc: `¡INCREÍBLE! El sorteo ha emparejado a ${h.name} y ${a.name} en la ${compName}. ¡${d.name} en formato de copa, sin red, sin margen de error! El que pierda, a casa. El que gane, leyenda. ¡Esto es de película!` });
+        }
+        addNews({ ...pick(derbyOpts), team: h, type: 'derby' });
+      } else if (hPos <= 3 && aPos <= 3) {
         addNews({ ...pick([
-          { title: `🔜 PREVIA: ${h.name} vs ${a.name} — Duelo en la cima`, desc: `${hPos}º contra ${aPos}º. Un partido que puede definir la parte alta de la tabla.${formText} Jornada ${matchday + 1}, no se lo pierdan.` },
-          { title: `⚡ Partidazo a la vista: ${h.name} recibe al ${a.name}`, desc: `Dos de los mejores frente a frente. ${h.pts} pts vs ${a.pts} pts.${formText} Esto promete.` },
+          { title: `🔜 PREVIA: ${h.name} vs ${a.name} — ¡Duelo de titanes!`, desc: `¡${hPos}º contra ${aPos}º! Un choque que puede definir el campeonato. ${h.pts} pts vs ${a.pts} pts.${formText} Jornada ${matchday + 1}. Esto es lo que los aficionados esperan. ¡Imperdible!` },
+          { title: `⚡ ¡PARTIDAZO! ${h.name} recibe al ${a.name}`, desc: `Dos colosos frente a frente en la jornada ${matchday + 1}. ${Math.abs(h.pts - a.pts) <= 3 ? '¡Separados por nada! El que gane se lleva mucho más que 3 puntos.' : 'Ambos en la élite de la tabla.'}${formText} El ambiente va a ser ELÉCTRICO.` },
         ]), team: h, type: 'preview' });
       } else {
+        const ptsDiff = Math.abs(h.pts - a.pts);
         addNews({ ...pick([
-          { title: `🔜 PREVIA J${matchday + 1}: ${h.name} vs ${a.name}`, desc: `${hPos}º vs ${aPos}º. ${hStreak.count >= 2 && hStreak.type === 'W' ? `${h.name} llega en racha.` : aStreak.count >= 2 && aStreak.type === 'W' ? `${a.name} llega en racha.` : 'Ambos necesitan los tres puntos.'}${formText}` },
-          { title: `📋 Ojo a la jornada ${matchday + 1}: ${h.name} - ${a.name}`, desc: `Cruce interesante en la próxima fecha.${formText} ${Math.abs(h.pts - a.pts) <= 3 ? 'Separados por poco en la tabla, cada punto cuenta.' : ''}` },
+          { title: `🔜 PREVIA J${matchday + 1}: ${h.name} vs ${a.name}`, desc: `${hPos}º vs ${aPos}º. ${hStreak.count >= 2 && hStreak.type === 'W' ? `${h.name} llega enrachado.` : aStreak.count >= 2 && aStreak.type === 'W' ? `${a.name} llega con el viento a favor.` : 'Ambos necesitan los tres puntos.'}${formText}` },
+          { title: `📋 Ojo a la jornada ${matchday + 1}: ${h.name} - ${a.name}`, desc: `Cruce interesante en la próxima fecha.${formText} ${ptsDiff <= 3 ? 'Separados por poco en la tabla, cada punto cuenta.' : ''}` },
         ]), team: h, type: 'preview' });
+      }
+    }
+
+    // === SEGUNDO DERBY si hay otro en la jornada ===
+    if (bestDerby) {
+      for (const m of nextRound) {
+        const h2 = sorted.find(t => t.id === m.homeId);
+        const a2 = sorted.find(t => t.id === m.awayId);
+        if (!h2 || !a2 || usedIds.has(h2.id) || usedIds.has(a2.id)) continue;
+        const derby2 = findDerby(h2.name, a2.name);
+        if (derby2 && derby2 !== bestDerby) {
+          addNews({
+            title: `${derby2.emoji} ¡También se juega el ${derby2.name}!`,
+            desc: `¡Jornada de derbys! ${h2.name} vs ${a2.name}. ${derby2.name} en la misma fecha. Cuando la rivalidad se multiplica, la emoción se desborda.`,
+            team: h2, type: 'derby'
+          });
+          break;
+        }
+      }
+    }
+  }
+
+  // === DERBY JUGADO (revisar último partido del historial) ===
+  if (history && history.length > 0 && matchday > 0) {
+    const lastDay = history[history.length - 1];
+    if (lastDay?.results) {
+      for (const res of lastDay.results) {
+        const hTeam = sorted.find(t => t.id === res.hId);
+        const aTeam = sorted.find(t => t.id === res.aId);
+        if (!hTeam || !aTeam || usedIds.has(hTeam.id) || usedIds.has(aTeam.id)) continue;
+        const derby = findDerby(hTeam.name, aTeam.name);
+        if (derby) {
+          const scoreLine = `${res.sh}-${res.sa}`;
+          const winner = res.sh > res.sa ? hTeam : res.sa > res.sh ? aTeam : null;
+          const loser = res.sh > res.sa ? aTeam : res.sa > res.sh ? hTeam : null;
+          const goalDiff = Math.abs(res.sh - res.sa);
+          if (winner) {
+            addNews({
+              title: `${derby.emoji} ¡${winner.name} SE LLEVA EL ${derby.name.toUpperCase()}! (${scoreLine})`,
+              desc: `${goalDiff >= 3 ? `¡GOLEADA HISTÓRICA! ${winner.name} destroza al ${loser!.name} por ${scoreLine}. Una humillación que tardará en olvidarse.` : goalDiff === 1 ? `¡Victoria agónica! ${winner.name} saca adelante el derby por la mínima. ${loser!.name} se queda con la miel en los labios.` : `${winner.name} se impone con autoridad. El ${derby.name} tiene dueño... por ahora.`} ¡Los aficionados del ${winner.name} estallan de alegría!`,
+              team: winner, type: 'derby'
+            });
+          } else {
+            addNews({
+              title: `${derby.emoji} ${derby.name}: ¡EMPATE ÉPICO! (${scoreLine})`,
+              desc: `${res.sh === 0 ? `Sin goles pero con MUCHA intensidad. ${hTeam.name} y ${aTeam.name} se neutralizan en un ${derby.name} táctico y tenso.` : `¡${res.sh} goles por lado! ${derby.name} de ida y vuelta donde ninguno quiso ceder. Punto que puede saber a poco para ambos.`} La rivalidad sigue más viva que nunca.`,
+              team: hTeam, type: 'derby'
+            });
+          }
+          break; // solo 1 noticia de derby jugado
+        }
       }
     }
   }
@@ -1000,13 +1148,140 @@ const generateNews = (teams: any[], teams2: any[], matchday: number, compType: s
     addNews({ ...pick(opts), team: ch, type: 'rivalry' });
   }
 
-  // === TORNEO / COPA ===
+  // === CAMBIO DE LÍDER / PÉRDIDA DE LIDERAZGO ===
+  if (history && history.length >= 2 && matchday >= 2 && compType === 'league') {
+    // Reconstruir la tabla de la jornada anterior para detectar cambio de líder
+    const prevDay = history[history.length - 1];
+    if (prevDay?.results) {
+      // Simulamos: si el líder actual perdió o empató en la última jornada, puede haber habido cambio
+      const leaderStreak = getStreak(sorted[0].id);
+      const leaderLastResult = prevDay.results.find((r: any) => r.hId === sorted[0].id || r.aId === sorted[0].id);
+
+      if (leaderLastResult) {
+        const wasHome = leaderLastResult.hId === sorted[0].id;
+        const leaderGoals = wasHome ? leaderLastResult.sh : leaderLastResult.sa;
+        const rivalGoals = wasHome ? leaderLastResult.sa : leaderLastResult.sh;
+        const leaderWon = leaderGoals > rivalGoals;
+        const leaderLost = leaderGoals < rivalGoals;
+        const leaderDrew = leaderGoals === rivalGoals;
+
+        // Si el segundo está a 0-2 pts y el líder NO ganó → posible cambio de líder dramático
+        const gap = sorted[0].pts - (sorted[1]?.pts || 0);
+
+        if (leaderLost && gap <= 3 && sorted[1] && !usedIds.has(sorted[1].id)) {
+          const newChallenger = sorted[1];
+          const spicyOpts = [
+            { title: `💥 ¡${sorted[0].name} TROPIEZA! ¿Se les escapa la Liga?`, desc: `El líder perdió en la última jornada y ${newChallenger.name} se le planta a ${gap} punto(s). ${gap === 0 ? '¡EMPATE EN LA CIMA! Esto se pone al rojo vivo.' : `La ventaja se reduce. ${newChallenger.name} huele sangre.`} ${leaderStreak.type === 'L' && leaderStreak.count >= 2 ? `¡Y van ${leaderStreak.count} derrotas seguidas! La crisis es real.` : 'Un tropiezo que puede costar carísimo.'}` },
+            { title: `😱 Terremoto en la tabla: ${sorted[0].name} pierde y el liderato tiembla`, desc: `Derrota que duele. ${newChallenger.name} está a solo ${gap} punto(s). ${phase === 'final' ? 'A estas alturas, perder no es un tropiezo: es un drama.' : phase === 'late' ? 'En la recta final, estos puntos no se recuperan fácil.' : 'Todavía hay margen, pero la presión aumenta.'}` },
+            { title: `🔻 ${sorted[0].name} afloja y ${newChallenger.name} aprieta`, desc: `Los de arriba pierden y los de abajo sonríen. Solo ${gap} punto(s) separan al 1º del 2º. ${gap === 0 ? '¡Liga igualada al milímetro!' : 'La tabla se comprime y cualquiera puede ser líder la próxima jornada.'} Dicen que las ligas se ganan con regularidad... ${sorted[0].name} acaba de perder una dosis de eso.` },
+          ];
+          addNews({ ...pick(spicyOpts), team: sorted[0], type: 'rivalry' });
+        } else if (leaderDrew && gap <= 2 && sorted[1] && !usedIds.has(sorted[1].id)) {
+          addNews({ ...pick([
+            { title: `🤨 ${sorted[0].name} empata y deja la puerta abierta`, desc: `El líder solo suma uno. ${sorted[1].name} está a ${gap} punto(s). Un empate que sabe a derrota cuando te persiguen de cerca. ${phase === 'late' || phase === 'final' ? 'En esta fase, cada punto que dejas es un regalo para tus rivales.' : ''}` },
+            { title: `😤 Empate amargo del ${sorted[0].name}`, desc: `2 puntos que se escapan. Con ${sorted[1].name} a ${gap} punto(s), estos empates se pagan caros. ${sorted[0].name} necesita volver a ganar o su ventaja será solo un recuerdo.` },
+          ]), team: sorted[0], type: 'rivalry' });
+        }
+      }
+    }
+  }
+
+  // === MULTI-LÍDER: Varios equipos empatados en puntos arriba ===
+  if (matchday >= 2 && sorted.length >= 3 && compType === 'league') {
+    const topPts = sorted[0].pts;
+    const tiedAtTop = sorted.filter(t => t.pts === topPts);
+    if (tiedAtTop.length >= 3 && topPts > 0) {
+      const names = tiedAtTop.slice(0, 4).map(t => t.name);
+      const nameStr = names.length <= 3 ? names.join(', ') : names.slice(0, 3).join(', ') + ` y ${names.length - 3} más`;
+      addNews({ ...pick([
+        { title: `🏁 ¡${tiedAtTop.length} equipos empatados en la cima!`, desc: `${nameStr} — todos con ${topPts} puntos. Esto es una locura. La igualdad es máxima y la diferencia de goles decide quién manda. ¿Cuántas jornadas aguantará este empate masivo?` },
+        { title: `⚡ Liga de locos: ${tiedAtTop.length} líderes con ${topPts} pts`, desc: `${nameStr}. Nadie consigue despegarse. ${phase === 'late' || phase === 'final' ? 'Y en plena recta final... esto es un infarto colectivo.' : 'La competición más igualada que se recuerda.'} ¿Quién romperá el empate?` },
+        { title: `🎭 ¡Empate masivo arriba! ${tiedAtTop.length} equipos pelean por 1 trono`, desc: `${nameStr}. Todos con ${topPts} pts. La liga no quiere un favorito, quiere DRAMA. Y lo está consiguiendo.` },
+      ]), team: tiedAtTop[0], type: 'leader' });
+    } else if (tiedAtTop.length === 2 && topPts > 0 && !usedIds.has(tiedAtTop[1].id)) {
+      const [a, b] = tiedAtTop;
+      const dgA = (a.gf || 0) - (a.ga || 0);
+      const dgB = (b.gf || 0) - (b.ga || 0);
+      addNews({ ...pick([
+        { title: `🤝 ${a.name} y ${b.name}: co-líderes con ${topPts} pts`, desc: `Empate perfecto en la cima. ${dgA > dgB ? `${a.name} manda por diferencia de goles (+${dgA} vs +${dgB}).` : dgB > dgA ? `${b.name} tiene mejor diferencia de goles (+${dgB} vs +${dgA}).` : '¡Hasta la diferencia de goles es igual!'} ${phase === 'final' ? 'En las últimas jornadas, esto es dinamita pura.' : 'La liga se decide en los detalles.'}` },
+        { title: `👀 Dos gallos para un corral: ${a.name} y ${b.name}`, desc: `Ambos con ${topPts} puntos. ${phase === 'late' ? 'El que pestañee, pierde.' : 'La liga tiene dos dueños. Pero al final, solo puede quedar uno.'} ¿Quién aguantará la presión?` },
+      ]), team: a, type: 'leader' });
+    }
+  }
+
+  // === FRASES PICANTES / PROVOCADORAS (aleatoriamente) ===
+  if (matchday >= 3 && Math.random() > 0.6) {
+    // Equipo grande en posición baja
+    const bigTeams = sorted.filter(t => (t.att >= 4 && t.opp >= 4) || t.att >= 5);
+    const bigTeamLow = bigTeams.find(t => {
+      const pos = sorted.indexOf(t) + 1;
+      return pos > totalTeams * 0.5 && !usedIds.has(t.id);
+    });
+
+    // Equipo modesto arriba
+    const modestTeamHigh = sorted.slice(0, Math.max(3, Math.floor(totalTeams * 0.2))).find(t =>
+      (t.att <= 3 && t.def <= 3) && !usedIds.has(t.id)
+    );
+
+    if (bigTeamLow && modestTeamHigh) {
+      addNews({ ...pick([
+        { title: `🌶️ ${modestTeamHigh.name} por encima del ${bigTeamLow.name}... ¡Sí, en serio!`, desc: `El fútbol de dados no entiende de presupuestos. ${modestTeamHigh.name} (${sorted.indexOf(modestTeamHigh) + 1}º) está por delante de ${bigTeamLow.name} (${sorted.indexOf(bigTeamLow) + 1}º). Los millones no ruedan el dado. A veces la humildad gana a la soberbia.` },
+        { title: `😏 ¿Dónde está el ${bigTeamLow.name}? Pregunta seria`, desc: `Con plantilla de ATT ${bigTeamLow.att} y OPP ${bigTeamLow.opp} están en el puesto ${sorted.indexOf(bigTeamLow) + 1}. Mientras tanto, el ${modestTeamHigh.name} con ATT ${modestTeamHigh.att} está ${sorted.indexOf(modestTeamHigh) + 1}º. El dado es democrático... o despiadado.` },
+      ]), team: bigTeamLow, type: 'surprise' });
+    } else if (bigTeamLow) {
+      const pos = sorted.indexOf(bigTeamLow) + 1;
+      addNews({ ...pick([
+        { title: `💀 ${bigTeamLow.name} en el puesto ${pos}... ¿esto es una broma?`, desc: `ATT ${bigTeamLow.att}, OPP ${bigTeamLow.opp || '?'}, presupuesto de campeón... y en la mitad baja de la tabla. El banquillo tiembla, la afición protesta, y el dado se ríe. A veces el fútbol (de dados) no tiene piedad.` },
+        { title: `🗣️ La afición del ${bigTeamLow.name} pide explicaciones`, desc: `Puesto ${pos}. Con ese plantel, estar ahí abajo es un escándalo. ¿Mala suerte con los dados o falta de algo más? El debate está servido.` },
+      ]), team: bigTeamLow, type: 'crisis' });
+    }
+  }
+
+
   if (compType !== 'league' && matchday > 0) {
-    const rTeam = pick(sorted);
-    addNews({ ...pick([
-      { title: `🏟️ Jornada ${matchday} de la ${compName}`, desc: `${matchday <= 3 ? 'El torneo está en fase inicial pero ya hay historia.' : 'A medida que avanza, cada partido pesa más. Los favoritos muestran sus cartas.'}` },
-      { title: `🌍 La ${compName} avanza`, desc: `${matchday <= 3 ? 'Primeras rondas con cruces interesantes.' : 'Fase avanzada. Los que quedan son los mejores.'}` },
-    ]), team: rTeam, type: 'generic' });
+    const rTeam = pick(sorted.filter(t => !usedIds.has(t.id))) || pick(sorted);
+    const isFinal = matchday >= 6;
+    const isSemis = matchday >= 4 && matchday < 6;
+    const isQuarters = matchday >= 3 && matchday < 4;
+
+    if (isFinal) {
+      addNews({ ...pick([
+        { title: `🏆 ¡LA GRAN FINAL DE LA ${compName.toUpperCase()}!`, desc: `¡Solo quedan dos! Después de semanas de eliminatorias, cruces imposibles y remontadas, llegamos al momento supremo. Quien gane, escribirá su nombre en letras de oro. Quien pierda, se quedará con el "casi". ¡La presión es MÁXIMA!` },
+        { title: `👑 FINAL: El momento que todos esperaban`, desc: `La ${compName} llega a su punto culminante. Todo lo que se ha jugado hasta ahora cobra sentido en este partido. Sin mañana, sin excusas. ¡ES LA FINAL!` },
+      ]), team: rTeam, type: 'generic' });
+    } else if (isSemis) {
+      addNews({ ...pick([
+        { title: `⚡ SEMIFINALES: La ${compName} arde`, desc: `¡Cuatro equipos, dos plazas para la final! Cada minuto cuenta, cada error puede ser letal. Los que llegaron hasta aquí se lo han ganado, pero solo los mejores darán el último paso.` },
+        { title: `🔥 ¡SEMIS! La ${compName} se pone al rojo vivo`, desc: `A un paso de la final. Las semifinales son donde se forjan las leyendas o se rompen los sueños. No hay margen para fallar. El que tiemble, pierde.` },
+      ]), team: rTeam, type: 'generic' });
+    } else if (isQuarters) {
+      addNews({ ...pick([
+        { title: `🏟️ CUARTOS DE FINAL: La ${compName} se estrecha`, desc: `Ocho pretendientes, pero solo cuatro seguirán adelante. Los cuartos de final son donde se separa a los buenos de los grandes. ¿Habrá sorpresas o mandarán los favoritos?` },
+        { title: `⚔️ Cuartos: Arranca lo bueno en la ${compName}`, desc: `A partir de aquí, cada partido es una final. No hay red de seguridad. Ganar o morir. La copa no perdona.` },
+      ]), team: rTeam, type: 'generic' });
+    } else {
+      addNews({ ...pick([
+        { title: `🏟️ La ${compName} toma forma — Jornada ${matchday}`, desc: `${matchday <= 2 ? 'Las primeras rondas dejan entrever quién viene con hambre y quién no está preparado para la presión de la copa.' : 'El torneo avanza y los cruces se ponen cada vez más interesantes. Los favoritos aprietan pero las sorpresas acechan.'}` },
+        { title: `🌍 Crónica de la ${compName} — Fase ${matchday}`, desc: `${matchday <= 2 ? 'Primeros compases de una competición que promete emociones fuertes. Los dados decidirán quién avanza.' : 'La copa no perdona: aquí no hay Liga que te salve. Un mal día y a casa. Esa es la magia del torneo.'}` },
+      ]), team: rTeam, type: 'generic' });
+    }
+
+    // Noticia extra de eliminatoria: equipo grande que podría caer
+    if (matchday >= 2) {
+      const bigTeamsInCup = sorted.filter(t => !usedIds.has(t.id) && (t.att >= 4 || t.opp >= 4));
+      const struggling = bigTeamsInCup.filter(t => {
+        const s = getStreak(t.id);
+        return s.type === 'L' || s.type === 'D' || (t.w || 0) < (t.l || 0);
+      });
+      if (struggling.length > 0) {
+        const team = pick(struggling);
+        addNews({
+          title: `⚠️ ¿Campanada? ${team.name} tambalea en la ${compName}`,
+          desc: `Un grande que no está en su mejor momento. En liga se puede remontar, pero en copa cada eliminatoria es una sentencia. ${team.name} necesita reaccionar o veremos una de las grandes sorpresas del torneo.`,
+          team, type: 'crisis'
+        });
+      }
+    }
   }
 
   // === EQUIPO SORPRESA ===
@@ -1052,7 +1327,7 @@ const generateNews = (teams: any[], teams2: any[], matchday: number, compType: s
     const totalGoals = teams.reduce((sum, t) => sum + (t.gf || 0), 0);
     const avgGoals = (totalGoals / (matchday * (totalTeams / 2))).toFixed(1);
     const highScoringGames = history?.reduce((count, day) => {
-      return count + (day.results?.filter((r: any) => (r.homeGoals + r.awayGoals) >= 5).length || 0);
+      return count + (day.results?.filter((r: any) => ((r.sh || 0) + (r.sa || 0)) >= 5).length || 0);
     }, 0) || 0;
     addNews({ ...pick([
       { title: `🎲 Estadísticas del dado: ${avgGoals} goles/partido`, desc: `${totalGoals} goles en ${matchday} jornadas. ${parseFloat(avgGoals) > 2.5 ? 'Los dados han sido generosos esta temporada. Espectáculo asegurado.' : parseFloat(avgGoals) < 1.5 ? 'Temporada de dados conservadores. Pocos goles pero mucha intensidad.' : 'Promedio equilibrado. El dado reparte con justicia.'}` },
@@ -1060,7 +1335,10 @@ const generateNews = (teams: any[], teams2: any[], matchday: number, compType: s
     ]), type: 'luck' });
   }
 
-  return news.sort(() => Math.random() - 0.5).slice(0, 7);
+  // Derbys siempre van primero, luego el resto aleatorio
+  const derbyNews = news.filter(n => n.type === 'derby');
+  const otherNews = news.filter(n => n.type !== 'derby').sort(() => Math.random() - 0.5);
+  return [...derbyNews, ...otherNews].slice(0, 8);
 };
 
 const NewsIcon = ({ type }: { type: string }) => {
@@ -1071,6 +1349,7 @@ const NewsIcon = ({ type }: { type: string }) => {
     case 'stats': case 'scorer': case 'defense': return <Flame size={18} className='text-orange-400' />;
     case 'momentum': return <TrendingUp size={18} className='text-yellow-400' />;
     case 'luck': return <Dice6 size={18} className='text-purple-400' />;
+    case 'derby': return <Swords size={18} className='text-red-500' />;
     case 'preview': return <Eye size={18} className='text-cyan-400' />;
     case 'generic': case 'surprise': return <Star size={18} className='text-blue-400' />;
     default: return <Newspaper size={18} className='text-slate-300' />;
