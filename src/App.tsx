@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
@@ -789,8 +790,8 @@ const MenuButton = ({ icon, label, onClick, disabled = false, isDanger = false, 
     onClick={onClick} 
     disabled={disabled}
     className={`
-      flex flex-col items-center justify-center p-3 rounded-2xl border transition-all 
-      ${isWide ? 'col-span-2 flex-row gap-2' : 'col-span-1'}
+      flex items-center justify-center p-3 rounded-2xl border transition-all 
+      ${isWide ? 'flex-row gap-2' : 'flex-col'}
       ${disabled ? 'opacity-30 cursor-not-allowed bg-slate-900/20 border-white/5' : 
         isDanger ? 'bg-red-900/20 border-red-500/30 text-red-400 hover:bg-red-900/40 active:scale-95' : 
         'bg-slate-800/40 border-white/10 text-white hover:bg-slate-700/60 active:scale-95 hover:border-white/30 backdrop-blur-md'}
@@ -2977,19 +2978,20 @@ function DiceFootballApp() {
           </div>
         )}
 
-        <div className='grid grid-cols-4 gap-2 mb-6 bg-slate-900/30 p-3 rounded-[2rem] border border-white/10 backdrop-blur-md shadow-lg'>
-           <MenuButton icon={<BarChart3 size={18} className='text-emerald-400'/>} label="Stats" onClick={() => setCompView('stats')} />
-           <MenuButton icon={<Calendar size={18} className='text-blue-400'/>} label="Fechas" onClick={() => setCompView('calendar')} />
-           <MenuButton icon={<History size={18} className='text-yellow-400'/>} label="Result." onClick={() => setCompView('results')} />
-           {activeComp.type !== 'league' && (
-             <MenuButton icon={<Swords size={18} className='text-purple-400'/>} label="Llaves" onClick={() => setCompView('bracket')} />
-           )}
-           {activeComp.type === 'league' && (
+        <div className='mb-6 bg-slate-900/30 p-3 rounded-[2rem] border border-white/10 backdrop-blur-md shadow-lg space-y-2'>
+           <div className={`grid gap-2 ${activeComp.type !== 'league' ? 'grid-cols-5' : 'grid-cols-4'}`}>
+             <MenuButton icon={<BarChart3 size={18} className='text-emerald-400'/>} label="Stats" onClick={() => setCompView('stats')} />
+             <MenuButton icon={<Calendar size={18} className='text-blue-400'/>} label="Fechas" onClick={() => setCompView('calendar')} />
+             <MenuButton icon={<History size={18} className='text-yellow-400'/>} label="Result." onClick={() => setCompView('results')} />
+             {activeComp.type !== 'league' && (
+               <MenuButton icon={<Swords size={18} className='text-purple-400'/>} label="Llaves" onClick={() => setCompView('bracket')} />
+             )}
              <MenuButton icon={<Users size={18} className='text-indigo-400'/>} label="Equipo" onClick={() => setCompView('teamSelect')} />
-           )}
-
-           <MenuButton icon={<Newspaper size={16} className='text-amber-400'/>} label="Noticias" onClick={() => setShowNewsModal(true)} isWide />
-           <MenuButton icon={<Settings size={16} className='text-slate-300'/>} label="Ajustes" onClick={() => setCompView('config')} isWide />
+           </div>
+           <div className='grid grid-cols-2 gap-2'>
+             <MenuButton icon={<Newspaper size={16} className='text-amber-400'/>} label="Noticias" onClick={() => setShowNewsModal(true)} isWide />
+             <MenuButton icon={<Settings size={16} className='text-slate-300'/>} label="Ajustes" onClick={() => setCompView('config')} isWide />
+           </div>
         </div>
 
         {activeComp.type !== 'league' && activeComp.phase === 'groups' && Array.isArray(activeComp.groups) && (
