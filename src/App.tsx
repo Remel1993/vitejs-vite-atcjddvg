@@ -23,184 +23,184 @@ const PRESETS = {
   ES: [
     { name: 'Real Madrid', att: 5, opp: 5, def: 4, color1: '#ffffff', color2: '#1e3a8a', league: 'ES' },
     { name: 'FC Barcelona', att: 5, opp: 5, def: 4, color1: '#a71930', color2: '#004d98', league: 'ES' },
-    { name: 'Atlético Madrid', att: 4, opp: 4, def: 4, color1: '#cb3524', color2: '#ffffff', league: 'ES' },
-    { name: 'Villarreal CF', att: 4, opp: 4, def: 3, color1: '#facc15', color2: '#1e3a8a', league: 'ES' },
+    { name: 'Atlético Madrid', att: 4, opp: 5, def: 4, color1: '#cb3524', color2: '#ffffff', league: 'ES' },
+    { name: 'Villarreal CF', att: 4, opp: 5, def: 4, color1: '#facc15', color2: '#1e3a8a', league: 'ES' },
     { name: 'Real Sociedad', att: 4, opp: 4, def: 4, color1: '#004d98', color2: '#ffffff', league: 'ES' },
     { name: 'Athletic Club', att: 4, opp: 4, def: 4, color1: '#cb3524', color2: '#000000', league: 'ES' },
-    { name: 'Girona FC', att: 4, opp: 5, def: 3, color1: '#cb3524', color2: '#ffffff', league: 'ES' },
-    { name: 'Real Betis', att: 3, opp: 4, def: 3, color1: '#16a34a', color2: '#ffffff', league: 'ES' },
-    { name: 'Valencia CF', att: 3, opp: 3, def: 3, color1: '#ffffff', color2: '#000000', league: 'ES' },
+    { name: 'Girona FC', att: 3, opp: 4, def: 3, color1: '#cb3524', color2: '#ffffff', league: 'ES' },
+    { name: 'Real Betis', att: 4, opp: 5, def: 3, color1: '#16a34a', color2: '#ffffff', league: 'ES' },
+    { name: 'Valencia CF', att: 3, opp: 4, def: 3, color1: '#ffffff', color2: '#000000', league: 'ES' },
     { name: 'Sevilla FC', att: 3, opp: 4, def: 3, color1: '#ffffff', color2: '#cb3524', league: 'ES' },
-    { name: 'Osasuna', att: 3, opp: 3, def: 4, color1: '#cb3524', color2: '#1e3a8a', league: 'ES' },
-    { name: 'Getafe', att: 2, opp: 3, def: 4, color1: '#1e3a8a', color2: '#ffffff', league: 'ES' },
-    { name: 'Celta Vigo', att: 3, opp: 4, def: 2, color1: '#87d3f8', color2: '#ffffff', league: 'ES' },
-    { name: 'Mallorca', att: 2, opp: 3, def: 4, color1: '#cb3524', color2: '#000000', league: 'ES' },
-    { name: 'Rayo Vallecano', att: 2, opp: 4, def: 3, color1: '#ffffff', color2: '#cb3524', league: 'ES' },
-    { name: 'Las Palmas', att: 2, opp: 4, def: 2, color1: '#facc15', color2: '#1e3a8a', league: 'ES' },
+    { name: 'Osasuna', att: 3, opp: 4, def: 4, color1: '#cb3524', color2: '#1e3a8a', league: 'ES' },
+    { name: 'Getafe', att: 2, opp: 4, def: 4, color1: '#1e3a8a', color2: '#ffffff', league: 'ES' },
+    { name: 'Celta Vigo', att: 4, opp: 4, def: 3, color1: '#87d3f8', color2: '#ffffff', league: 'ES' },
+    { name: 'Mallorca', att: 3, opp: 3, def: 3, color1: '#cb3524', color2: '#000000', league: 'ES' },
+    { name: 'Rayo Vallecano', att: 3, opp: 4, def: 4, color1: '#ffffff', color2: '#cb3524', league: 'ES' },
+    { name: 'Elche CF', att: 3, opp: 3, def: 3, color1: '#ffffff', color2: '#006400', league: 'ES' },
     { name: 'Alavés', att: 2, opp: 3, def: 3, color1: '#1e3a8a', color2: '#ffffff', league: 'ES' },
-    { name: 'Leganés', att: 2, opp: 2, def: 4, color1: '#ffffff', color2: '#1e3a8a', league: 'ES' },
-    { name: 'Valladolid', att: 2, opp: 2, def: 3, color1: '#ffffff', color2: '#951b81', league: 'ES' },
-    { name: 'Espanyol', att: 2, opp: 3, def: 3, color1: '#004d98', color2: '#ffffff', league: 'ES' }
+    { name: 'Levante UD', att: 2, opp: 3, def: 2, color1: '#a71930', color2: '#004d98', league: 'ES' },
+    { name: 'Real Oviedo', att: 2, opp: 3, def: 3, color1: '#00529f', color2: '#ffffff', league: 'ES' },
+    { name: 'Espanyol', att: 3, opp: 4, def: 3, color1: '#004d98', color2: '#ffffff', league: 'ES' }
   ],
   IT: [
-    { name: 'Inter Milan', att: 5, opp: 5, def: 4, color1: '#003399', color2: '#000000', league: 'IT' },
-    { name: 'Juventus', att: 4, opp: 4, def: 4, color1: '#ffffff', color2: '#000000', league: 'IT' },
-    { name: 'AC Milan', att: 4, opp: 5, def: 4, color1: '#fb090b', color2: '#000000', league: 'IT' },
-    { name: 'Napoli', att: 4, opp: 5, def: 3, color1: '#00bfff', color2: '#ffffff', league: 'IT' },
-    { name: 'AS Roma', att: 4, opp: 4, def: 4, color1: '#8e1f2f', color2: '#f0bc42', league: 'IT' },
+    { name: 'Inter Milan', att: 4, opp: 5, def: 4, color1: '#003399', color2: '#000000', league: 'IT' },
+    { name: 'Juventus', att: 3, opp: 4, def: 4, color1: '#ffffff', color2: '#000000', league: 'IT' },
+    { name: 'AC Milan', att: 4, opp: 4, def: 3, color1: '#fb090b', color2: '#000000', league: 'IT' },
+    { name: 'Napoli', att: 4, opp: 4, def: 4, color1: '#00bfff', color2: '#ffffff', league: 'IT' },
+    { name: 'AS Roma', att: 3, opp: 4, def: 4, color1: '#8e1f2f', color2: '#f0bc42', league: 'IT' },
     { name: 'Atalanta', att: 4, opp: 5, def: 3, color1: '#1e71b8', color2: '#000000', league: 'IT' },
     { name: 'Lazio', att: 3, opp: 4, def: 3, color1: '#87d3f8', color2: '#ffffff', league: 'IT' },
     { name: 'Fiorentina', att: 3, opp: 4, def: 3, color1: '#4b2e83', color2: '#ffffff', league: 'IT' },
-    { name: 'Bologna', att: 3, opp: 3, def: 4, color1: '#a71930', color2: '#1e3a8a', league: 'IT' },
-    { name: 'Torino', att: 2, opp: 3, def: 4, color1: '#8b0000', color2: '#ffffff', league: 'IT' },
-    { name: 'Monza', att: 2, opp: 3, def: 3, color1: '#ffffff', color2: '#cb3524', league: 'IT' },
-    { name: 'Genoa', att: 2, opp: 3, def: 4, color1: '#a71930', color2: '#1e3a8a', league: 'IT' },
-    { name: 'Lecce', att: 2, opp: 2, def: 4, color1: '#facc15', color2: '#cb3524', league: 'IT' },
-    { name: 'Udinese', att: 2, opp: 2, def: 4, color1: '#ffffff', color2: '#000000', league: 'IT' },
-    { name: 'Cagliari', att: 2, opp: 3, def: 3, color1: '#a71930', color2: '#1e3a8a', league: 'IT' },
-    { name: 'Empoli', att: 2, opp: 2, def: 4, color1: '#1e3a8a', color2: '#ffffff', league: 'IT' },
-    { name: 'Verona', att: 2, opp: 2, def: 3, color1: '#facc15', color2: '#1e3a8a', league: 'IT' },
+    { name: 'Bologna', att: 3, opp: 4, def: 4, color1: '#a71930', color2: '#1e3a8a', league: 'IT' },
+    { name: 'Torino', att: 2, opp: 3, def: 3, color1: '#8b0000', color2: '#ffffff', league: 'IT' },
+    { name: 'Sassuolo', att: 3, opp: 4, def: 3, color1: '#000000', color2: '#00a650', league: 'IT' },
+    { name: 'Genoa', att: 2, opp: 3, def: 3, color1: '#a71930', color2: '#1e3a8a', league: 'IT' },
+    { name: 'Lecce', att: 1, opp: 2, def: 3, color1: '#facc15', color2: '#cb3524', league: 'IT' },
+    { name: 'Udinese', att: 2, opp: 3, def: 3, color1: '#ffffff', color2: '#000000', league: 'IT' },
+    { name: 'Cagliari', att: 2, opp: 2, def: 3, color1: '#a71930', color2: '#1e3a8a', league: 'IT' },
+    { name: 'Pisa', att: 2, opp: 3, def: 3, color1: '#000000', color2: '#0033a0', league: 'IT' },
+    { name: 'Verona', att: 2, opp: 2, def: 2, color1: '#facc15', color2: '#1e3a8a', league: 'IT' },
     { name: 'Parma', att: 2, opp: 3, def: 3, color1: '#ffffff', color2: '#000000', league: 'IT' },
-    { name: 'Como', att: 3, opp: 3, def: 2, color1: '#1e3a8a', color2: '#ffffff', league: 'IT' },
-    { name: 'Venezia', att: 2, opp: 2, def: 3, color1: '#fb923c', color2: '#16a34a', league: 'IT' }
+    { name: 'Como', att: 3, opp: 4, def: 3, color1: '#1e3a8a', color2: '#ffffff', league: 'IT' },
+    { name: 'Cremonese', att: 2, opp: 3, def: 3, color1: '#8b0000', color2: '#a9a9a9', league: 'IT' }
   ],
   EN: [
     { name: 'Manchester City', att: 5, opp: 5, def: 4, color1: '#6caee0', color2: '#ffffff', league: 'EN' },
-    { name: 'Liverpool FC', att: 5, opp: 5, def: 4, color1: '#c8102e', color2: '#f6eb61', league: 'EN' },
-    { name: 'Arsenal FC', att: 5, opp: 5, def: 4, color1: '#ef0107', color2: '#ffffff', league: 'EN' },
-    { name: 'Aston Villa', att: 4, opp: 5, def: 4, color1: '#95bfe5', color2: '#670e36', league: 'EN' },
-    { name: 'Tottenham', att: 4, opp: 5, def: 3, color1: '#ffffff', color2: '#132257', league: 'EN' },
-    { name: 'Chelsea FC', att: 4, opp: 4, def: 3, color1: '#034694', color2: '#ffffff', league: 'EN' },
+    { name: 'Liverpool FC', att: 5, opp: 5, def: 3, color1: '#c8102e', color2: '#f6eb61', league: 'EN' },
+    { name: 'Arsenal FC', att: 4, opp: 5, def: 4, color1: '#ef0107', color2: '#ffffff', league: 'EN' },
+    { name: 'Aston Villa', att: 3, opp: 4, def: 4, color1: '#95bfe5', color2: '#670e36', league: 'EN' },
+    { name: 'Tottenham', att: 4, opp: 4, def: 2, color1: '#ffffff', color2: '#132257', league: 'EN' },
+    { name: 'Chelsea FC', att: 4, opp: 5, def: 3, color1: '#034694', color2: '#ffffff', league: 'EN' },
     { name: 'Man United', att: 3, opp: 4, def: 3, color1: '#da291c', color2: '#fbe122', league: 'EN' },
-    { name: 'Newcastle', att: 4, opp: 4, def: 3, color1: '#ffffff', color2: '#000000', league: 'EN' },
-    { name: 'West Ham', att: 3, opp: 3, def: 3, color1: '#7a263a', color2: '#1bb1e7', league: 'EN' },
-    { name: 'Brighton', att: 3, opp: 5, def: 2, color1: '#0057b8', color2: '#ffffff', league: 'EN' },
-    { name: 'Wolves', att: 3, opp: 3, def: 3, color1: '#facc15', color2: '#000000', league: 'EN' },
-    { name: 'Bournemouth', att: 3, opp: 4, def: 2, color1: '#cb3524', color2: '#000000', league: 'EN' },
+    { name: 'Newcastle', att: 4, opp: 4, def: 4, color1: '#ffffff', color2: '#000000', league: 'EN' },
+    { name: 'West Ham', att: 2, opp: 3, def: 2, color1: '#7a263a', color2: '#1bb1e7', league: 'EN' },
+    { name: 'Brighton', att: 3, opp: 4, def: 3, color1: '#0057b8', color2: '#ffffff', league: 'EN' },
+    { name: 'Wolves', att: 2, opp: 3, def: 2, color1: '#facc15', color2: '#000000', league: 'EN' },
+    { name: 'Bournemouth', att: 4, opp: 4, def: 3, color1: '#cb3524', color2: '#000000', league: 'EN' },
     { name: 'Fulham', att: 3, opp: 3, def: 3, color1: '#ffffff', color2: '#000000', league: 'EN' },
-    { name: 'Crystal Palace', att: 3, opp: 3, def: 3, color1: '#1e3a8a', color2: '#cb3524', league: 'EN' },
-    { name: 'Brentford', att: 3, opp: 4, def: 2, color1: '#cb3524', color2: '#ffffff', league: 'EN' },
-    { name: 'Everton', att: 2, opp: 2, def: 4, color1: '#003399', color2: '#ffffff', league: 'EN' },
-    { name: 'Nottingham Forest', att: 2, opp: 3, def: 3, color1: '#cb3524', color2: '#ffffff', league: 'EN' },
-    { name: 'Leicester City', att: 2, opp: 3, def: 3, color1: '#1e3a8a', color2: '#ffffff', league: 'EN' },
-    { name: 'Ipswich Town', att: 2, opp: 3, def: 2, color1: '#1e3a8a', color2: '#ffffff', league: 'EN' },
-    { name: 'Southampton', att: 2, opp: 3, def: 2, color1: '#cb3524', color2: '#ffffff', league: 'EN' }
+    { name: 'Crystal Palace', att: 3, opp: 4, def: 4, color1: '#1e3a8a', color2: '#cb3524', league: 'EN' },
+    { name: 'Brentford', att: 3, opp: 4, def: 3, color1: '#cb3524', color2: '#ffffff', league: 'EN' },
+    { name: 'Everton', att: 2, opp: 3, def: 4, color1: '#003399', color2: '#ffffff', league: 'EN' },
+    { name: 'Nottingham Forest', att: 3, opp: 4, def: 4, color1: '#cb3524', color2: '#ffffff', league: 'EN' },
+    { name: 'Leeds United', att: 3, opp: 4, def: 3, color1: '#ffffff', color2: '#1d428a', league: 'EN' },
+    { name: 'Burnley', att: 2, opp: 3, def: 4, color1: '#6c1d45', color2: '#87ceeb', league: 'EN' },
+    { name: 'Sunderland', att: 3, opp: 4, def: 4, color1: '#ff0000', color2: '#ffffff', league: 'EN' }
   ],
   NL: [ 
-    { name: 'PSV Eindhoven', att: 4, opp: 4, def: 4, color1: '#ff0000', color2: '#ffffff', league: 'NL' },
+    { name: 'PSV Eindhoven', att: 4, opp: 5, def: 3, color1: '#ff0000', color2: '#ffffff', league: 'NL' },
     { name: 'Feyenoord', att: 4, opp: 4, def: 3, color1: '#ff0000', color2: '#ffffff', league: 'NL' },
-    { name: 'Ajax', att: 4, opp: 4, def: 3, color1: '#ffffff', color2: '#ff0000', league: 'NL' },
+    { name: 'Ajax', att: 3, opp: 4, def: 3, color1: '#ffffff', color2: '#ff0000', league: 'NL' },
     { name: 'AZ Alkmaar', att: 3, opp: 4, def: 3, color1: '#ff0000', color2: '#ffffff', league: 'NL' },
-    { name: 'FC Twente', att: 3, opp: 3, def: 4, color1: '#ff0000', color2: '#ffffff', league: 'NL' },
+    { name: 'FC Twente', att: 3, opp: 3, def: 3, color1: '#ff0000', color2: '#ffffff', league: 'NL' },
     { name: 'Utrecht', att: 3, opp: 3, def: 3, color1: '#ff0000', color2: '#ffffff', league: 'NL' },
-    { name: 'Sparta Rotterdam', att: 2, opp: 3, def: 3, color1: '#ff0000', color2: '#ffffff', league: 'NL' },
-    { name: 'Go Ahead Eagles', att: 2, opp: 3, def: 2, color1: '#ff0000', color2: '#ffff00', league: 'NL' },
+    { name: 'Sparta Rotterdam', att: 2, opp: 2, def: 2, color1: '#ff0000', color2: '#ffffff', league: 'NL' },
+    { name: 'Go Ahead Eagles', att: 2, opp: 3, def: 3, color1: '#ff0000', color2: '#ffff00', league: 'NL' },
     { name: 'NEC Nijmegen', att: 2, opp: 3, def: 3, color1: '#ff0000', color2: '#000000', league: 'NL' },
-    { name: 'Heerenveen', att: 2, opp: 3, def: 2, color1: '#0000ff', color2: '#ffffff', league: 'NL' },
-    { name: 'Fortuna Sittard', att: 2, opp: 2, def: 3, color1: '#ffff00', color2: '#16a34a', league: 'NL' },
-    { name: 'Heracles Almelo', att: 2, opp: 2, def: 2, color1: '#000000', color2: '#ffffff', league: 'NL' },
+    { name: 'Heerenveen', att: 2, opp: 2, def: 2, color1: '#0000ff', color2: '#ffffff', league: 'NL' },
+    { name: 'Fortuna Sittard', att: 2, opp: 2, def: 2, color1: '#ffff00', color2: '#16a34a', league: 'NL' },
+    { name: 'Heracles Almelo', att: 1, opp: 2, def: 2, color1: '#000000', color2: '#ffffff', league: 'NL' },
     { name: 'PEC Zwolle', att: 2, opp: 2, def: 2, color1: '#00bfff', color2: '#ffffff', league: 'NL' },
-    { name: 'Almere City', att: 1, opp: 2, def: 3, color1: '#ff0000', color2: '#000000', league: 'NL' },
-    { name: 'RKC Waalwijk', att: 1, opp: 2, def: 2, color1: '#ffff00', color2: '#1e3a8a', league: 'NL' },
-    { name: 'Willem II', att: 2, opp: 2, def: 3, color1: '#ff0000', color2: '#ffffff', league: 'NL' },
-    { name: 'Groningen', att: 2, opp: 2, def: 3, color1: '#16a34a', color2: '#ffffff', league: 'NL' },
+    { name: 'FC Volendam', att: 2, opp: 3, def: 2, color1: '#f5a12d', color2: '#000000', league: 'NL' },
+    { name: 'Excelsior', att: 2, opp: 2, def: 2, color1: '#000000', color2: '#e30613', league: 'NL' },
+    { name: 'SC Telstar', att: 1, opp: 2, def: 2, color1: '#ffffff', color2: '#0033a0', league: 'NL' },
+    { name: 'Groningen', att: 2, opp: 3, def: 3, color1: '#16a34a', color2: '#ffffff', league: 'NL' },
     { name: 'NAC Breda', att: 2, opp: 2, def: 2, color1: '#ffff00', color2: '#000000', league: 'NL' }
   ],
   DE: [ 
     { name: 'Bayern Munich', att: 5, opp: 5, def: 4, color1: '#dc052d', color2: '#ffffff', league: 'DE' },
-    { name: 'B. Dortmund', att: 4, opp: 5, def: 3, color1: '#fde100', color2: '#000000', league: 'DE' },
-    { name: 'B. Leverkusen', att: 5, opp: 5, def: 4, color1: '#e32221', color2: '#000000', league: 'DE' },
-    { name: 'RB Leipzig', att: 4, opp: 4, def: 4, color1: '#ffffff', color2: '#dd013f', league: 'DE' },
-    { name: 'VfB Stuttgart', att: 4, opp: 4, def: 3, color1: '#ffffff', color2: '#e32221', league: 'DE' },
-    { name: 'E. Frankfurt', att: 4, opp: 4, def: 3, color1: '#000000', color2: '#e32221', league: 'DE' },
-    { name: 'SC Freiburg', att: 3, opp: 4, def: 4, color1: '#000000', color2: '#ffffff', league: 'DE' },
-    { name: 'M\'gladbach', att: 3, opp: 4, def: 3, color1: '#000000', color2: '#ffffff', league: 'DE' },
-    { name: 'Wolfsburg', att: 3, opp: 3, def: 3, color1: '#009d00', color2: '#ffffff', league: 'DE' },
-    { name: 'Werder Bremen', att: 3, opp: 3, def: 3, color1: '#1d9053', color2: '#ffffff', league: 'DE' },
-    { name: 'Union Berlin', att: 2, opp: 3, def: 4, color1: '#d71920', color2: '#f6d800', league: 'DE' },
-    { name: 'Hoffenheim', att: 3, opp: 4, def: 2, color1: '#004f9f', color2: '#ffffff', league: 'DE' },
+    { name: 'B. Dortmund', att: 4, opp: 4, def: 3, color1: '#fde100', color2: '#000000', league: 'DE' },
+    { name: 'B. Leverkusen', att: 4, opp: 4, def: 3, color1: '#e32221', color2: '#000000', league: 'DE' },
+    { name: 'RB Leipzig', att: 3, opp: 4, def: 3, color1: '#ffffff', color2: '#dd013f', league: 'DE' },
+    { name: 'VfB Stuttgart', att: 3, opp: 4, def: 3, color1: '#ffffff', color2: '#e32221', league: 'DE' },
+    { name: 'E. Frankfurt', att: 4, opp: 4, def: 2, color1: '#000000', color2: '#e32221', league: 'DE' },
+    { name: 'SC Freiburg', att: 3, opp: 3, def: 4, color1: '#000000', color2: '#ffffff', league: 'DE' },
+    { name: 'M\'gladbach', att: 2, opp: 3, def: 3, color1: '#000000', color2: '#ffffff', league: 'DE' },
+    { name: 'Wolfsburg', att: 2, opp: 3, def: 3, color1: '#009d00', color2: '#ffffff', league: 'DE' },
+    { name: 'Werder Bremen', att: 3, opp: 3, def: 2, color1: '#1d9053', color2: '#ffffff', league: 'DE' },
+    { name: 'Union Berlin', att: 2, opp: 2, def: 4, color1: '#d71920', color2: '#f6d800', league: 'DE' },
+    { name: 'Hoffenheim', att: 2, opp: 3, def: 2, color1: '#004f9f', color2: '#ffffff', league: 'DE' },
     { name: 'Augsburg', att: 2, opp: 3, def: 3, color1: '#ba3733', color2: '#ffffff', league: 'DE' },
-    { name: 'Mainz 05', att: 2, opp: 3, def: 3, color1: '#ed1c24', color2: '#ffffff', league: 'DE' },
-    { name: 'VfL Bochum', att: 2, opp: 3, def: 2, color1: '#005ca9', color2: '#ffffff', league: 'DE' },
-    { name: 'Heidenheim', att: 2, opp: 3, def: 3, color1: '#e2001a', color2: '#ffffff', league: 'DE' },
-    { name: 'St. Pauli', att: 2, opp: 3, def: 2, color1: '#754b29', color2: '#ffffff', league: 'DE' },
-    { name: 'Holstein Kiel', att: 2, opp: 3, def: 2, color1: '#0053a4', color2: '#ffffff', league: 'DE' }
+    { name: 'Mainz 05', att: 3, opp: 3, def: 4, color1: '#ed1c24', color2: '#ffffff', league: 'DE' },
+    { name: 'FC Köln', att: 3, opp: 4, def: 3, color1: '#e30613', color2: '#ffffff', league: 'DE' },
+    { name: 'Heidenheim', att: 2, opp: 2, def: 2, color1: '#e2001a', color2: '#ffffff', league: 'DE' },
+    { name: 'St. Pauli', att: 1, opp: 2, def: 4, color1: '#754b29', color2: '#ffffff', league: 'DE' },
+    { name: 'Hamburger SV', att: 3, opp: 3, def: 3, color1: '#ffffff', color2: '#0033a0', league: 'DE' }
   ],
   FR: [ 
     { name: 'PSG', att: 5, opp: 5, def: 4, color1: '#004170', color2: '#da291c', league: 'FR' },
-    { name: 'AS Monaco', att: 4, opp: 4, def: 4, color1: '#e30613', color2: '#ffffff', league: 'FR' },
+    { name: 'AS Monaco', att: 4, opp: 4, def: 3, color1: '#e30613', color2: '#ffffff', league: 'FR' },
     { name: 'Marseille', att: 4, opp: 4, def: 3, color1: '#ffffff', color2: '#009dff', league: 'FR' },
-    { name: 'Lille OSC', att: 4, opp: 4, def: 4, color1: '#e2001a', color2: '#002654', league: 'FR' },
-    { name: 'Olympique Lyon', att: 4, opp: 4, def: 3, color1: '#ffffff', color2: '#da291c', league: 'FR' },
-    { name: 'RC Lens', att: 3, opp: 4, def: 4, color1: '#ed1c24', color2: '#ffcc00', league: 'FR' },
-    { name: 'OGC Nice', att: 3, opp: 4, def: 4, color1: '#000000', color2: '#e30613', league: 'FR' },
-    { name: 'Stade Rennais', att: 3, opp: 4, def: 3, color1: '#e2001a', color2: '#000000', league: 'FR' },
-    { name: 'Stade Reims', att: 3, opp: 3, def: 3, color1: '#e30613', color2: '#ffffff', league: 'FR' },
-    { name: 'Strasbourg', att: 3, opp: 3, def: 3, color1: '#00529f', color2: '#ffffff', league: 'FR' },
-    { name: 'Toulouse', att: 3, opp: 3, def: 3, color1: '#542f88', color2: '#ffffff', league: 'FR' },
-    { name: 'Montpellier', att: 3, opp: 3, def: 3, color1: '#0033a0', color2: '#f68712', league: 'FR' },
-    { name: 'FC Nantes', att: 2, opp: 3, def: 3, color1: '#fdf200', color2: '#006532', league: 'FR' },
-    { name: 'Brest', att: 3, opp: 4, def: 3, color1: '#e2001a', color2: '#ffffff', league: 'FR' },
-    { name: 'Le Havre', att: 2, opp: 3, def: 3, color1: '#00529f', color2: '#87ceeb', league: 'FR' },
-    { name: 'AJ Auxerre', att: 2, opp: 3, def: 2, color1: '#ffffff', color2: '#00529f', league: 'FR' },
-    { name: 'Angers SCO', att: 2, opp: 3, def: 2, color1: '#000000', color2: '#ffffff', league: 'FR' },
-    { name: 'Saint-Étienne', att: 2, opp: 3, def: 3, color1: '#006532', color2: '#ffffff', league: 'FR' },
+    { name: 'Lille OSC', att: 3, opp: 4, def: 4, color1: '#e2001a', color2: '#002654', league: 'FR' },
+    { name: 'Olympique Lyon', att: 3, opp: 4, def: 3, color1: '#ffffff', color2: '#da291c', league: 'FR' },
+    { name: 'RC Lens', att: 3, opp: 3, def: 4, color1: '#ed1c24', color2: '#ffcc00', league: 'FR' },
+    { name: 'OGC Nice', att: 3, opp: 3, def: 3, color1: '#000000', color2: '#e30613', league: 'FR' },
+    { name: 'Stade Rennais', att: 3, opp: 3, def: 2, color1: '#e2001a', color2: '#000000', league: 'FR' },
+    { name: 'Paris FC', att: 2, opp: 3, def: 3, color1: '#0033a0', color2: '#ffffff', league: 'FR' },
+    { name: 'Strasbourg', att: 3, opp: 4, def: 3, color1: '#00529f', color2: '#ffffff', league: 'FR' },
+    { name: 'Toulouse', att: 2, opp: 3, def: 3, color1: '#542f88', color2: '#ffffff', league: 'FR' },
+    { name: 'FC Lorient', att: 2, opp: 3, def: 2, color1: '#f68712', color2: '#000000', league: 'FR' },
+    { name: 'FC Nantes', att: 2, opp: 2, def: 3, color1: '#fdf200', color2: '#006532', league: 'FR' },
+    { name: 'Brest', att: 2, opp: 3, def: 3, color1: '#e2001a', color2: '#ffffff', league: 'FR' },
+    { name: 'Le Havre', att: 1, opp: 2, def: 3, color1: '#00529f', color2: '#87ceeb', league: 'FR' },
+    { name: 'AJ Auxerre', att: 2, opp: 3, def: 3, color1: '#ffffff', color2: '#00529f', league: 'FR' },
+    { name: 'Angers SCO', att: 1, opp: 2, def: 3, color1: '#000000', color2: '#ffffff', league: 'FR' },
+    { name: 'FC Metz', att: 2, opp: 3, def: 2, color1: '#6c1d45', color2: '#ffffff', league: 'FR' },
     ],
   MI: [ 
-    { name: 'FC Porto', att: 4, opp: 4, def: 4, color1: '#003399', color2: '#ffffff', league: 'MI' },
-    { name: 'Benfica', att: 4, opp: 4, def: 4, color1: '#e30613', color2: '#ffffff', league: 'MI' },
-    { name: 'Sporting CP', att: 4, opp: 4, def: 4, color1: '#006532', color2: '#ffffff', league: 'MI' },
+    { name: 'FC Porto', att: 3, opp: 4, def: 4, color1: '#003399', color2: '#ffffff', league: 'MI' },
+    { name: 'Benfica', att: 4, opp: 4, def: 3, color1: '#e30613', color2: '#ffffff', league: 'MI' },
+    { name: 'Sporting CP', att: 4, opp: 4, def: 3, color1: '#006532', color2: '#ffffff', league: 'MI' },
     { name: 'Celtic FC', att: 3, opp: 4, def: 3, color1: '#006532', color2: '#ffffff', league: 'MI' },
-    { name: 'Rangers FC', att: 3, opp: 4, def: 3, color1: '#0033a0', color2: '#ffffff', league: 'MI' },
-    { name: 'Galatasaray', att: 3, opp: 4, def: 3, color1: '#a32638', color2: '#fdb913', league: 'MI' },
+    { name: 'Rangers FC', att: 2, opp: 3, def: 3, color1: '#0033a0', color2: '#ffffff', league: 'MI' },
+    { name: 'Galatasaray', att: 4, opp: 4, def: 3, color1: '#a32638', color2: '#fdb913', league: 'MI' },
     { name: 'Fenerbahçe', att: 3, opp: 4, def: 3, color1: '#0033a0', color2: '#fdb913', league: 'MI' },
     { name: 'Olympiacos', att: 3, opp: 4, def: 3, color1: '#e30613', color2: '#ffffff', league: 'MI' },
     { name: 'Panathinaikos', att: 3, opp: 3, def: 3, color1: '#006532', color2: '#ffffff', league: 'MI' },
     { name: 'Club Brugge', att: 3, opp: 4, def: 3, color1: '#0033a0', color2: '#000000', league: 'MI' },
     { name: 'Anderlecht', att: 3, opp: 3, def: 3, color1: '#542f88', color2: '#ffffff', league: 'MI' },
-    { name: 'RB Salzburg', att: 3, opp: 4, def: 3, color1: '#ffffff', color2: '#e30613', league: 'MI' },
-    { name: 'Slavia Praga', att: 3, opp: 3, def: 3, color1: '#e30613', color2: '#ffffff', league: 'MI' },
-    { name: 'Sparta Praga', att: 3, opp: 3, def: 3, color1: '#a32638', color2: '#0033a0', league: 'MI' },
-    { name: 'Dinamo Zagreb', att: 3, opp: 3, def: 3, color1: '#0033a0', color2: '#ffffff', league: 'MI' },
-    { name: 'Estrella Roja', att: 3, opp: 3, def: 3, color1: '#e30613', color2: '#ffffff', league: 'MI' },
-    { name: 'FC Copenhague', att: 3, opp: 3, def: 3, color1: '#ffffff', color2: '#0033a0', league: 'MI' },
-    { name: 'Malmö FF', att: 3, opp: 3, def: 3, color1: '#87ceeb', color2: '#ffffff', league: 'MI' },
-    { name: 'Shakhtar D.', att: 3, opp: 4, def: 3, color1: '#f68712', color2: '#000000', league: 'MI' },
-    { name: 'Dynamo Kyiv', att: 3, opp: 3, def: 3, color1: '#ffffff', color2: '#0033a0', league: 'MI' }
+    { name: 'RB Salzburg', att: 3, opp: 3, def: 2, color1: '#ffffff', color2: '#e30613', league: 'MI' },
+    { name: 'Slavia Praga', att: 3, opp: 3, def: 4, color1: '#e30613', color2: '#ffffff', league: 'MI' },
+    { name: 'Sparta Praga', att: 2, opp: 3, def: 3, color1: '#a32638', color2: '#0033a0', league: 'MI' },
+    { name: 'Dinamo Zagreb', att: 2, opp: 3, def: 3, color1: '#0033a0', color2: '#ffffff', league: 'MI' },
+    { name: 'Estrella Roja', att: 3, opp: 3, def: 2, color1: '#e30613', color2: '#ffffff', league: 'MI' },
+    { name: 'FC Copenhague', att: 2, opp: 3, def: 3, color1: '#ffffff', color2: '#0033a0', league: 'MI' },
+    { name: 'Malmö FF', att: 2, opp: 2, def: 3, color1: '#87ceeb', color2: '#ffffff', league: 'MI' },
+    { name: 'Shakhtar D.', att: 3, opp: 3, def: 3, color1: '#f68712', color2: '#000000', league: 'MI' },
+    { name: 'Dynamo Kyiv', att: 2, opp: 2, def: 3, color1: '#ffffff', color2: '#0033a0', league: 'MI' }
   ],
   WC: [
-    { name: 'Argentina', att: 5, opp: 5, def: 4, color1: '#75aadb', color2: '#ffffff', isFlag: true, region: 'SA' },
-    { name: 'France', att: 5, opp: 5, def: 4, color1: '#002395', color2: '#ffffff', isFlag: true, region: 'EU' },
-    { name: 'Brazil', att: 5, opp: 5, def: 4, color1: '#fedf00', color2: '#009b3a', isFlag: true, region: 'SA' },
-    { name: 'England', att: 5, opp: 5, def: 4, color1: '#ffffff', color2: '#ce1124', isFlag: true, region: 'EU' },
-    { name: 'Spain', att: 4, opp: 5, def: 4, color1: '#aa151b', color2: '#f1bf00', isFlag: true, region: 'EU' },
-    { name: 'Germany', att: 4, opp: 5, def: 4, color1: '#000000', color2: '#ffce00', isFlag: true, region: 'EU' },
-    { name: 'Portugal', att: 5, opp: 4, def: 4, color1: '#046a38', color2: '#da291c', isFlag: true, region: 'EU' },
-    { name: 'Netherlands', att: 4, opp: 4, def: 4, color1: '#f36c21', color2: '#ffffff', isFlag: true, region: 'EU' },
+    { name: 'Argentina', att: 4, opp: 5, def: 4, color1: '#75aadb', color2: '#ffffff', isFlag: true, region: 'SA' },
+    { name: 'France', att: 5, opp: 5, def: 3, color1: '#002395', color2: '#ffffff', isFlag: true, region: 'EU' },
+    { name: 'Brazil', att: 4, opp: 5, def: 3, color1: '#fedf00', color2: '#009b3a', isFlag: true, region: 'SA' },
+    { name: 'England', att: 4, opp: 5, def: 4, color1: '#ffffff', color2: '#ce1124', isFlag: true, region: 'EU' },
+    { name: 'Spain', att: 5, opp: 5, def: 4, color1: '#aa151b', color2: '#f1bf00', isFlag: true, region: 'EU' },
+    { name: 'Germany', att: 4, opp: 4, def: 3, color1: '#000000', color2: '#ffce00', isFlag: true, region: 'EU' },
+    { name: 'Portugal', att: 4, opp: 5, def: 3, color1: '#046a38', color2: '#da291c', isFlag: true, region: 'EU' },
+    { name: 'Netherlands', att: 4, opp: 4, def: 3, color1: '#f36c21', color2: '#ffffff', isFlag: true, region: 'EU' },
     { name: 'Italy', att: 3, opp: 4, def: 4, color1: '#008c45', color2: '#ffffff', isFlag: true, region: 'EU' },
-    { name: 'Uruguay', att: 4, opp: 4, def: 4, color1: '#0081c8', color2: '#ffffff', isFlag: true, region: 'SA' },
-    { name: 'Croatia', att: 3, opp: 4, def: 4, color1: '#ff0000', color2: '#ffffff', isFlag: true, region: 'EU' },
+    { name: 'Uruguay', att: 3, opp: 4, def: 4, color1: '#0081c8', color2: '#ffffff', isFlag: true, region: 'SA' },
+    { name: 'Croatia', att: 3, opp: 4, def: 3, color1: '#ff0000', color2: '#ffffff', isFlag: true, region: 'EU' },
     { name: 'Morocco', att: 3, opp: 3, def: 4, color1: '#c1272d', color2: '#006233', isFlag: true, region: 'AF' },
-    { name: 'Japan', att: 3, opp: 5, def: 3, color1: '#ffffff', color2: '#bc002d', isFlag: true, region: 'AS' },
-    { name: 'USA', att: 3, opp: 4, def: 3, color1: '#b22234', color2: '#3c3b6e', isFlag: true, region: 'NA' },
-    { name: 'Mexico', att: 3, opp: 3, def: 3, color1: '#006847', color2: '#ce1126', isFlag: true, region: 'NA' },
-    { name: 'Colombia', att: 4, opp: 3, def: 3, color1: '#fcd116', color2: '#003893', isFlag: true, region: 'SA' },
-    { name: 'Belgium', att: 4, opp: 4, def: 3, color1: '#e30613', color2: '#000000', isFlag: true, region: 'EU' },
-    { name: 'Senegal', att: 3, opp: 3, def: 3, color1: '#00853f', color2: '#fdef42', isFlag: true, region: 'AF' },
-    { name: 'Switzerland', att: 3, opp: 3, def: 4, color1: '#d52b1e', color2: '#ffffff', isFlag: true, region: 'EU' },
+    { name: 'Japan', att: 3, opp: 4, def: 3, color1: '#ffffff', color2: '#bc002d', isFlag: true, region: 'AS' },
+    { name: 'USA', att: 3, opp: 3, def: 3, color1: '#b22234', color2: '#3c3b6e', isFlag: true, region: 'NA' },
+    { name: 'Mexico', att: 2, opp: 3, def: 3, color1: '#006847', color2: '#ce1126', isFlag: true, region: 'NA' },
+    { name: 'Colombia', att: 3, opp: 4, def: 3, color1: '#fcd116', color2: '#003893', isFlag: true, region: 'SA' },
+    { name: 'Belgium', att: 3, opp: 4, def: 3, color1: '#e30613', color2: '#000000', isFlag: true, region: 'EU' },
+    { name: 'Senegal', att: 3, opp: 3, def: 4, color1: '#00853f', color2: '#fdef42', isFlag: true, region: 'AF' },
+    { name: 'Switzerland', att: 2, opp: 3, def: 4, color1: '#d52b1e', color2: '#ffffff', isFlag: true, region: 'EU' },
     { name: 'Denmark', att: 3, opp: 3, def: 3, color1: '#c60c30', color2: '#ffffff', isFlag: true, region: 'EU' },
-    { name: 'South Korea', att: 3, opp: 4, def: 2, color1: '#ffffff', color2: '#cd2e3a', isFlag: true, region: 'AS' },
-    { name: 'Chile', att: 3, opp: 3, def: 3, color1: '#0039a6', color2: '#d52b1e', isFlag: true, region: 'SA' },
-    { name: 'Ecuador', att: 3, opp: 3, def: 3, color1: '#ffdd00', color2: '#0033a0', isFlag: true, region: 'SA' },
-    { name: 'Nigeria', att: 3, opp: 4, def: 2, color1: '#008751', color2: '#ffffff', isFlag: true, region: 'AF' },
+    { name: 'South Korea', att: 3, opp: 3, def: 3, color1: '#ffffff', color2: '#cd2e3a', isFlag: true, region: 'AS' },
+    { name: 'Chile', att: 2, opp: 2, def: 2, color1: '#0039a6', color2: '#d52b1e', isFlag: true, region: 'SA' },
+    { name: 'Ecuador', att: 2, opp: 3, def: 4, color1: '#ffdd00', color2: '#0033a0', isFlag: true, region: 'SA' },
+    { name: 'Nigeria', att: 3, opp: 3, def: 3, color1: '#008751', color2: '#ffffff', isFlag: true, region: 'AF' },
     { name: 'Cameroon', att: 2, opp: 3, def: 3, color1: '#007a5e', color2: '#ce1126', isFlag: true, region: 'AF' },
     { name: 'Ghana', att: 2, opp: 3, def: 2, color1: '#ffffff', color2: '#000000', isFlag: true, region: 'AF' },
-    { name: 'Canada', att: 3, opp: 3, def: 2, color1: '#ff0000', color2: '#ffffff', isFlag: true, region: 'NA' },
-    { name: 'Australia', att: 2, opp: 3, def: 3, color1: '#00008b', color2: '#ffcd00', isFlag: true, region: 'AS' },
-    { name: 'Serbia', att: 3, opp: 3, def: 3, color1: '#c6363c', color2: '#0c4076', isFlag: true, region: 'EU' },
-    { name: 'Poland', att: 3, opp: 2, def: 4, color1: '#ffffff', color2: '#dc143c', isFlag: true, region: 'EU' },
-    { name: 'Peru', att: 2, opp: 3, def: 3, color1: '#ffffff', color2: '#d91023', isFlag: true, region: 'SA' },
-    { name: 'Egypt', att: 3, opp: 2, def: 3, color1: '#ce1126', color2: '#000000', isFlag: true, region: 'AF' }
+    { name: 'Canada', att: 2, opp: 3, def: 3, color1: '#ff0000', color2: '#ffffff', isFlag: true, region: 'NA' },
+    { name: 'Australia', att: 2, opp: 2, def: 3, color1: '#00008b', color2: '#ffcd00', isFlag: true, region: 'AS' },
+    { name: 'Serbia', att: 3, opp: 3, def: 2, color1: '#c6363c', color2: '#0c4076', isFlag: true, region: 'EU' },
+    { name: 'Poland', att: 2, opp: 3, def: 3, color1: '#ffffff', color2: '#dc143c', isFlag: true, region: 'EU' },
+    { name: 'Peru', att: 1, opp: 2, def: 3, color1: '#ffffff', color2: '#d91023', isFlag: true, region: 'SA' },
+    { name: 'Egypt', att: 2, opp: 3, def: 3, color1: '#ce1126', color2: '#000000', isFlag: true, region: 'AF' }
   ]
 };
 
@@ -283,152 +283,152 @@ const findDerby = (teamName1: string, teamName2: string) => {
 // ==========================================
 const PRESETS_2 = {
   ES: [
-    { name: 'Almería', att: 5, opp: 5, def: 3, color1: '#e30613', color2: '#ffffff', league: 'ES' },
-    { name: 'Cádiz CF', att: 4, opp: 4, def: 4, color1: '#fde100', color2: '#0000ff', league: 'ES' },
-    { name: 'Granada CF', att: 4, opp: 5, def: 3, color1: '#c8102e', color2: '#ffffff', league: 'ES' },
-    { name: 'SD Eibar', att: 4, opp: 4, def: 4, color1: '#a71930', color2: '#004d98', league: 'ES' },
+    { name: 'Almería', att: 3, opp: 4, def: 3, color1: '#e30613', color2: '#ffffff', league: 'ES' },
+    { name: 'Cádiz CF', att: 3, opp: 3, def: 3, color1: '#fde100', color2: '#0000ff', league: 'ES' },
+    { name: 'Granada CF', att: 3, opp: 3, def: 3, color1: '#c8102e', color2: '#ffffff', league: 'ES' },
+    { name: 'SD Eibar', att: 3, opp: 3, def: 3, color1: '#a71930', color2: '#004d98', league: 'ES' },
     { name: 'Sporting Gijón', att: 4, opp: 4, def: 3, color1: '#e30613', color2: '#ffffff', league: 'ES' },
-    { name: 'Real Oviedo', att: 3, opp: 4, def: 4, color1: '#00529f', color2: '#ffffff', league: 'ES' },
-    { name: 'Levante UD', att: 4, opp: 4, def: 3, color1: '#a71930', color2: '#004d98', league: 'ES' },
-    { name: 'Real Zaragoza', att: 3, opp: 4, def: 4, color1: '#ffffff', color2: '#00529f', league: 'ES' },
+    { name: 'Valladolid', att: 3, opp: 3, def: 3, color1: '#ffffff', color2: '#951b81', league: 'ES' },
+    { name: 'Las Palmas', att: 4, opp: 4, def: 3, color1: '#facc15', color2: '#1e3a8a', league: 'ES' },
+    { name: 'Real Zaragoza', att: 2, opp: 3, def: 3, color1: '#ffffff', color2: '#00529f', league: 'ES' },
     { name: 'Racing Santander', att: 4, opp: 4, def: 3, color1: '#ffffff', color2: '#006400', league: 'ES' },
-    { name: 'Elche CF', att: 3, opp: 4, def: 3, color1: '#ffffff', color2: '#006400', league: 'ES' },
-    { name: 'CD Tenerife', att: 3, opp: 3, def: 4, color1: '#ffffff', color2: '#00529f', league: 'ES' },
-    { name: 'Burgos CF', att: 2, opp: 3, def: 4, color1: '#ffffff', color2: '#000000', league: 'ES' },
-    { name: 'SD Huesca', att: 2, opp: 3, def: 4, color1: '#a71930', color2: '#004d98', league: 'ES' },
+    { name: 'Leganés', att: 3, opp: 3, def: 4, color1: '#ffffff', color2: '#1e3a8a', league: 'ES' },
+    { name: 'CD Tenerife', att: 2, opp: 2, def: 2, color1: '#ffffff', color2: '#00529f', league: 'ES' },
+    { name: 'Burgos CF', att: 2, opp: 3, def: 3, color1: '#ffffff', color2: '#000000', league: 'ES' },
+    { name: 'SD Huesca', att: 2, opp: 3, def: 3, color1: '#a71930', color2: '#004d98', league: 'ES' },
     { name: 'Málaga CF', att: 3, opp: 3, def: 3, color1: '#ffffff', color2: '#87ceeb', league: 'ES' },
     { name: 'Dep. La Coruña', att: 3, opp: 4, def: 3, color1: '#ffffff', color2: '#00529f', league: 'ES' },
-    { name: 'Castellón', att: 4, opp: 4, def: 2, color1: '#000000', color2: '#ffffff', league: 'ES' },
-    { name: 'Córdoba CF', att: 3, opp: 3, def: 3, color1: '#ffffff', color2: '#006400', league: 'ES' },
-    { name: 'Albacete', att: 2, opp: 3, def: 3, color1: '#ffffff', color2: '#8b0000', league: 'ES' },
-    { name: 'Mirandés', att: 2, opp: 2, def: 4, color1: '#e30613', color2: '#000000', league: 'ES' },
-    { name: 'Eldense', att: 2, opp: 3, def: 2, color1: '#e30613', color2: '#0000ff', league: 'ES' }
+    { name: 'Castellón', att: 3, opp: 3, def: 2, color1: '#000000', color2: '#ffffff', league: 'ES' },
+    { name: 'Córdoba CF', att: 2, opp: 3, def: 3, color1: '#ffffff', color2: '#006400', league: 'ES' },
+    { name: 'Albacete', att: 2, opp: 2, def: 3, color1: '#ffffff', color2: '#8b0000', league: 'ES' },
+    { name: 'Mirandés', att: 2, opp: 3, def: 3, color1: '#e30613', color2: '#000000', league: 'ES' },
+    { name: 'Eldense', att: 1, opp: 2, def: 2, color1: '#e30613', color2: '#0000ff', league: 'ES' }
   ],
   EN: [
-    { name: 'Leeds United', att: 5, opp: 5, def: 4, color1: '#ffffff', color2: '#1d428a', league: 'EN' },
-    { name: 'Burnley', att: 4, opp: 5, def: 4, color1: '#6c1d45', color2: '#87ceeb', league: 'EN' },
-    { name: 'Sheffield United', att: 4, opp: 4, def: 4, color1: '#ee2737', color2: '#ffffff', league: 'EN' },
-    { name: 'Luton Town', att: 4, opp: 4, def: 3, color1: '#f78f1e', color2: '#000000', league: 'EN' },
-    { name: 'West Bromwich', att: 3, opp: 4, def: 4, color1: '#002f68', color2: '#ffffff', league: 'EN' },
-    { name: 'Norwich City', att: 4, opp: 4, def: 3, color1: '#fff200', color2: '#00a650', league: 'EN' },
-    { name: 'Sunderland', att: 4, opp: 4, def: 3, color1: '#ff0000', color2: '#ffffff', league: 'EN' },
-    { name: 'Middlesbrough', att: 4, opp: 4, def: 3, color1: '#e30613', color2: '#ffffff', league: 'EN' },
-    { name: 'Coventry City', att: 3, opp: 4, def: 3, color1: '#87ceeb', color2: '#ffffff', league: 'EN' },
-    { name: 'Hull City', att: 3, opp: 4, def: 3, color1: '#f5a12d', color2: '#000000', league: 'EN' },
+    { name: 'Leicester City', att: 4, opp: 4, def: 3, color1: '#1e3a8a', color2: '#ffffff', league: 'EN' },
+    { name: 'Ipswich Town', att: 3, opp: 4, def: 3, color1: '#1e3a8a', color2: '#ffffff', league: 'EN' },
+    { name: 'Sheffield United', att: 4, opp: 4, def: 3, color1: '#ee2737', color2: '#ffffff', league: 'EN' },
+    { name: 'Luton Town', att: 2, opp: 3, def: 3, color1: '#f78f1e', color2: '#000000', league: 'EN' },
+    { name: 'West Bromwich', att: 3, opp: 3, def: 3, color1: '#002f68', color2: '#ffffff', league: 'EN' },
+    { name: 'Norwich City', att: 3, opp: 3, def: 2, color1: '#fff200', color2: '#00a650', league: 'EN' },
+    { name: 'Southampton', att: 3, opp: 4, def: 3, color1: '#cb3524', color2: '#ffffff', league: 'EN' },
+    { name: 'Middlesbrough', att: 3, opp: 4, def: 3, color1: '#e30613', color2: '#ffffff', league: 'EN' },
+    { name: 'Coventry City', att: 4, opp: 4, def: 3, color1: '#87ceeb', color2: '#ffffff', league: 'EN' },
+    { name: 'Hull City', att: 2, opp: 3, def: 2, color1: '#f5a12d', color2: '#000000', league: 'EN' },
     { name: 'Watford', att: 3, opp: 3, def: 3, color1: '#fbee21', color2: '#ed2127', league: 'EN' },
-    { name: 'Bristol City', att: 3, opp: 3, def: 4, color1: '#e30613', color2: '#ffffff', league: 'EN' },
-    { name: 'Swansea City', att: 3, opp: 4, def: 2, color1: '#ffffff', color2: '#000000', league: 'EN' },
-    { name: 'Preston N.E.', att: 2, opp: 3, def: 4, color1: '#ffffff', color2: '#000040', league: 'EN' },
-    { name: 'QPR', att: 2, opp: 3, def: 3, color1: '#ffffff', color2: '#0033a0', league: 'EN' },
+    { name: 'Bristol City', att: 3, opp: 3, def: 3, color1: '#e30613', color2: '#ffffff', league: 'EN' },
+    { name: 'Swansea City', att: 2, opp: 3, def: 2, color1: '#ffffff', color2: '#000000', league: 'EN' },
+    { name: 'Preston N.E.', att: 2, opp: 2, def: 3, color1: '#ffffff', color2: '#000040', league: 'EN' },
+    { name: 'QPR', att: 2, opp: 2, def: 3, color1: '#ffffff', color2: '#0033a0', league: 'EN' },
     { name: 'Stoke City', att: 2, opp: 3, def: 3, color1: '#e30613', color2: '#ffffff', league: 'EN' },
     { name: 'Sheffield Wed', att: 2, opp: 3, def: 3, color1: '#0033a0', color2: '#ffffff', league: 'EN' },
-    { name: 'Blackburn', att: 3, opp: 3, def: 2, color1: '#0033a0', color2: '#ffffff', league: 'EN' },
-    { name: 'Millwall', att: 2, opp: 2, def: 4, color1: '#000040', color2: '#ffffff', league: 'EN' },
-    { name: 'Derby County', att: 2, opp: 3, def: 3, color1: '#ffffff', color2: '#000000', league: 'EN' }
+    { name: 'Blackburn', att: 3, opp: 3, def: 3, color1: '#0033a0', color2: '#ffffff', league: 'EN' },
+    { name: 'Millwall', att: 2, opp: 2, def: 3, color1: '#000040', color2: '#ffffff', league: 'EN' },
+    { name: 'Derby County', att: 2, opp: 2, def: 3, color1: '#ffffff', color2: '#000000', league: 'EN' }
   ],
   IT: [
-    { name: 'Sassuolo', att: 5, opp: 5, def: 3, color1: '#000000', color2: '#00a650', league: 'IT' },
-    { name: 'Frosinone', att: 4, opp: 4, def: 3, color1: '#ffcc00', color2: '#0033a0', league: 'IT' },
-    { name: 'Salernitana', att: 4, opp: 4, def: 3, color1: '#8b0000', color2: '#ffffff', league: 'IT' },
-    { name: 'Sampdoria', att: 4, opp: 5, def: 3, color1: '#0033a0', color2: '#ffffff', league: 'IT' },
+    { name: 'Monza', att: 3, opp: 4, def: 3, color1: '#ffffff', color2: '#cb3524', league: 'IT' },
+    { name: 'Frosinone', att: 2, opp: 3, def: 3, color1: '#ffcc00', color2: '#0033a0', league: 'IT' },
+    { name: 'Salernitana', att: 2, opp: 3, def: 3, color1: '#8b0000', color2: '#ffffff', league: 'IT' },
+    { name: 'Sampdoria', att: 2, opp: 3, def: 3, color1: '#0033a0', color2: '#ffffff', league: 'IT' },
     { name: 'Palermo', att: 4, opp: 4, def: 3, color1: '#ffc0cb', color2: '#000000', league: 'IT' },
-    { name: 'Cremonese', att: 4, opp: 4, def: 4, color1: '#8b0000', color2: '#a9a9a9', league: 'IT' },
-    { name: 'Brescia', att: 3, opp: 4, def: 4, color1: '#0033a0', color2: '#ffffff', league: 'IT' },
-    { name: 'Bari', att: 3, opp: 4, def: 3, color1: '#ffffff', color2: '#e30613', league: 'IT' },
-    { name: 'Pisa', att: 4, opp: 4, def: 3, color1: '#000000', color2: '#0033a0', league: 'IT' },
-    { name: 'Spezia', att: 3, opp: 3, def: 4, color1: '#ffffff', color2: '#000000', league: 'IT' },
-    { name: 'Catanzaro', att: 3, opp: 4, def: 2, color1: '#ffcc00', color2: '#e30613', league: 'IT' },
-    { name: 'Reggiana', att: 2, opp: 3, def: 4, color1: '#8b0000', color2: '#ffffff', league: 'IT' },
-    { name: 'Südtirol', att: 2, opp: 3, def: 4, color1: '#ffffff', color2: '#e30613', league: 'IT' },
+    { name: 'Venezia', att: 3, opp: 3, def: 3, color1: '#fb923c', color2: '#16a34a', league: 'IT' },
+    { name: 'Brescia', att: 2, opp: 3, def: 3, color1: '#0033a0', color2: '#ffffff', league: 'IT' },
+    { name: 'Bari', att: 3, opp: 3, def: 3, color1: '#ffffff', color2: '#e30613', league: 'IT' },
+    { name: 'Empoli', att: 3, opp: 3, def: 3, color1: '#1e3a8a', color2: '#ffffff', league: 'IT' },
+    { name: 'Spezia', att: 3, opp: 3, def: 3, color1: '#ffffff', color2: '#000000', league: 'IT' },
+    { name: 'Catanzaro', att: 3, opp: 3, def: 2, color1: '#ffcc00', color2: '#e30613', league: 'IT' },
+    { name: 'Reggiana', att: 2, opp: 2, def: 3, color1: '#8b0000', color2: '#ffffff', league: 'IT' },
+    { name: 'Südtirol', att: 2, opp: 2, def: 3, color1: '#ffffff', color2: '#e30613', league: 'IT' },
     { name: 'Modena', att: 3, opp: 3, def: 3, color1: '#ffcc00', color2: '#0033a0', league: 'IT' },
-    { name: 'Cosenza', att: 2, opp: 3, def: 3, color1: '#0033a0', color2: '#e30613', league: 'IT' },
-    { name: 'Cittadella', att: 2, opp: 2, def: 4, color1: '#8b0000', color2: '#ffffff', league: 'IT' },
-    { name: 'Mantova', att: 3, opp: 4, def: 2, color1: '#ffffff', color2: '#e30613', league: 'IT' },
-    { name: 'Cesena', att: 3, opp: 3, def: 3, color1: '#ffffff', color2: '#000000', league: 'IT' },
+    { name: 'Cosenza', att: 1, opp: 2, def: 2, color1: '#0033a0', color2: '#e30613', league: 'IT' },
+    { name: 'Cittadella', att: 2, opp: 2, def: 3, color1: '#8b0000', color2: '#ffffff', league: 'IT' },
+    { name: 'Mantova', att: 2, opp: 2, def: 2, color1: '#ffffff', color2: '#e30613', league: 'IT' },
+    { name: 'Cesena', att: 2, opp: 3, def: 3, color1: '#ffffff', color2: '#000000', league: 'IT' },
     { name: 'Juve Stabia', att: 2, opp: 3, def: 3, color1: '#ffcc00', color2: '#0033a0', league: 'IT' },
     { name: 'Carrarese', att: 2, opp: 2, def: 3, color1: '#ffcc00', color2: '#0033a0', league: 'IT' }
   ],
   DE: [
-    { name: 'FC Köln', att: 5, opp: 5, def: 3, color1: '#e30613', color2: '#ffffff', league: 'DE' },
-    { name: 'Darmstadt 98', att: 4, opp: 4, def: 4, color1: '#0033a0', color2: '#ffffff', league: 'DE' },
-    { name: 'Hamburger SV', att: 5, opp: 5, def: 3, color1: '#ffffff', color2: '#0033a0', league: 'DE' },
-    { name: 'Hertha BSC', att: 4, opp: 4, def: 3, color1: '#0033a0', color2: '#ffffff', league: 'DE' },
-    { name: 'Schalke 04', att: 4, opp: 4, def: 3, color1: '#0033a0', color2: '#ffffff', league: 'DE' },
-    { name: 'Hannover 96', att: 4, opp: 4, def: 4, color1: '#e30613', color2: '#000000', league: 'DE' },
-    { name: 'F. Düsseldorf', att: 4, opp: 4, def: 4, color1: '#e30613', color2: '#ffffff', league: 'DE' },
-    { name: 'Karlsruher SC', att: 4, opp: 4, def: 3, color1: '#0033a0', color2: '#ffffff', league: 'DE' },
-    { name: 'FC Nürnberg', att: 3, opp: 3, def: 3, color1: '#8b0000', color2: '#ffffff', league: 'DE' },
-    { name: 'SC Paderborn', att: 4, opp: 4, def: 3, color1: '#000000', color2: '#0033a0', league: 'DE' },
-    { name: 'Greuther Fürth', att: 3, opp: 4, def: 3, color1: '#00a650', color2: '#ffffff', league: 'DE' },
-    { name: 'SV Elversberg', att: 3, opp: 4, def: 2, color1: '#ffffff', color2: '#000000', league: 'DE' },
-    { name: 'FC Magdeburg', att: 4, opp: 4, def: 2, color1: '#0033a0', color2: '#ffffff', league: 'DE' },
-    { name: 'E. Braunschweig', att: 2, opp: 3, def: 3, color1: '#ffcc00', color2: '#0033a0', league: 'DE' },
+    { name: 'VfL Bochum', att: 3, opp: 3, def: 3, color1: '#005ca9', color2: '#ffffff', league: 'DE' },
+    { name: 'Darmstadt 98', att: 2, opp: 3, def: 3, color1: '#0033a0', color2: '#ffffff', league: 'DE' },
+    { name: 'Holstein Kiel', att: 3, opp: 3, def: 3, color1: '#0053a4', color2: '#ffffff', league: 'DE' },
+    { name: 'Hertha BSC', att: 3, opp: 3, def: 2, color1: '#0033a0', color2: '#ffffff', league: 'DE' },
+    { name: 'Schalke 04', att: 3, opp: 3, def: 3, color1: '#0033a0', color2: '#ffffff', league: 'DE' },
+    { name: 'Hannover 96', att: 3, opp: 3, def: 3, color1: '#e30613', color2: '#000000', league: 'DE' },
+    { name: 'F. Düsseldorf', att: 3, opp: 3, def: 3, color1: '#e30613', color2: '#ffffff', league: 'DE' },
+    { name: 'Karlsruher SC', att: 3, opp: 4, def: 3, color1: '#0033a0', color2: '#ffffff', league: 'DE' },
+    { name: 'FC Nürnberg', att: 2, opp: 3, def: 3, color1: '#8b0000', color2: '#ffffff', league: 'DE' },
+    { name: 'SC Paderborn', att: 3, opp: 4, def: 2, color1: '#000000', color2: '#0033a0', league: 'DE' },
+    { name: 'Greuther Fürth', att: 2, opp: 3, def: 2, color1: '#00a650', color2: '#ffffff', league: 'DE' },
+    { name: 'SV Elversberg', att: 3, opp: 3, def: 3, color1: '#ffffff', color2: '#000000', league: 'DE' },
+    { name: 'FC Magdeburg', att: 3, opp: 3, def: 3, color1: '#0033a0', color2: '#ffffff', league: 'DE' },
+    { name: 'E. Braunschweig', att: 2, opp: 2, def: 3, color1: '#ffcc00', color2: '#0033a0', league: 'DE' },
     { name: 'Kaiserslautern', att: 3, opp: 3, def: 3, color1: '#e30613', color2: '#ffffff', league: 'DE' },
-    { name: 'SSV Ulm', att: 2, opp: 2, def: 4, color1: '#000000', color2: '#ffffff', league: 'DE' },
-    { name: 'Preußen Münster', att: 2, opp: 3, def: 3, color1: '#00a650', color2: '#000000', league: 'DE' },
-    { name: 'Jahn Regensburg', att: 2, opp: 2, def: 3, color1: '#ffffff', color2: '#e30613', league: 'DE' }
+    { name: 'SSV Ulm', att: 1, opp: 2, def: 2, color1: '#000000', color2: '#ffffff', league: 'DE' },
+    { name: 'Preußen Münster', att: 2, opp: 2, def: 3, color1: '#00a650', color2: '#000000', league: 'DE' },
+    { name: 'Jahn Regensburg', att: 1, opp: 2, def: 2, color1: '#ffffff', color2: '#e30613', league: 'DE' }
   ],
   FR: [
-    { name: 'Clermont Foot', att: 4, opp: 4, def: 4, color1: '#e30613', color2: '#0033a0', league: 'FR' },
-    { name: 'Valenciennes FC', att: 4, opp: 4, def: 3, color1: '#e30613', color2: '#ffffff', league: 'FR' },
-    { name: 'Chamois Niortais', att: 3, opp: 3, def: 4, color1: '#ffcc00', color2: '#006400', league: 'FR' },
-    { name: 'Paris FC', att: 4, opp: 5, def: 4, color1: '#0033a0', color2: '#ffffff', league: 'FR' },
-    { name: 'Rodez AF', att: 3, opp: 4, def: 3, color1: '#e30613', color2: '#ffcc00', league: 'FR' },
-    { name: 'SM Caen', att: 3, opp: 4, def: 3, color1: '#0033a0', color2: '#e30613', league: 'FR' },
-    { name: 'EA Guingamp', att: 3, opp: 4, def: 3, color1: '#e30613', color2: '#000000', league: 'FR' },
-    { name: 'Amiens SC', att: 3, opp: 3, def: 4, color1: '#ffffff', color2: '#000000', league: 'FR' },
-    { name: 'SC Bastia', att: 3, opp: 3, def: 4, color1: '#0033a0', color2: '#ffffff', league: 'FR' },
-    { name: 'Pau FC', att: 3, opp: 4, def: 2, color1: '#ffcc00', color2: '#0033a0', league: 'FR' },
-    { name: 'Grenoble Foot', att: 3, opp: 3, def: 3, color1: '#0033a0', color2: '#ffffff', league: 'FR' },
-    { name: 'FC Annecy', att: 3, opp: 4, def: 2, color1: '#e30613', color2: '#ffffff', league: 'FR' },
-    { name: 'ES Troyes AC', att: 2, opp: 3, def: 3, color1: '#0033a0', color2: '#ffffff', league: 'FR' },
-    { name: 'AC Ajaccio', att: 2, opp: 3, def: 4, color1: '#ffffff', color2: '#e30613', league: 'FR' },
-    { name: 'USL Dunkerque', att: 2, opp: 3, def: 3, color1: '#87ceeb', color2: '#ffffff', league: 'FR' },
-    { name: 'Red Star FC', att: 2, opp: 3, def: 3, color1: '#00a650', color2: '#ffffff', league: 'FR' },
-    { name: 'FC Metz', att: 3, opp: 3, def: 2, color1: '#6c1d45', color2: '#ffffff', league: 'FR' },
-    { name: 'FC Lorient', att: 3, opp: 3, def: 3, color1: '#f68712', color2: '#000000', league: 'FR' }
+    { name: 'Clermont Foot', att: 3, opp: 3, def: 3, color1: '#e30613', color2: '#0033a0', league: 'FR' },
+    { name: 'Valenciennes FC', att: 2, opp: 2, def: 2, color1: '#e30613', color2: '#ffffff', league: 'FR' },
+    { name: 'Chamois Niortais', att: 1, opp: 2, def: 2, color1: '#ffcc00', color2: '#006400', league: 'FR' },
+    { name: 'Stade Reims', att: 3, opp: 4, def: 3, color1: '#e30613', color2: '#ffffff', league: 'FR' },
+    { name: 'Rodez AF', att: 2, opp: 3, def: 3, color1: '#e30613', color2: '#ffcc00', league: 'FR' },
+    { name: 'SM Caen', att: 2, opp: 2, def: 2, color1: '#0033a0', color2: '#e30613', league: 'FR' },
+    { name: 'EA Guingamp', att: 3, opp: 3, def: 3, color1: '#e30613', color2: '#000000', league: 'FR' },
+    { name: 'Amiens SC', att: 2, opp: 3, def: 3, color1: '#ffffff', color2: '#000000', league: 'FR' },
+    { name: 'SC Bastia', att: 2, opp: 3, def: 3, color1: '#0033a0', color2: '#ffffff', league: 'FR' },
+    { name: 'Pau FC', att: 2, opp: 2, def: 3, color1: '#ffcc00', color2: '#0033a0', league: 'FR' },
+    { name: 'Grenoble Foot', att: 2, opp: 3, def: 3, color1: '#0033a0', color2: '#ffffff', league: 'FR' },
+    { name: 'FC Annecy', att: 2, opp: 2, def: 2, color1: '#e30613', color2: '#ffffff', league: 'FR' },
+    { name: 'ES Troyes AC', att: 2, opp: 3, def: 2, color1: '#0033a0', color2: '#ffffff', league: 'FR' },
+    { name: 'AC Ajaccio', att: 2, opp: 2, def: 3, color1: '#ffffff', color2: '#e30613', league: 'FR' },
+    { name: 'USL Dunkerque', att: 3, opp: 3, def: 3, color1: '#87ceeb', color2: '#ffffff', league: 'FR' },
+    { name: 'Red Star FC', att: 2, opp: 2, def: 3, color1: '#00a650', color2: '#ffffff', league: 'FR' },
+    { name: 'Saint-Étienne', att: 4, opp: 4, def: 3, color1: '#006532', color2: '#ffffff', league: 'FR' },
+    { name: 'Montpellier', att: 3, opp: 3, def: 3, color1: '#0033a0', color2: '#f68712', league: 'FR' }
   ],
   NL: [
-    { name: 'Excelsior', att: 5, opp: 5, def: 3, color1: '#000000', color2: '#e30613', league: 'NL' },
-    { name: 'Vitesse', att: 4, opp: 4, def: 4, color1: '#ffcc00', color2: '#000000', league: 'NL' },
-    { name: 'FC Volendam', att: 4, opp: 4, def: 3, color1: '#f5a12d', color2: '#000000', league: 'NL' },
-    { name: 'De Graafschap', att: 4, opp: 4, def: 3, color1: '#0033a0', color2: '#ffffff', league: 'NL' },
-    { name: 'ADO Den Haag', att: 4, opp: 4, def: 3, color1: '#00a650', color2: '#ffcc00', league: 'NL' },
-    { name: 'SC Cambuur', att: 4, opp: 5, def: 2, color1: '#ffcc00', color2: '#0033a0', league: 'NL' },
-    { name: 'FC Emmen', att: 3, opp: 3, def: 4, color1: '#e30613', color2: '#ffffff', league: 'NL' },
-    { name: 'Roda JC', att: 3, opp: 4, def: 3, color1: '#ffcc00', color2: '#000000', league: 'NL' },
-    { name: 'MVV Maastricht', att: 3, opp: 3, def: 3, color1: '#e30613', color2: '#ffffff', league: 'NL' },
-    { name: 'VVV-Venlo', att: 3, opp: 3, def: 3, color1: '#ffcc00', color2: '#000000', league: 'NL' },
-    { name: 'FC Dordrecht', att: 4, opp: 4, def: 2, color1: '#00a650', color2: '#ffffff', league: 'NL' },
-    { name: 'Helmond Sport', att: 3, opp: 3, def: 3, color1: '#e30613', color2: '#000000', league: 'NL' },
-    { name: 'FC Eindhoven', att: 2, opp: 3, def: 3, color1: '#0033a0', color2: '#ffffff', league: 'NL' },
-    { name: 'SC Telstar', att: 2, opp: 3, def: 3, color1: '#ffffff', color2: '#0033a0', league: 'NL' },
-    { name: 'TOP Oss', att: 2, opp: 2, def: 3, color1: '#e30613', color2: '#ffffff', league: 'NL' },
-    { name: 'FC Den Bosch', att: 3, opp: 3, def: 3, color1: '#0033a0', color2: '#ffffff', league: 'NL' },
-    { name: 'Jong Ajax', att: 3, opp: 4, def: 2, color1: '#ffffff', color2: '#e30613', league: 'NL' },
-    { name: 'Jong PSV', att: 3, opp: 4, def: 2, color1: '#ff0000', color2: '#ffffff', league: 'NL' }
+    { name: 'Willem II', att: 3, opp: 3, def: 3, color1: '#ff0000', color2: '#ffffff', league: 'NL' },
+    { name: 'Vitesse', att: 2, opp: 2, def: 2, color1: '#ffcc00', color2: '#000000', league: 'NL' },
+    { name: 'Almere City', att: 2, opp: 3, def: 2, color1: '#ff0000', color2: '#000000', league: 'NL' },
+    { name: 'De Graafschap', att: 3, opp: 3, def: 3, color1: '#0033a0', color2: '#ffffff', league: 'NL' },
+    { name: 'ADO Den Haag', att: 3, opp: 3, def: 3, color1: '#00a650', color2: '#ffcc00', league: 'NL' },
+    { name: 'SC Cambuur', att: 3, opp: 3, def: 2, color1: '#ffcc00', color2: '#0033a0', league: 'NL' },
+    { name: 'FC Emmen', att: 3, opp: 3, def: 3, color1: '#e30613', color2: '#ffffff', league: 'NL' },
+    { name: 'Roda JC', att: 3, opp: 3, def: 3, color1: '#ffcc00', color2: '#000000', league: 'NL' },
+    { name: 'MVV Maastricht', att: 2, opp: 2, def: 2, color1: '#e30613', color2: '#ffffff', league: 'NL' },
+    { name: 'VVV-Venlo', att: 2, opp: 3, def: 2, color1: '#ffcc00', color2: '#000000', league: 'NL' },
+    { name: 'FC Dordrecht', att: 2, opp: 3, def: 2, color1: '#00a650', color2: '#ffffff', league: 'NL' },
+    { name: 'Helmond Sport', att: 2, opp: 2, def: 2, color1: '#e30613', color2: '#000000', league: 'NL' },
+    { name: 'FC Eindhoven', att: 2, opp: 3, def: 2, color1: '#0033a0', color2: '#ffffff', league: 'NL' },
+    { name: 'RKC Waalwijk', att: 2, opp: 3, def: 2, color1: '#ffff00', color2: '#1e3a8a', league: 'NL' },
+    { name: 'TOP Oss', att: 1, opp: 2, def: 2, color1: '#e30613', color2: '#ffffff', league: 'NL' },
+    { name: 'FC Den Bosch', att: 2, opp: 2, def: 2, color1: '#0033a0', color2: '#ffffff', league: 'NL' },
+    { name: 'Jong Ajax', att: 3, opp: 4, def: 1, color1: '#ffffff', color2: '#e30613', league: 'NL' },
+    { name: 'Jong PSV', att: 3, opp: 4, def: 1, color1: '#ff0000', color2: '#ffffff', league: 'NL' }
   ],
   MI: [
-    { name: 'SC Braga', att: 4, opp: 5, def: 3, color1: '#e30613', color2: '#ffffff', league: 'MI' },
-    { name: 'Besiktas', att: 4, opp: 4, def: 4, color1: '#000000', color2: '#ffffff', league: 'MI' },
-    { name: 'AEK Athens', att: 4, opp: 4, def: 3, color1: '#fde100', color2: '#000000', league: 'MI' },
-    { name: 'PAOK', att: 4, opp: 4, def: 3, color1: '#000000', color2: '#ffffff', league: 'MI' },
-    { name: 'KRC Genk', att: 4, opp: 4, def: 3, color1: '#0033a0', color2: '#ffffff', league: 'MI' },
-    { name: 'Royal Antwerp', att: 3, opp: 4, def: 4, color1: '#e30613', color2: '#ffffff', league: 'MI' },
-    { name: 'Young Boys', att: 4, opp: 4, def: 3, color1: '#ffd700', color2: '#000000', league: 'MI' },
-    { name: 'FC Basel', att: 3, opp: 3, def: 3, color1: '#e30613', color2: '#0033a0', league: 'MI' },
-    { name: 'Trabzonspor', att: 3, opp: 4, def: 3, color1: '#8b0000', color2: '#87ceeb', league: 'MI' },
-    { name: 'Hajduk Split', att: 3, opp: 3, def: 3, color1: '#ffffff', color2: '#0033a0', league: 'MI' },
-    { name: 'FC Midtjylland', att: 3, opp: 4, def: 3, color1: '#000000', color2: '#e30613', league: 'MI' },
-    { name: 'Brøndby IF', att: 3, opp: 3, def: 3, color1: '#ffd700', color2: '#0033a0', league: 'MI' },
+    { name: 'SC Braga', att: 4, opp: 4, def: 3, color1: '#e30613', color2: '#ffffff', league: 'MI' },
+    { name: 'Besiktas', att: 3, opp: 3, def: 2, color1: '#000000', color2: '#ffffff', league: 'MI' },
+    { name: 'AEK Athens', att: 3, opp: 3, def: 3, color1: '#fde100', color2: '#000000', league: 'MI' },
+    { name: 'PAOK', att: 3, opp: 4, def: 3, color1: '#000000', color2: '#ffffff', league: 'MI' },
+    { name: 'KRC Genk', att: 3, opp: 4, def: 3, color1: '#0033a0', color2: '#ffffff', league: 'MI' },
+    { name: 'Royal Antwerp', att: 2, opp: 3, def: 3, color1: '#e30613', color2: '#ffffff', league: 'MI' },
+    { name: 'Young Boys', att: 3, opp: 3, def: 2, color1: '#ffd700', color2: '#000000', league: 'MI' },
+    { name: 'FC Basel', att: 4, opp: 4, def: 3, color1: '#e30613', color2: '#0033a0', league: 'MI' },
+    { name: 'Trabzonspor', att: 3, opp: 3, def: 3, color1: '#8b0000', color2: '#87ceeb', league: 'MI' },
+    { name: 'Hajduk Split', att: 2, opp: 3, def: 3, color1: '#ffffff', color2: '#0033a0', league: 'MI' },
+    { name: 'FC Midtjylland', att: 4, opp: 4, def: 3, color1: '#000000', color2: '#e30613', league: 'MI' },
+    { name: 'Brøndby IF', att: 2, opp: 3, def: 3, color1: '#ffd700', color2: '#0033a0', league: 'MI' },
     { name: 'Sturm Graz', att: 3, opp: 3, def: 3, color1: '#000000', color2: '#ffffff', league: 'MI' },
-    { name: 'Viktoria Plzen', att: 3, opp: 3, def: 4, color1: '#e30613', color2: '#0033a0', league: 'MI' },
+    { name: 'Viktoria Plzen', att: 3, opp: 3, def: 3, color1: '#e30613', color2: '#0033a0', league: 'MI' },
     { name: 'Ferencvaros', att: 3, opp: 3, def: 3, color1: '#00a650', color2: '#ffffff', league: 'MI' },
-    { name: 'Ludogorets', att: 3, opp: 4, def: 2, color1: '#00a650', color2: '#ffffff', league: 'MI' },
-    { name: 'Bodo/Glimt', att: 4, opp: 4, def: 2, color1: '#ffff00', color2: '#000000', league: 'MI' },
+    { name: 'Ludogorets', att: 3, opp: 3, def: 3, color1: '#00a650', color2: '#ffffff', league: 'MI' },
+    { name: 'Bodo/Glimt', att: 4, opp: 4, def: 3, color1: '#ffff00', color2: '#000000', league: 'MI' },
     { name: 'Qarabag FK', att: 3, opp: 3, def: 3, color1: '#000000', color2: '#ffffff', league: 'MI' },
     { name: 'Maccabi Tel Aviv', att: 3, opp: 3, def: 2, color1: '#ffd700', color2: '#0033a0', league: 'MI' },
-    { name: 'Legia Warsaw', att: 3, opp: 3, def: 3, color1: '#ffffff', color2: '#000000', league: 'MI' }
+    { name: 'Legia Warsaw', att: 2, opp: 3, def: 3, color1: '#ffffff', color2: '#000000', league: 'MI' }
   ]
 };
 
@@ -476,7 +476,9 @@ const getDefaultComps = () => {
       teams: baseTeam(code), matchday: 0, history: [], showWinner: false, 
       teams2: t2, matchday2: 0, history2: [], showWinner2: false,
       userTeamId: 1, userTeamId2: t2[0]?.id || 21, disqualified: false,
-      promotionsLogs: null
+      promotionsLogs: null,
+      previousStandings: null, previousStandings2: null
+
     };
   };
 
@@ -493,21 +495,88 @@ const getDefaultComps = () => {
   };
 };
 
-// MODIFICADO: CL se construye desde el estado actual de comps, no desde los presets originales,
-// para que los equipos ascendidos puedan jugarla.
+// Snapshot independiente de una tabla final (posición, equipo, PJ, PG, PE, PP, GF, GC, DG, Pts)
+const buildStandingsSnapshot = (teams) => {
+  if (!Array.isArray(teams) || teams.length === 0) return null;
+  return [...teams]
+    .sort((a, b) => b.pts - a.pts || (b.gf - b.ga) - (a.gf - a.ga) || b.gf - a.gf)
+    .map((t, i) => ({
+      pos: i + 1,
+      id: t.id, name: t.name, color1: t.color1, color2: t.color2, isFlag: t.isFlag, league: t.league,
+      att: t.att, opp: t.opp, def: t.def,
+      p: t.p, w: t.w, d: t.d, l: t.l, gf: t.gf, ga: t.ga, dg: t.gf - t.ga, pts: t.pts
+    }));
+};
+
+const isLeagueFinished = (comp) => {
+  if (!comp || !Array.isArray(comp.teams) || comp.teams.length < 2) return false;
+  const totalRounds = (comp.teams.length - 1) * 2;
+  return comp.showWinner === true || (comp.matchday || 0) >= totalRounds;
+};
+
+// MODIFICADO: CL se construye con jerarquía de fuentes:
+// 1) clasificación real final de la liga terminada
+// 2) previousStandings (última tabla final guardada)
+// 3) respaldo simulado/provisional (sistema anterior)
+// 4) sorteo de respaldo para completar 32
 const buildCLPool = (compsState) => {
+  const getSource = (compKey) => {
+    const comp = compsState?.[compKey];
+    if (!comp || !Array.isArray(comp.teams) || comp.teams.length === 0) return null;
+    // PRIORIDAD 1: clasificación real de la competición terminada
+    if (isLeagueFinished(comp)) {
+      return { origin: 'real', table: buildStandingsSnapshot(comp.teams), teams: comp.teams };
+    }
+    // PRIORIDAD 2: previousStandings
+    if (Array.isArray(comp.previousStandings) && comp.previousStandings.length > 0) {
+      return { origin: 'previous', table: comp.previousStandings, teams: comp.teams };
+    }
+    // PRIORIDAD 3: respaldo provisional (por fuerza deportiva + azar)
+    const sim = [...comp.teams].sort((a, b) => (b.att + b.opp + b.def) - (a.att + a.opp + a.def));
+    return { origin: 'sim', table: buildStandingsSnapshot(sim.map((t, i) => ({ ...t, pts: 1000 - i }))), teams: comp.teams };
+  };
+
   const pull = (compKey, guaranteed, extra) => {
-    if (!compsState[compKey] || !compsState[compKey].teams) return [];
-    const t = [...compsState[compKey].teams].sort((a,b) => b.pts - a.pts || (b.gf - b.ga) - (a.gf - a.ga));
-    const top = t.slice(0, guaranteed);
-    const rest = [...t.slice(guaranteed, guaranteed + 6)].sort(() => Math.random() - 0.5).slice(0, extra);
+    const src = getSource(compKey);
+    if (!src) return [];
+    // Resolvemos cada fila de la tabla contra el equipo vivo actual (por id, si no por nombre)
+    const resolve = (row) => {
+      const live = src.teams.find(t => t.id === row.id) || src.teams.find(t => t.name === row.name);
+      const base = live || row;
+      return { ...base, clOrigin: src.origin, clProvisional: src.origin === 'sim' };
+    };
+    const ordered = src.table.map(resolve);
+    const top = ordered.slice(0, guaranteed);
+    const rest = [...ordered.slice(guaranteed, guaranteed + 6)].sort(() => Math.random() - 0.5).slice(0, extra);
     return [...top, ...rest];
-  }
-  return [
+  };
+
+  let pool = [
     ...pull('L1', 3, 2), ...pull('L3', 3, 2), ...pull('L4', 3, 2), ...pull('L2', 3, 2),
     ...pull('L6', 3, 1), ...pull('L5', 3, 1), ...pull('L7', 3, 1),
   ];
+
+  // Sin duplicados por nombre
+  const seen = new Set();
+  pool = pool.filter(t => { if (!t || seen.has(t.name)) return false; seen.add(t.name); return true; });
+
+  // PRIORIDAD 4: sorteo de respaldo hasta completar exactamente 32
+  if (pool.length < 32) {
+    const eligible = [];
+    ['L1','L3','L4','L2','L6','L5','L7'].forEach(k => {
+      const comp = compsState?.[k];
+      if (comp && Array.isArray(comp.teams)) comp.teams.forEach(t => { if (!seen.has(t.name)) eligible.push({ ...t, clOrigin: 'draw', clProvisional: true }); });
+    });
+    eligible.sort(() => Math.random() - 0.5);
+    while (pool.length < 32 && eligible.length > 0) {
+      const t = eligible.pop();
+      if (!seen.has(t.name)) { seen.add(t.name); pool.push(t); }
+    }
+  }
+
+  return pool.slice(0, 32);
 };
+
 
 const drawKnockoutGroups = (pool, isWC, randomize) => {
   let groups = Array.from({length: 8}, () => []);
@@ -571,8 +640,12 @@ const drawKnockoutGroups = (pool, isWC, randomize) => {
   }
 
   const formattedGroups = groups.map((g, i) => ({ name: 'Grupo ' + String.fromCharCode(65 + i), teamIds: g.map(t => t.id) }));
-  return { teams: pool, groups: formattedGroups, matchday: 0, history: [], phase: 'groups', showWinner: false, disqualified: false, userTeamId: pool[0].id, bracket: null };
+  return { teams: pool, groups: formattedGroups, matchday: 0, history: [], phase: 'groups', showWinner: false, disqualified: false, userTeamId: pool[0].id, bracket: null,
+    participantsFrozen: true, participantsLockedAt: Date.now(),
+    participantsSources: pool.map(t => ({ name: t.name, origin: t.clOrigin || 'preset', provisional: !!t.clProvisional })) };
 };
+
+
 
 const getAutoFillData = (compId, compsState) => {
   const isWC = compId === 'C2';
@@ -587,6 +660,7 @@ const getShuffleData = (compId, compsState) => {
   pool = pool.map((t, i) => ({ ...t, id: i + 1, p: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, pts: 0 }));
   return drawKnockoutGroups(pool, isWC, true);
 };
+
 
 const generateKnockoutBrackets = (comp) => {
   if (!comp || !Array.isArray(comp.groups) || !Array.isArray(comp.teams)) return null;
@@ -1802,6 +1876,8 @@ function DiceFootballApp() {
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [championModalTab, setChampionModalTab] = useState<'stats' | 'results' | 'promotions' | 'bracket'>('stats');
   const [championModalDiv, setChampionModalDiv] = useState(1);
+  const [standingsView, setStandingsView] = useState<'current' | 'previous'>('current');
+
   const [eliminatedModal, setEliminatedModal] = useState<{ compId: string; phase: string } | null>(null);
   const [resetConfirmModal, setResetConfirmModal] = useState(false);
   const [showNewsModal, setShowNewsModal] = useState(false);
@@ -2260,6 +2336,9 @@ function DiceFootballApp() {
     const nextTeams2 = [...remaining2, ...boostedRelegated.map(resetStats)];
 
     updateActiveComp({
+      // Guardamos la tabla final terminada como "anterior competición" (una sola, reemplaza a la previa)
+      previousStandings: buildStandingsSnapshot(activeComp.teams),
+      previousStandings2: buildStandingsSnapshot(activeComp.teams2),
       teams: nextTeams1,
       teams2: nextTeams2,
       matchday: 0,
@@ -2269,6 +2348,7 @@ function DiceFootballApp() {
       showWinner: false,
       showWinner2: false
     });
+
 
   };
 
@@ -3084,8 +3164,26 @@ function DiceFootballApp() {
           <h2 className='text-xl font-black italic uppercase drop-shadow-md'>Estadísticas {isDiv2 && '(2ª Div)'}</h2>
         </div>
 
+        {isLeague && (() => {
+          const prev = isDiv2 ? activeComp.previousStandings2 : activeComp.previousStandings;
+          const showingPrev = standingsView === 'previous';
+          return (
+            <>
+              <div className='flex gap-2 bg-slate-900/40 p-1 rounded-2xl border border-white/10 mb-4'>
+                <button onClick={() => setStandingsView('current')} className={`flex-1 py-2 text-[9px] font-black uppercase italic rounded-xl transition-all ${!showingPrev ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400'}`}>Clasificación actual</button>
+                <button onClick={() => setStandingsView('previous')} className={`flex-1 py-2 text-[9px] font-black uppercase italic rounded-xl transition-all ${showingPrev ? 'bg-yellow-500 text-slate-900 shadow-md' : 'text-slate-400'}`}>Anterior competición</button>
+              </div>
+              {showingPrev && (!prev || prev.length === 0) && (
+                <div className='bg-slate-900/30 border border-white/10 rounded-[2rem] p-8 text-center text-[10px] font-bold uppercase italic text-slate-400'>No hay una competición anterior disponible.</div>
+              )}
+            </>
+          );
+        })()}
+
         {isLeague ? (
+          (standingsView === 'previous' && !((isDiv2 ? activeComp.previousStandings2 : activeComp.previousStandings) || []).length) ? null :
           <div className='bg-slate-900/30 backdrop-blur-md rounded-[2rem] border border-white/10 overflow-x-auto custom-scrollbar relative shadow-xl'>
+
             <table className='w-full text-left border-collapse min-w-[550px]'>
               <thead className='bg-[#0f172a] sticky top-0 z-50 shadow-md'>
                 <tr className='text-[8px] font-black uppercase italic text-slate-400'>
@@ -3096,11 +3194,15 @@ function DiceFootballApp() {
                 </tr>
               </thead>
               <tbody className='divide-y divide-white/5'>
-                {Array.isArray(sortedTeams) && sortedTeams.map((t, i) => {
-                  const isUser = t.id === activeComp.userTeamId;
-                  const isPromo = isDiv2 && i < 3;
-                  const isRelegation = !isDiv2 && i >= sortedTeams.length - 3;
+                {(() => {
+                  const prevTable = (isDiv2 ? activeComp.previousStandings2 : activeComp.previousStandings) || [];
+                  const rows = standingsView === 'previous' ? prevTable : sortedTeams;
+                  return Array.isArray(rows) && rows.map((t, i) => {
+                  const isUser = standingsView !== 'previous' && t.id === activeComp.userTeamId;
+                  const isPromo = standingsView !== 'previous' && isDiv2 && i < 3;
+                  const isRelegation = standingsView !== 'previous' && !isDiv2 && i >= rows.length - 3;
                   const rowBg = isUser ? 'bg-blue-600/30' : (isPromo ? 'bg-emerald-900/20' : (isRelegation ? 'bg-red-900/20' : ''));
+
                   return (
                     <tr key={t.id} className={rowBg}>
                       <td className={'p-3 text-[10px] font-black italic sticky z-40 bg-[#0f172a] ' + (isPromo ? 'text-emerald-400' : isRelegation ? 'text-red-400' : 'text-slate-300')} style={{ left: 0 }}>{i+1}</td>
@@ -3109,7 +3211,9 @@ function DiceFootballApp() {
                       <td className='p-3 text-center text-[10px] font-bold'>{t.w}</td><td className='p-3 text-center text-[10px] font-bold'>{t.d}</td><td className='p-3 text-center text-[10px] font-bold'>{t.l}</td><td className='p-3 text-center text-[10px] font-bold'>{t.gf}</td><td className='p-3 text-center text-[10px] font-bold'>{t.ga}</td><td className='p-3 text-center text-[10px] font-bold'>{t.gf - t.ga}</td><td className='p-3 text-center text-[10px] font-black text-emerald-400'>{t.pts}</td>
                     </tr>
                   )
-                })}
+                });
+                })()}
+
               </tbody>
             </table>
           </div>
