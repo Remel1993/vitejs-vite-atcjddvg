@@ -1,23 +1,31 @@
-# ⚽ Dice Football Elite
+# Football Hub — Elite Dice Engine V6
 
-¡Bienvenido a **Dice Football Elite**! Una aplicación interactiva de fútbol desarrollada con **React**, **Vite** y **Tailwind CSS**. Este proyecto permite gestionar alineaciones, visualizar el campo de juego y disfrutar de una experiencia futbolística desde el navegador.
+Proyecto Vite + React independiente con el juego de fútbol con dados.
 
-## 🚀 Características
-* **Visualización del Campo**: Interfaz gráfica del terreno de juego en verde.
-* **Gestión de Equipos**: Control de alineaciones y jugadores.
-* **Diseño Responsivo**: Optimizado para dispositivos móviles y escritorio.
-* **Iconografía Moderna**: Uso de la librería `lucide-react`.
+## Archivos principales
 
-## 🛠️ Tecnologías Utilizadas
-* **React**: Biblioteca de JavaScript para construir interfaces de usuario.
-* **Vite**: Herramienta de construcción rápida para proyectos web modernos.
-* **TypeScript**: Tipado estático para un código más robusto.
-* **Tailwind CSS**: Framework de CSS para un diseño rápido y estilizado.
+- `src/App.tsx`: juego completo.
+- `src/main.tsx`: entrada de React.
+- `src/index.css`: Tailwind CSS y estilos globales.
+- `index.html`: página HTML de entrada.
+- `vite.config.ts`: configuración de Vite.
+- `tsconfig.json`: configuración de TypeScript.
+- `package.json`: dependencias y comandos.
 
-## 📦 Instalación y Uso Local
-Si quieres ejecutar este proyecto en tu propia máquina:
+## Ejecutar
 
-1. Clona el repositorio:
-   ```bash
-   git clone [https://github.com/Remel1993/vitejs-vite-atcjddvg.git](https://github.com/Remel1993/vitejs-vite-atcjddvg.git)
+Requiere Node.js 18 o superior.
 
+```bash
+npm install
+npm run dev
+```
+
+Después abre la dirección local que muestre Vite. Para generar una versión de producción:
+
+```bash
+npm run build
+npm run preview
+```
+
+La partida y el historial se guardan en `localStorage` del navegador.
